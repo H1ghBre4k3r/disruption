@@ -16,7 +16,7 @@ pub struct Payload {
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
 #[repr(u8)]
-enum GatewayOpcode {
+pub enum GatewayOpcode {
     /// An event was dispatched.
     Dispatch = 0,
     /// Fired periodically by the client to keep the connection alive.
