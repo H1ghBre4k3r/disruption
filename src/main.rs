@@ -21,6 +21,7 @@ impl Client {
     }
 
     pub fn start(&mut self) -> Result<(), Box<dyn Error>> {
+        self.init()?;
         loop {
             let msg = self.socket.read_message()?;
             match msg {
@@ -49,21 +50,40 @@ impl Client {
         Ok(())
     }
 
+    fn init(&mut self) -> Result<(), Box<dyn Error>> {
+        self.handle_hello()?;
+        Ok(())
+    }
+
+    fn handle_hello(&mut self) -> Result<(), Box<dyn Error>> {
+        let msg = self.socket.read_message()?;
+        match msg {
+            Message::Text(msg) => {
+                let payload: discord::payloads::Payload = serde_json::from_str(msg.as_str())?;
+                match payload.op {
+                    GatewayOpcode::Hello => match payload.d {
+                        Some(v) => {
+                            let hello_payload: HelloPayloadData = serde_json::from_value(v)?;
+                            self.heartbeat = Some(hello_payload.heartbeat_interval);
+                            self.heartbeating();
+                        }
+                        _ => {
+                            panic!("Gateway::Hello did not have matching payload")
+                        }
+                    },
+                    _ => panic!("Initial message from gateway was not Hello"),
+                }
+            }
+            _ => panic!("Unexpected message from gateway"),
+        }
+        Ok(())
+    }
+
     fn handle_payload(
         &mut self,
         payload: discord::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
         match payload.op {
-            GatewayOpcode::Hello => match payload.d {
-                Some(v) => {
-                    let hello_payload: HelloPayloadData = serde_json::from_value(v)?;
-                    self.heartbeat = Some(hello_payload.heartbeat_interval);
-                    self.heartbeating();
-                }
-                _ => {
-                    panic!("Gateway::Hello did not have matching payload")
-                }
-            },
             _ => println!("{:?}", payload),
         }
         Ok(())
