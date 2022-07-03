@@ -14,3 +14,8 @@ pub struct Payload {
     /// the event name for this payload
     pub t: Option<String>,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HelloPayloadData {
+    pub heartbeat_interval: u64,
+}

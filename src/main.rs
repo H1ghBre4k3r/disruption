@@ -1,6 +1,6 @@
 mod discord;
 
-use discord::opcodes::GatewayOpcode;
+use discord::{opcodes::GatewayOpcode, payloads::HelloPayloadData};
 use std::{error::Error, net::TcpStream};
 use tungstenite::{connect, stream::MaybeTlsStream, Message, WebSocket};
 use url::Url;
@@ -24,7 +24,8 @@ impl Client {
         loop {
             let msg = self.socket.read_message()?;
             match msg {
-                Message::Close(_) => {
+                Message::Close(r) => {
+                    println!("Closing connection: {:?}", r);
                     break;
                 }
                 Message::Text(msg) => {
@@ -54,23 +55,37 @@ impl Client {
     ) -> Result<(), Box<dyn Error>> {
         match payload.op {
             GatewayOpcode::Hello => match payload.d {
-                Some(serde_json::Value::Object(v)) => {
-                    let heartbeat_interval = match v.get("heartbeat_interval") {
-                        Some(serde_json::Value::Number(interval)) => interval.as_u64().unwrap(),
-                        _ => panic!("Gateway::Hello did not have matching payload"),
-                    };
-                    self.heartbeat = Some(heartbeat_interval);
+                Some(v) => {
+                    let hello_payload: HelloPayloadData = serde_json::from_value(v)?;
+                    self.heartbeat = Some(hello_payload.heartbeat_interval);
+                    self.heartbeating();
                 }
                 _ => {
                     panic!("Gateway::Hello did not have matching payload")
                 }
             },
-            _ => (),
+            _ => println!("{:?}", payload),
         }
         Ok(())
     }
 
-    fn heartbeat(self) {}
+    fn send(&mut self, payload: discord::payloads::Payload) -> Result<(), Box<dyn Error>> {
+        let msg = serde_json::to_string(&payload)?;
+        self.socket.write_message(Message::Text(msg))?;
+        Ok(())
+    }
+
+    fn heartbeating(&mut self) {
+        let payload = discord::payloads::Payload {
+            op: GatewayOpcode::Heartbeat,
+            d: None,
+            s: None,
+            t: None,
+        };
+        if let Err(e) = self.send(payload) {
+            panic!("{:?}", e)
+        }
+    }
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
