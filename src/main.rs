@@ -6,7 +6,7 @@ use futures::{
     FutureExt, SinkExt,
 };
 use futures_util::StreamExt;
-use std::error::Error;
+use std::{error::Error, time::SystemTime};
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use url::Url;
@@ -14,7 +14,9 @@ use url::Url;
 struct Client {
     writer: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
-    heartbeat: Option<u64>,
+    heartbeat: Option<u128>,
+    last_heartbeat: Option<SystemTime>,
+    last_heartbeat_ack: bool,
 }
 
 impl Client {
@@ -27,12 +29,16 @@ impl Client {
             writer,
             reader,
             heartbeat: None,
+            last_heartbeat: None,
+            last_heartbeat_ack: true,
         })
     }
 
+    /// Start the discord client.
     pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         self.init().await?;
         loop {
+            self.check_heartbeat().await?;
             // loop and check for new messages
             match self.reader.next().now_or_never() {
                 Some(Some(msg)) => {
@@ -44,7 +50,6 @@ impl Client {
                         Message::Text(msg) => {
                             let payload: discord::payloads::Payload =
                                 serde_json::from_str(msg.as_str())?;
-                            println!("{:?}", payload);
                             if let Err(e) = self.handle_payload(payload) {
                                 eprintln!("Error handling payload: {:?}", e);
                             }
@@ -67,6 +72,7 @@ impl Client {
         Ok(())
     }
 
+    /// Handle the intial message after connecting to the discord gateway.
     async fn handle_hello(&mut self) -> Result<(), Box<dyn Error>> {
         match self.reader.next().await {
             None => panic!(""),
@@ -79,7 +85,7 @@ impl Client {
                                 let hello_payload: HelloPayloadData = serde_json::from_value(v)?;
                                 println!("{:?}", hello_payload);
                                 self.heartbeat = Some(hello_payload.heartbeat_interval);
-                                self.heartbeating();
+                                self.last_heartbeat = Some(SystemTime::now());
                             }
                             _ => {
                                 panic!("Gateway::Hello did not have matching payload")
@@ -94,32 +100,49 @@ impl Client {
         Ok(())
     }
 
+    /// Handle payloads received via the websocket.
     fn handle_payload(
         &mut self,
         payload: discord::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
         match payload.op {
+            GatewayOpcode::HeartbeatACK => self.last_heartbeat_ack = true,
             _ => println!("{:?}", payload),
         }
         Ok(())
     }
 
+    /// Send a payload over the websocket.
     async fn send(&mut self, payload: discord::payloads::Payload) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
         self.writer.send(Message::Text(msg)).await?;
         Ok(())
     }
 
-    async fn heartbeating(&mut self) {
-        let payload = discord::payloads::Payload {
-            op: GatewayOpcode::Heartbeat,
-            d: None,
-            s: None,
-            t: None,
-        };
-        if let Err(e) = self.send(payload).await {
-            panic!("{:?}", e)
+    /// Check, if it is time to send the next heartbeat.
+    /// This function also handles non-received ACKs.
+    async fn check_heartbeat(&mut self) -> Result<(), Box<dyn Error>> {
+        // check, if enough time has ellapsed since last heartbeat
+        if self.last_heartbeat.unwrap().elapsed()?.as_millis() >= self.heartbeat.unwrap() {
+            // check, if we received an GatewayOpcode::HeartbeatACK after last heartbeat
+            if self.last_heartbeat_ack {
+                // construct and send heartbeat
+                let payload = discord::payloads::Payload {
+                    op: GatewayOpcode::Heartbeat,
+                    ..Default::default()
+                };
+                if let Err(e) = self.send(payload).await {
+                    panic!("{:?}", e);
+                } else {
+                    // reset heartbeat information
+                    self.last_heartbeat = Some(SystemTime::now());
+                    self.last_heartbeat_ack = false;
+                }
+            } else {
+                todo!()
+            }
         }
+        Ok(())
     }
 }
 
@@ -127,6 +150,5 @@ impl Client {
 async fn main() -> Result<(), Box<dyn Error>> {
     let mut client = Client::new().await?;
 
-    client.start().await?;
-    Ok(())
+    client.start().await
 }

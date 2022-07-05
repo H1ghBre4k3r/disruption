@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::opcodes::GatewayOpcode;
 
 /// Payload for communicating with the discord API
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Payload {
     /// opcode for this payload
     pub op: GatewayOpcode,
@@ -17,5 +17,5 @@ pub struct Payload {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HelloPayloadData {
-    pub heartbeat_interval: u64,
+    pub heartbeat_interval: u128,
 }

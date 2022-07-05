@@ -1,9 +1,10 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Default)]
 #[repr(u8)]
 pub enum GatewayOpcode {
     /// An event was dispatched.
+    #[default]
     Dispatch = 0,
     /// Fired periodically by the client to keep the connection alive.
     Heartbeat = 1,
