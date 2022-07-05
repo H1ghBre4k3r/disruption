@@ -55,7 +55,7 @@ impl Client {
                             }
                         }
                         Message::Ping(v) => {
-                            self.writer.send(Message::Pong(v));
+                            self.writer.send(Message::Pong(v)).await?;
                         }
                         _ => panic!(),
                     };
