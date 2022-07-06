@@ -1,5 +1,7 @@
+
+/// TODO: Allow ORing of intents
 #[allow(dead_code)]
-pub enum Indents {
+pub enum Intents {
     #[allow(non_camel_case_types)]
     GUILDS = 1 << 0,
 

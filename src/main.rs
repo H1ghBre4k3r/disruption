@@ -1,12 +1,12 @@
 mod discord;
 
-use discord::{opcodes::GatewayOpcode, payloads::HelloPayloadData};
+use discord::{opcodes::GatewayOpcode, payloads::{HelloPayloadData, IdentifyPayloadData, IdentifyConnectionProperties, Payload}};
 use futures::{
     stream::{SplitSink, SplitStream},
     FutureExt, SinkExt,
 };
 use futures_util::StreamExt;
-use std::{error::Error, time::SystemTime};
+use std::{error::Error, time::SystemTime, env};
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use url::Url;
@@ -37,6 +37,7 @@ impl Client {
     /// Start the discord client.
     pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         self.init().await?;
+        // TODO: move this to own thread
         loop {
             self.check_heartbeat().await?;
             // loop and check for new messages
@@ -69,6 +70,7 @@ impl Client {
 
     async fn init(&mut self) -> Result<(), Box<dyn Error>> {
         self.handle_hello().await?;
+        self.identify().await?;
         Ok(())
     }
 
@@ -100,6 +102,30 @@ impl Client {
         Ok(())
     }
 
+    async fn identify(&mut self) -> Result<(), Box<dyn Error>> {
+        let payload_data = IdentifyPayloadData {
+            token: env::var("BOT_TOKEN")?.to_owned(),
+            properties: IdentifyConnectionProperties {
+                os: "linux".to_owned(),
+                browser: "discoruption".to_owned(),
+                device: "discoruption".to_owned(),
+            },
+            // TODO: Think about useful intents
+            intents: (1 << 9) | (1 << 0) | (1 << 15),
+            ..Default::default()
+        };
+
+        let payload = Payload {
+            op: GatewayOpcode::Identify,
+            d: Some(serde_json::to_value(payload_data)?),
+            ..Default::default()
+        };
+
+        self.send(payload).await?;
+
+        Ok(())
+    }
+
     /// Handle payloads received via the websocket.
     fn handle_payload(
         &mut self,
@@ -113,6 +139,7 @@ impl Client {
     }
 
     /// Send a payload over the websocket.
+    /// TODO: Move this to own thread
     async fn send(&mut self, payload: discord::payloads::Payload) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
         self.writer.send(Message::Text(msg)).await?;
