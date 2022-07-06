@@ -62,12 +62,14 @@ pub enum Intents {
 /// Enum for working with dispatch event types
 pub enum Event {
     READY,
+    MESSAGE_CREATE,
 }
 
 impl Event {
     pub fn from(val: &String) -> Option<Self> {
         match val.as_str() {
             "READY" => Some(Self::READY),
+            "MESSAGE_CREATE" => Some(Self::MESSAGE_CREATE),
             _ => None,
         }
     }

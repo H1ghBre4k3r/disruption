@@ -1,6 +1,7 @@
 mod discord;
 
 use discord::{
+    entities,
     gateway::{Event, Intents},
     opcodes::GatewayOpcode,
     payloads::{
@@ -176,6 +177,14 @@ impl Client {
                         }
                         _ => panic!("No data received for GatewayOpcode::Dispatch"),
                     },
+                    Event::MESSAGE_CREATE => match payload.d {
+                        Some(d) => {
+                            println!("{:?}", d);
+                            let message: entities::Message = serde_json::from_value(d)?;
+                            self.handle_message(message).await?;
+                        }
+                        _ => panic!("No data received for GatewayOpcode::Dispatch"),
+                    },
                 },
             },
         }
@@ -185,6 +194,11 @@ impl Client {
     /// Handle the initial ready message after identifying to the gateway.
     async fn handle_ready(&mut self, data: ReadyPayloadData) -> Result<(), Box<dyn Error>> {
         self.session_id = Some(data.session_id);
+        Ok(())
+    }
+
+    /// Handle incomming messages.
+    async fn handle_message(&mut self, message: entities::Message) -> Result<(), Box<dyn Error>> {
         Ok(())
     }
 
@@ -200,7 +214,7 @@ impl Client {
     /// This function also handles non-received ACKs.
     async fn check_heartbeat(&mut self) -> Result<(), Box<dyn Error>> {
         // check, if enough time has ellapsed since last heartbeat
-        if self.last_heartbeat.unwrap().elapsed()?.as_millis() >= self.heartbeat.unwrap() {
+        if self.last_heartbeat.unwrap().elapsed()?.as_millis() >= self.heartbeat.unwrap() / 2 {
             // check, if we received an GatewayOpcode::HeartbeatACK after last heartbeat
             if self.last_heartbeat_ack {
                 self.send_heartbeat().await?;
