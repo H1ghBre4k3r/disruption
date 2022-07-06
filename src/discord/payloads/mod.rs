@@ -18,7 +18,7 @@ pub struct Payload {
     /// event data
     pub d: Option<serde_json::Value>,
     /// sequence number, used for resuming sessions and heartbeats
-    pub s: Option<i64>,
+    pub s: Option<u128>,
     /// the event name for this payload
     pub t: Option<String>,
 }

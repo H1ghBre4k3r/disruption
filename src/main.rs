@@ -1,12 +1,15 @@
 mod discord;
 
-use discord::{opcodes::GatewayOpcode, payloads::{HelloPayloadData, IdentifyPayloadData, IdentifyConnectionProperties, Payload}};
+use discord::{
+    opcodes::GatewayOpcode,
+    payloads::{HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload},
+};
 use futures::{
     stream::{SplitSink, SplitStream},
     FutureExt, SinkExt,
 };
 use futures_util::StreamExt;
-use std::{error::Error, time::SystemTime, env};
+use std::{env, error::Error, time::SystemTime};
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use url::Url;
@@ -17,6 +20,7 @@ struct Client {
     heartbeat: Option<u128>,
     last_heartbeat: Option<SystemTime>,
     last_heartbeat_ack: bool,
+    last_seq: Option<u128>,
 }
 
 impl Client {
@@ -31,6 +35,7 @@ impl Client {
             heartbeat: None,
             last_heartbeat: None,
             last_heartbeat_ack: true,
+            last_seq: None,
         })
     }
 
@@ -51,6 +56,7 @@ impl Client {
                         Message::Text(msg) => {
                             let payload: discord::payloads::Payload =
                                 serde_json::from_str(msg.as_str())?;
+                            self.last_seq = payload.s;
                             if let Err(e) = self.handle_payload(payload) {
                                 eprintln!("Error handling payload: {:?}", e);
                             }
@@ -111,7 +117,7 @@ impl Client {
                 device: "discoruption".to_owned(),
             },
             // TODO: Think about useful intents
-            intents: (1 << 9) | (1 << 0) | (1 << 15),
+            intents: (1 << 1) | (1 << 9) | (1 << 10) | (1 << 12) | (1 << 15),
             ..Default::default()
         };
 
@@ -140,7 +146,11 @@ impl Client {
 
     /// Send a payload over the websocket.
     /// TODO: Move this to own thread
-    async fn send(&mut self, payload: discord::payloads::Payload) -> Result<(), Box<dyn Error>> {
+    async fn send(
+        &mut self,
+        mut payload: discord::payloads::Payload,
+    ) -> Result<(), Box<dyn Error>> {
+        payload.s = self.last_seq;
         let msg = serde_json::to_string(&payload)?;
         self.writer.send(Message::Text(msg)).await?;
         Ok(())

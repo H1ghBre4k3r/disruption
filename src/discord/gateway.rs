@@ -1,5 +1,5 @@
-
 /// TODO: Allow ORing of intents
+/// ? https://discord.com/developers/docs/topics/gateway#gateway-intents
 #[allow(dead_code)]
 pub enum Intents {
     #[allow(non_camel_case_types)]
