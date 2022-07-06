@@ -57,7 +57,7 @@ impl Client {
                             let payload: discord::payloads::Payload =
                                 serde_json::from_str(msg.as_str())?;
                             self.last_seq = payload.s;
-                            if let Err(e) = self.handle_payload(payload) {
+                            if let Err(e) = self.handle_payload(payload).await {
                                 eprintln!("Error handling payload: {:?}", e);
                             }
                         }
@@ -133,12 +133,13 @@ impl Client {
     }
 
     /// Handle payloads received via the websocket.
-    fn handle_payload(
+    async fn handle_payload(
         &mut self,
         payload: discord::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
         match payload.op {
             GatewayOpcode::HeartbeatACK => self.last_heartbeat_ack = true,
+            GatewayOpcode::Heartbeat => self.send_heartbeat().await?,
             _ => println!("{:?}", payload),
         }
         Ok(())
@@ -163,21 +164,27 @@ impl Client {
         if self.last_heartbeat.unwrap().elapsed()?.as_millis() >= self.heartbeat.unwrap() {
             // check, if we received an GatewayOpcode::HeartbeatACK after last heartbeat
             if self.last_heartbeat_ack {
-                // construct and send heartbeat
-                let payload = discord::payloads::Payload {
-                    op: GatewayOpcode::Heartbeat,
-                    ..Default::default()
-                };
-                if let Err(e) = self.send(payload).await {
-                    panic!("{:?}", e);
-                } else {
-                    // reset heartbeat information
-                    self.last_heartbeat = Some(SystemTime::now());
-                    self.last_heartbeat_ack = false;
-                }
+                self.send_heartbeat().await?;
             } else {
                 todo!()
             }
+        }
+        Ok(())
+    }
+
+    /// Send a heartbeat via the websocket
+    async fn send_heartbeat(&mut self) -> Result<(), Box<dyn Error>> {
+        // construct and send heartbeat
+        let payload = discord::payloads::Payload {
+            op: GatewayOpcode::Heartbeat,
+            ..Default::default()
+        };
+        if let Err(e) = self.send(payload).await {
+            panic!("{:?}", e);
+        } else {
+            // reset heartbeat information
+            self.last_heartbeat = Some(SystemTime::now());
+            self.last_heartbeat_ack = false;
         }
         Ok(())
     }
