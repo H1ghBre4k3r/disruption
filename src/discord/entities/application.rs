@@ -8,17 +8,17 @@ pub struct Application {
     /// the id of the app
     pub id: String,
     /// the name of the app
-    pub name: String,
+    pub name: Option<String>,
     /// the icon hash of the app
     pub icon: Option<String>,
     /// the description of the app
-    pub description: String,
+    pub description: Option<String>,
     /// an array of rpc origin urls, if rpc is enabled
     pub rpc_origins: Option<Vec<String>>,
     /// when false only app owner can join the app's bot to guilds
-    pub bot_public: bool,
+    pub bot_public: Option<bool>,
     /// when true the app's bot will only join upon completion of the full oauth2 code grant flow
-    pub bot_require_code_grant: bool,
+    pub bot_require_code_grant: Option<bool>,
     /// the url of the app's terms of service
     pub terms_of_service_url: Option<String>,
     /// the url of the app's privacy policy
@@ -26,7 +26,7 @@ pub struct Application {
     /// partial user object containing info on the owner of the application
     pub owner: Option<User>,
     /// the hex encoded key for verification in interactions and the GameSDK's GetTicket
-    pub verify_key: String,
+    pub verify_key: Option<String>,
     /// if the application belongs to a team, this will be a list of the members of that team
     pub team: Option<Team>,
     /// if this application is a game sold on Discord, this field will be the guild to which it has been linked
@@ -34,7 +34,7 @@ pub struct Application {
     /// if this application is a game sold on Discord, this field will be the id of the "Game SKU" that is created, if exists
     pub primary_sku_id: Option<String>,
     /// if this application is a game sold on Discord, this field will be the URL slug that links to the store page
-    pub slug: String,
+    pub slug: Option<String>,
     /// the application's default rich presence invite cover image hash
     pub cover_image: Option<String>,
     /// the application's public flags

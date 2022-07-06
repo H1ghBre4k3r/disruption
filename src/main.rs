@@ -1,8 +1,12 @@
 mod discord;
 
 use discord::{
+    gateway::Event,
     opcodes::GatewayOpcode,
-    payloads::{HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload},
+    payloads::{
+        HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload,
+        ReadyPayloadData,
+    },
 };
 use futures::{
     stream::{SplitSink, SplitStream},
@@ -21,6 +25,7 @@ struct Client {
     last_heartbeat: Option<SystemTime>,
     last_heartbeat_ack: bool,
     last_seq: Option<u128>,
+    session_id: Option<String>,
 }
 
 impl Client {
@@ -36,6 +41,7 @@ impl Client {
             last_heartbeat: None,
             last_heartbeat_ack: true,
             last_seq: None,
+            session_id: None,
         })
     }
 
@@ -91,7 +97,6 @@ impl Client {
                         GatewayOpcode::Hello => match payload.d {
                             Some(v) => {
                                 let hello_payload: HelloPayloadData = serde_json::from_value(v)?;
-                                println!("{:?}", hello_payload);
                                 self.heartbeat = Some(hello_payload.heartbeat_interval);
                                 self.last_heartbeat = Some(SystemTime::now());
                             }
@@ -108,6 +113,7 @@ impl Client {
         Ok(())
     }
 
+    /// Identify to the gateway.
     async fn identify(&mut self) -> Result<(), Box<dyn Error>> {
         let payload_data = IdentifyPayloadData {
             token: env::var("BOT_TOKEN")?.to_owned(),
@@ -140,8 +146,35 @@ impl Client {
         match payload.op {
             GatewayOpcode::HeartbeatACK => self.last_heartbeat_ack = true,
             GatewayOpcode::Heartbeat => self.send_heartbeat().await?,
+            GatewayOpcode::Dispatch => self.handle_dispatch(payload).await?,
             _ => println!("{:?}", payload),
         }
+        Ok(())
+    }
+
+    /// Handle GatewayOpcode::Dispatch (opcode 0)
+    async fn handle_dispatch(
+        &mut self,
+        payload: discord::payloads::Payload,
+    ) -> Result<(), Box<dyn Error>> {
+        match payload.t {
+            None => panic!("Invalid payload received for GatewayOpcode::Dispatch"),
+            Some(event) => match Event::from(event) {
+                Event::READY => match payload.d {
+                    Some(d) => {
+                        let data: ReadyPayloadData = serde_json::from_value(d)?;
+                        self.handle_ready(data).await?;
+                    }
+                    _ => panic!("No data received for GatewayOpcode::Dispatch"),
+                },
+            },
+        }
+        Ok(())
+    }
+
+    /// Handle the initial ready message after identifying to the gateway.
+    async fn handle_ready(&mut self, data: ReadyPayloadData) -> Result<(), Box<dyn Error>> {
+        self.session_id = Some(data.session_id);
         Ok(())
     }
 

@@ -59,3 +59,17 @@ pub enum Intents {
     #[allow(non_camel_case_types)]
     AUTO_MODERATION_EXECUTION = 1 << 21,
 }
+
+/// Enum for working with dispatch event types
+pub enum Event {
+    READY,
+}
+
+impl Event {
+    pub fn from(val: String) -> Self {
+        match val.as_str() {
+            "READY" => Self::READY,
+            _ => panic!(),
+        }
+    }
+}

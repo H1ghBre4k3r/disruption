@@ -24,7 +24,7 @@ pub struct User {
     /// the user's chosen language option
     pub locale: Option<String>,
     /// whether the email on this account has been verified
-    pub verified: Option<String>,
+    pub verified: Option<bool>,
     /// the user's email
     pub email: Option<String>,
     /// the flags on a user's account
