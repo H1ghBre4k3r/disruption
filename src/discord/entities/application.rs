@@ -38,7 +38,7 @@ pub struct Application {
     /// the application's default rich presence invite cover image hash
     pub cover_image: Option<String>,
     /// the application's public flags
-    pub flags: Option<u128>,
+    pub flags: Option<u64>,
     /// up to 5 tags describing the content and functionality of the application
     pub tags: Option<Vec<String>>,
     /// settings for the application's default in-app authorization link, if enabled

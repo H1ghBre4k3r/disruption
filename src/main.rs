@@ -5,7 +5,7 @@ use discord::{
     opcodes::GatewayOpcode,
     payloads::{
         HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload,
-        ReadyPayloadData,
+        ReadyPayloadData, ResumePayloadData,
     },
 };
 use futures::{
@@ -19,22 +19,24 @@ use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, Web
 use url::Url;
 
 struct Client {
+    token: String,
     writer: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
     heartbeat: Option<u128>,
     last_heartbeat: Option<SystemTime>,
     last_heartbeat_ack: bool,
-    last_seq: Option<u128>,
+    last_seq: Option<u64>,
     session_id: Option<String>,
 }
 
 impl Client {
-    pub async fn new() -> Result<Self, Box<dyn Error>> {
+    pub async fn new(token: String) -> Result<Self, Box<dyn Error>> {
         let (socket, _res) =
             connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
         let (writer, reader) = socket.split();
 
         Ok(Client {
+            token,
             writer,
             reader,
             heartbeat: None,
@@ -116,7 +118,7 @@ impl Client {
     /// Identify to the gateway.
     async fn identify(&mut self) -> Result<(), Box<dyn Error>> {
         let payload_data = IdentifyPayloadData {
-            token: env::var("BOT_TOKEN")?.to_owned(),
+            token: self.token.clone(),
             properties: IdentifyConnectionProperties {
                 os: "linux".to_owned(),
                 browser: "discoruption".to_owned(),
@@ -157,6 +159,7 @@ impl Client {
         &mut self,
         payload: discord::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
+        println!("Dispatch: {:?}", payload.t);
         match payload.t {
             None => panic!("Invalid payload received for GatewayOpcode::Dispatch"),
             Some(event) => match Event::from(event) {
@@ -180,11 +183,7 @@ impl Client {
 
     /// Send a payload over the websocket.
     /// TODO: Move this to own thread
-    async fn send(
-        &mut self,
-        mut payload: discord::payloads::Payload,
-    ) -> Result<(), Box<dyn Error>> {
-        payload.s = self.last_seq;
+    async fn send(&mut self, payload: discord::payloads::Payload) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
         self.writer.send(Message::Text(msg)).await?;
         Ok(())
@@ -199,7 +198,7 @@ impl Client {
             if self.last_heartbeat_ack {
                 self.send_heartbeat().await?;
             } else {
-                todo!()
+                self.resume().await?;
             }
         }
         Ok(())
@@ -210,6 +209,10 @@ impl Client {
         // construct and send heartbeat
         let payload = discord::payloads::Payload {
             op: GatewayOpcode::Heartbeat,
+            d: match self.last_seq {
+                Some(seq) => Some(serde_json::to_value(seq)?),
+                None => None,
+            },
             ..Default::default()
         };
         if let Err(e) = self.send(payload).await {
@@ -221,11 +224,36 @@ impl Client {
         }
         Ok(())
     }
+
+    /// Try to resume the connection to the gateway
+    async fn resume(&mut self) -> Result<(), Box<dyn Error>> {
+        if let Some(session_id) = self.session_id.clone() {
+            let data = ResumePayloadData {
+                /// TODO: What do we take here?
+                token: self.token.clone(),
+                session_id,
+                seq: match self.last_seq {
+                    Some(n) => n,
+                    None => 0,
+                },
+            };
+
+            let payload = Payload {
+                op: GatewayOpcode::Resume,
+                d: Some(serde_json::to_value(data)?),
+                ..Default::default()
+            };
+            self.send(payload).await?;
+        } else {
+            todo!();
+        }
+        Ok(())
+    }
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let mut client = Client::new().await?;
+    let mut client = Client::new(env::var("BOT_TOKEN")?.to_owned()).await?;
 
     client.start().await
 }

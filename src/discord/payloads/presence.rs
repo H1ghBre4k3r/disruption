@@ -6,7 +6,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 pub struct PresenceUpdateStructure {
     /// unix time (in ms) of when the client went idle if the client is not idle
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub since: Option<u128>,
+    pub since: Option<u64>,
     /// the user's activities
     pub activities: Vec<Activity>,
     /// the user's new status
@@ -27,7 +27,7 @@ pub struct Activity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     /// unix timestamp (in milliseconds) of when the activity was added to the user's session
-    pub created_at: u128,
+    pub created_at: u64,
     /// unix timestamps for start and/or end of the game
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timestamps: Option<ActivityTimestamps>,
@@ -57,7 +57,7 @@ pub struct Activity {
     pub instance: Option<bool>,
     /// activity flags ORd together, describes what the payload includes
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub flags: Option<u128>,
+    pub flags: Option<u64>,
     /// the custom buttons shown in the Rich Presence (max 2)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub buttons: Option<Vec<ActivityButton>>,
@@ -80,10 +80,10 @@ pub enum ActivityType {
 pub struct ActivityTimestamps {
     /// unix time (in milliseconds) of when the activity started
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub start: Option<u128>,
+    pub start: Option<u64>,
     /// unix time (in milliseconds) of when the activity ends
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub end: Option<u128>,
+    pub end: Option<u64>,
 }
 
 /// TODO: https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji

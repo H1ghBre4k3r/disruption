@@ -20,7 +20,7 @@ pub struct User {
     /// the user's banner hash
     pub banner: Option<String>,
     /// the user's banner color encoded as an integer representation of hexadecimal color code
-    pub accent_color: Option<u128>,
+    pub accent_color: Option<u64>,
     /// the user's chosen language option
     pub locale: Option<String>,
     /// whether the email on this account has been verified
@@ -28,9 +28,9 @@ pub struct User {
     /// the user's email
     pub email: Option<String>,
     /// the flags on a user's account
-    pub flags: Option<u128>,
+    pub flags: Option<u64>,
     /// the type of Nitro subscription on a user's account
-    pub premium_type: Option<u128>,
+    pub premium_type: Option<u64>,
     /// the public flags on a user's account
-    pub public_flags: Option<u128>,
+    pub public_flags: Option<u64>,
 }
