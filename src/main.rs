@@ -14,6 +14,7 @@ use futures::{
     FutureExt, SinkExt,
 };
 use futures_util::StreamExt;
+use serde_json::json;
 use std::{env, error::Error, time::SystemTime};
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
@@ -28,6 +29,7 @@ struct Client {
     last_heartbeat_ack: bool,
     last_seq: Option<u64>,
     session_id: Option<String>,
+    api_version: Option<u8>,
 }
 
 impl Client {
@@ -45,6 +47,7 @@ impl Client {
             last_heartbeat_ack: true,
             last_seq: None,
             session_id: None,
+            api_version: None,
         })
     }
 
@@ -179,7 +182,6 @@ impl Client {
                     },
                     Event::MESSAGE_CREATE => match payload.d {
                         Some(d) => {
-                            println!("{:?}", d);
                             let message: entities::Message = serde_json::from_value(d)?;
                             self.handle_message(message).await?;
                         }
@@ -194,11 +196,37 @@ impl Client {
     /// Handle the initial ready message after identifying to the gateway.
     async fn handle_ready(&mut self, data: ReadyPayloadData) -> Result<(), Box<dyn Error>> {
         self.session_id = Some(data.session_id);
+        self.api_version = Some(data.v);
         Ok(())
     }
 
     /// Handle incomming messages.
     async fn handle_message(&mut self, message: entities::Message) -> Result<(), Box<dyn Error>> {
+        println!(
+            "{}#{}: {}",
+            message.author.username, message.author.discriminator, message.content
+        );
+
+        if message.content == String::from("§ping") {
+            let client = reqwest::Client::new();
+            client
+                .post(format!(
+                    "https://discord.com/api/v{}/channels/{}/messages",
+                    self.api_version.unwrap(),
+                    message.channel_id
+                ))
+                .header("Authorization", format!("Bot {}", self.token))
+                .header(
+                    "User-Agent",
+                    "DiscordBot (https://github.com/H1ghBre4k3r/disruption, 0.1.0)",
+                )
+                .json(&json!({
+                    "content": "Pong!"
+                }))
+                .send()
+                .await?;
+        }
+
         Ok(())
     }
 

@@ -59,6 +59,7 @@ pub enum Intents {
     AUTO_MODERATION_EXECUTION = 1 << 21,
 }
 
+/// ? https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events
 /// Enum for working with dispatch event types
 pub enum Event {
     READY,
