@@ -162,13 +162,16 @@ impl Client {
         println!("Dispatch: {:?}", payload.t);
         match payload.t {
             None => panic!("Invalid payload received for GatewayOpcode::Dispatch"),
-            Some(event) => match Event::from(event) {
-                Event::READY => match payload.d {
-                    Some(d) => {
-                        let data: ReadyPayloadData = serde_json::from_value(d)?;
-                        self.handle_ready(data).await?;
-                    }
-                    _ => panic!("No data received for GatewayOpcode::Dispatch"),
+            Some(event) => match Event::from(&event) {
+                None => eprintln!("Event {} not implemented yet...", event),
+                Some(e) => match e {
+                    Event::READY => match payload.d {
+                        Some(d) => {
+                            let data: ReadyPayloadData = serde_json::from_value(d)?;
+                            self.handle_ready(data).await?;
+                        }
+                        _ => panic!("No data received for GatewayOpcode::Dispatch"),
+                    },
                 },
             },
         }

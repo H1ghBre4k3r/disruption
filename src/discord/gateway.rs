@@ -66,10 +66,10 @@ pub enum Event {
 }
 
 impl Event {
-    pub fn from(val: String) -> Self {
+    pub fn from(val: &String) -> Option<Self> {
         match val.as_str() {
-            "READY" => Self::READY,
-            _ => panic!(),
+            "READY" => Some(Self::READY),
+            _ => None,
         }
     }
 }
