@@ -1,6 +1,7 @@
 mod hello;
 mod identify;
 mod presence;
+mod ready;
 
 use serde::{Deserialize, Serialize};
 
@@ -9,6 +10,7 @@ use super::opcodes::GatewayOpcode;
 pub use self::hello::*;
 pub use self::identify::*;
 pub use self::presence::*;
+pub use self::ready::*;
 
 /// Payload for communicating with the discord API
 #[derive(Serialize, Deserialize, Debug, Default)]
