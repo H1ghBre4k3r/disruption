@@ -1,7 +1,7 @@
 mod discord;
 
 use discord::{
-    gateway::Event,
+    gateway::{Event, Intents},
     opcodes::GatewayOpcode,
     payloads::{
         HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload,
@@ -125,7 +125,11 @@ impl Client {
                 device: "discoruption".to_owned(),
             },
             // TODO: Think about useful intents
-            intents: (1 << 1) | (1 << 9) | (1 << 10) | (1 << 12) | (1 << 15),
+            intents: Intents::GUILD_MEMBERS as u64
+                | Intents::GUILD_MESSAGES as u64
+                | Intents::GUILD_MESSAGE_REACTIONS as u64
+                | Intents::DIRECT_MESSAGES as u64
+                | Intents::MESSAGE_CONTENT as u64,
             ..Default::default()
         };
 
