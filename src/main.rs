@@ -15,7 +15,7 @@ use futures::{
 };
 use futures_util::StreamExt;
 use serde_json::json;
-use std::{env, error::Error, time::SystemTime};
+use std::{env, error::Error, thread, time::SystemTime};
 use tokio::net::TcpStream;
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use url::Url;
@@ -37,6 +37,17 @@ impl Client {
         let (socket, _res) =
             connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
         let (writer, reader) = socket.split();
+        let (s, r) = async_channel::unbounded();
+
+        let receiver = thread::spawn(move || {
+            reader.for_each(|msg| async {
+                s.send(msg.unwrap());
+            });
+        });
+
+        let (socket, _res) =
+            connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
+        let (writer, reader) = socket.split();
 
         Ok(Client {
             token,
@@ -55,6 +66,7 @@ impl Client {
     pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         self.init().await?;
         // TODO: move this to own thread
+
         loop {
             self.check_heartbeat().await?;
             // loop and check for new messages
