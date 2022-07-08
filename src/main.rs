@@ -12,6 +12,7 @@ use discord::{
 };
 use futures::{stream::SplitStream, SinkExt};
 use futures_util::StreamExt;
+use log::{debug, error, info};
 use serde_json::json;
 use std::{
     env,
@@ -49,13 +50,13 @@ impl Client {
                 loop {
                     match msg_queue.recv().await {
                         Ok(msg) => {
-                            println!("Sending message: {}", msg);
+                            debug!("Sending message: {}", msg);
                             if let Err(e) = writer.send(msg.clone()).await {
-                                eprintln!("Error while sending message: {} ({})", msg, e);
+                                error!("Error while sending message: {} ({})", msg, e);
                                 panic!();
                             }
                         }
-                        Err(e) => eprintln!("Error during reading: {}", e),
+                        Err(e) => error!("Error during reading: {}", e),
                     }
                 }
             }),
@@ -85,7 +86,7 @@ impl Client {
                 Some(msg) => {
                     match msg? {
                         Message::Close(r) => {
-                            println!("Closing connection: {:?}", r);
+                            info!("Closing connection: {:?}", r);
                             break;
                         }
                         Message::Text(msg) => {
@@ -93,10 +94,11 @@ impl Client {
                                 serde_json::from_str(msg.as_str())?;
                             self.last_seq = payload.s;
                             if let Err(e) = self.handle_payload(payload).await {
-                                eprintln!("Error handling payload: {:?}", e);
+                                error!("Error handling payload: {:?}", e);
                             }
                         }
                         Message::Ping(v) => {
+                            debug!("Pinging ({:?})", v);
                             self.writer.send(Message::Pong(v)).await?;
                         }
                         _ => panic!(),
@@ -145,6 +147,7 @@ impl Client {
 
     /// Identify to the gateway.
     async fn identify(&mut self) -> Result<(), Box<dyn Error>> {
+        info!("Trying to identify with Gateway");
         let payload_data = IdentifyPayloadData {
             token: self.token.clone(),
             properties: IdentifyConnectionProperties {
@@ -177,11 +180,12 @@ impl Client {
         &mut self,
         payload: discord::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
+        debug!("Handling payload: {:?}", payload);
         match payload.op {
             GatewayOpcode::HeartbeatACK => self.last_heartbeat_ack = true,
             GatewayOpcode::Heartbeat => self.send_heartbeat().await?,
             GatewayOpcode::Dispatch => self.handle_dispatch(payload).await?,
-            _ => println!("{:?}", payload),
+            _ => debug!("{:?}", payload),
         }
         Ok(())
     }
@@ -191,11 +195,11 @@ impl Client {
         &mut self,
         payload: discord::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
-        println!("Dispatch: {:?}", payload.t);
+        debug!("Dispatch: {:?}", payload.t);
         match payload.t {
             None => panic!("Invalid payload received for GatewayOpcode::Dispatch"),
             Some(event) => match Event::from(&event) {
-                None => eprintln!("Event {} not implemented yet...", event),
+                None => error!("Event {} not implemented yet...", event),
                 Some(e) => match e {
                     Event::READY => match payload.d {
                         Some(d) => {
@@ -219,6 +223,11 @@ impl Client {
 
     /// Handle the initial ready message after identifying to the gateway.
     async fn handle_ready(&mut self, data: ReadyPayloadData) -> Result<(), Box<dyn Error>> {
+        info!("Identifying successful!");
+        debug!(
+            "Starting session with ID {} on API v{}",
+            data.session_id, data.v
+        );
         self.session_id = Some(data.session_id);
         self.api_version = Some(data.v);
         Ok(())
@@ -226,7 +235,7 @@ impl Client {
 
     /// Handle incomming messages.
     async fn handle_message(&mut self, message: entities::Message) -> Result<(), Box<dyn Error>> {
-        println!(
+        info!(
             "{}#{}: {}",
             message.author.username, message.author.discriminator, message.content
         );
@@ -259,7 +268,7 @@ impl Client {
         let msg = serde_json::to_string(&payload)?;
 
         match self.writer.send(Message::Text(msg)).await {
-            Err(e) => eprintln!(
+            Err(e) => error!(
                 "[{}:{}] Error sending message: {:?}, ({})",
                 file!(),
                 line!(),
@@ -293,15 +302,10 @@ impl Client {
                                 ..Default::default()
                             };
 
+                            debug!("Sending heartbeat...");
                             let msg = serde_json::to_string(&payload).unwrap();
                             if let Err(e) = writer.send(Message::Text(msg)).await {
-                                eprintln!(
-                                    "[{}:{}] Error sending message: {:?}, ({})",
-                                    file!(),
-                                    line!(),
-                                    payload,
-                                    e
-                                );
+                                panic!("Error sending heartbeat ({})", e);
                             }
                         }
                     })
@@ -360,6 +364,7 @@ impl Client {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    env_logger::init();
     let mut client = Client::new(env::var("BOT_TOKEN")?.to_owned()).await?;
 
     client.start().await
