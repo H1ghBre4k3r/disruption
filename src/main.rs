@@ -1,5 +1,6 @@
 mod discord;
 
+use async_channel::Sender;
 use discord::{
     entities,
     gateway::{Event, Intents},
@@ -9,20 +10,22 @@ use discord::{
         ReadyPayloadData, ResumePayloadData,
     },
 };
-use futures::{
-    stream::{SplitSink, SplitStream},
-    FutureExt, SinkExt,
-};
+use futures::{stream::SplitStream, SinkExt};
 use futures_util::StreamExt;
 use serde_json::json;
-use std::{env, error::Error, thread, time::SystemTime};
-use tokio::net::TcpStream;
+use std::{
+    env,
+    error::Error,
+    thread,
+    time::{Duration, SystemTime},
+};
+use tokio::{net::TcpStream, runtime::Runtime};
 use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 use url::Url;
 
 struct Client {
     token: String,
-    writer: SplitSink<WebSocketStream<MaybeTlsStream<TcpStream>>, Message>,
+    writer: Sender<Message>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
     heartbeat: Option<u128>,
     last_heartbeat: Option<SystemTime>,
@@ -36,22 +39,32 @@ impl Client {
     pub async fn new(token: String) -> Result<Self, Box<dyn Error>> {
         let (socket, _res) =
             connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
-        let (writer, reader) = socket.split();
-        let (s, r) = async_channel::unbounded();
+        let (mut writer, reader) = socket.split();
 
-        let receiver = thread::spawn(move || {
-            reader.for_each(|msg| async {
-                s.send(msg.unwrap());
-            });
+        // TODO: Move this to own function
+        let (s, msg_queue) = async_channel::unbounded::<Message>();
+        // spawn a thread which is responsible for sending messages over the websocket
+        thread::spawn(move || match Runtime::new() {
+            Ok(rt) => rt.block_on(async move {
+                loop {
+                    match msg_queue.recv().await {
+                        Ok(msg) => {
+                            println!("Sending message: {}", msg);
+                            if let Err(e) = writer.send(msg.clone()).await {
+                                eprintln!("Error while sending message: {} ({})", msg, e);
+                                panic!();
+                            }
+                        }
+                        Err(e) => eprintln!("Error during reading: {}", e),
+                    }
+                }
+            }),
+            _ => panic!(),
         });
-
-        let (socket, _res) =
-            connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
-        let (writer, reader) = socket.split();
 
         Ok(Client {
             token,
-            writer,
+            writer: s,
             reader,
             heartbeat: None,
             last_heartbeat: None,
@@ -65,13 +78,11 @@ impl Client {
     /// Start the discord client.
     pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         self.init().await?;
-        // TODO: move this to own thread
 
         loop {
-            self.check_heartbeat().await?;
             // loop and check for new messages
-            match self.reader.next().now_or_never() {
-                Some(Some(msg)) => {
+            match self.reader.next().await {
+                Some(msg) => {
                     match msg? {
                         Message::Close(r) => {
                             println!("Closing connection: {:?}", r);
@@ -117,6 +128,7 @@ impl Client {
                                 let hello_payload: HelloPayloadData = serde_json::from_value(v)?;
                                 self.heartbeat = Some(hello_payload.heartbeat_interval);
                                 self.last_heartbeat = Some(SystemTime::now());
+                                self.start_heartbeating();
                             }
                             _ => {
                                 panic!("Gateway::Hello did not have matching payload")
@@ -243,26 +255,60 @@ impl Client {
     }
 
     /// Send a payload over the websocket.
-    /// TODO: Move this to own thread
     async fn send(&mut self, payload: discord::payloads::Payload) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
-        self.writer.send(Message::Text(msg)).await?;
+
+        match self.writer.send(Message::Text(msg)).await {
+            Err(e) => eprintln!(
+                "[{}:{}] Error sending message: {:?}, ({})",
+                file!(),
+                line!(),
+                payload,
+                e
+            ),
+            _ => (),
+        }
         Ok(())
     }
 
-    /// Check, if it is time to send the next heartbeat.
-    /// This function also handles non-received ACKs.
-    async fn check_heartbeat(&mut self) -> Result<(), Box<dyn Error>> {
-        // check, if enough time has ellapsed since last heartbeat
-        if self.last_heartbeat.unwrap().elapsed()?.as_millis() >= self.heartbeat.unwrap() / 2 {
-            // check, if we received an GatewayOpcode::HeartbeatACK after last heartbeat
-            if self.last_heartbeat_ack {
-                self.send_heartbeat().await?;
-            } else {
-                self.resume().await?;
+    /// Start heartbeating with the API.
+    fn start_heartbeating(&mut self) {
+        let writer = self.writer.clone();
+        let heartbeat_interval = self.heartbeat.unwrap();
+
+        thread::spawn(move || {
+            match Runtime::new() {
+                Ok(rt) => {
+                    rt.block_on(async move {
+                        loop {
+                            thread::sleep(Duration::from_millis(heartbeat_interval as u64));
+                            let payload = discord::payloads::Payload {
+                                op: GatewayOpcode::Heartbeat,
+                                d: None,
+                                // TODO: Try to retrieve seq_num
+                                // d: match seq_num {
+                                //     Some(seq) => Some(serde_json::to_value(seq).unwrap()),
+                                //     None => None,
+                                // },
+                                ..Default::default()
+                            };
+
+                            let msg = serde_json::to_string(&payload).unwrap();
+                            if let Err(e) = writer.send(Message::Text(msg)).await {
+                                eprintln!(
+                                    "[{}:{}] Error sending message: {:?}, ({})",
+                                    file!(),
+                                    line!(),
+                                    payload,
+                                    e
+                                );
+                            }
+                        }
+                    })
+                }
+                _ => panic!("Failed to start heartbeating runtime"),
             }
-        }
-        Ok(())
+        });
     }
 
     /// Send a heartbeat via the websocket
