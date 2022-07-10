@@ -13,5 +13,5 @@ A featherweight API wrapper around the Discord API written in Rust.
 To execute a basic example of using this library, just run 
 
 ```console
-$ cargo run --example basic
+cargo run --example basic
 ```
