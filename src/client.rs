@@ -18,12 +18,14 @@ use std::{
     time::{Duration, SystemTime},
 };
 use tokio::{net::TcpStream, runtime::Runtime};
-use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
+use tokio_tungstenite::{
+    connect_async, tungstenite::Message as TMsg, MaybeTlsStream, WebSocketStream,
+};
 use url::Url;
 
 pub struct Client {
     token: String,
-    writer: Sender<Message>,
+    writer: Sender<TMsg>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
     heartbeat: Option<u128>,
     last_heartbeat: Option<SystemTime>,
@@ -40,7 +42,7 @@ impl Client {
         let (mut writer, reader) = socket.split();
 
         // TODO: Move this to own function
-        let (s, msg_queue) = async_channel::unbounded::<Message>();
+        let (s, msg_queue) = async_channel::unbounded::<TMsg>();
         // spawn a thread which is responsible for sending messages over the websocket
         thread::spawn(move || match Runtime::new() {
             Ok(rt) => rt.block_on(async move {
@@ -83,11 +85,11 @@ impl Client {
             match self.reader.next().await {
                 Some(msg) => {
                     match msg? {
-                        Message::Close(r) => {
+                        TMsg::Close(r) => {
                             info!("Closing connection: {:?}", r);
                             break;
                         }
-                        Message::Text(msg) => {
+                        TMsg::Text(msg) => {
                             let payload: super::api::payloads::Payload =
                                 serde_json::from_str(msg.as_str())?;
                             self.last_seq = payload.s;
@@ -95,9 +97,9 @@ impl Client {
                                 error!("Error handling payload: {:?}", e);
                             }
                         }
-                        Message::Ping(v) => {
+                        TMsg::Ping(v) => {
                             debug!("Pinging ({:?})", v);
-                            self.writer.send(Message::Pong(v)).await?;
+                            self.writer.send(TMsg::Pong(v)).await?;
                         }
                         _ => panic!(),
                     };
@@ -120,7 +122,7 @@ impl Client {
         match self.reader.next().await {
             None => panic!(""),
             Some(msg) => match msg? {
-                Message::Text(msg) => {
+                TMsg::Text(msg) => {
                     let payload: super::api::payloads::Payload =
                         serde_json::from_str(msg.as_str())?;
                     match payload.op {
@@ -266,7 +268,7 @@ impl Client {
     async fn send(&mut self, payload: super::api::payloads::Payload) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
 
-        match self.writer.send(Message::Text(msg)).await {
+        match self.writer.send(TMsg::Text(msg)).await {
             Err(e) => error!(
                 "[{}:{}] Error sending message: {:?}, ({})",
                 file!(),
@@ -303,7 +305,7 @@ impl Client {
 
                             debug!("Sending heartbeat...");
                             let msg = serde_json::to_string(&payload).unwrap();
-                            if let Err(e) = writer.send(Message::Text(msg)).await {
+                            if let Err(e) = writer.send(TMsg::Text(msg)).await {
                                 panic!("Error sending heartbeat ({})", e);
                             }
                         }
