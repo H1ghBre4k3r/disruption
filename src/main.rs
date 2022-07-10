@@ -2,7 +2,7 @@ mod discord;
 
 use async_channel::Sender;
 use discord::{
-    entities,
+    channel,
     gateway::{Event, Intents},
     opcodes::GatewayOpcode,
     payloads::{
@@ -12,7 +12,7 @@ use discord::{
 };
 use futures::{stream::SplitStream, SinkExt};
 use futures_util::StreamExt;
-use log::{debug, error, info};
+use log::{debug, error, info, trace};
 use serde_json::json;
 use std::{
     env,
@@ -210,7 +210,7 @@ impl Client {
                     },
                     Event::MESSAGE_CREATE => match payload.d {
                         Some(d) => {
-                            let message: entities::Message = serde_json::from_value(d)?;
+                            let message: channel::Message = serde_json::from_value(d)?;
                             self.handle_message(message).await?;
                         }
                         _ => panic!("No data received for GatewayOpcode::Dispatch"),
@@ -234,7 +234,7 @@ impl Client {
     }
 
     /// Handle incomming messages.
-    async fn handle_message(&mut self, message: entities::Message) -> Result<(), Box<dyn Error>> {
+    async fn handle_message(&mut self, message: channel::Message) -> Result<(), Box<dyn Error>> {
         info!(
             "{}#{}: {}",
             message.author.username, message.author.discriminator, message.content
@@ -367,5 +367,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     env_logger::init();
     let mut client = Client::new(env::var("BOT_TOKEN")?.to_owned()).await?;
 
-    client.start().await
+    if let Err(e) = client.start().await {
+        trace!("{}", e);
+    }
+    Ok(())
 }

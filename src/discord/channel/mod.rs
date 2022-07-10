@@ -1,19 +1,10 @@
-use serde::{Deserialize, Serialize};
-use serde_repr::{Deserialize_repr, Serialize_repr};
+mod mention;
+mod message;
 
-/// ? https://discord.com/developers/docs/resources/channel#channel-mention-object
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ChannelMention {
-    /// id of the channel
-    pub id: String,
-    /// id of the guild containing the channel
-    pub guild_id: String,
-    /// the type of channel
-    #[serde(rename = "type")]
-    pub type_: ChannelType,
-    /// the name of the channel
-    pub name: String,
-}
+pub use self::mention::*;
+pub use self::message::*;
+
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-object-channel-types
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
