@@ -86,12 +86,11 @@ pub struct ActivityTimestamps {
     pub end: Option<u64>,
 }
 
-/// TODO: https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
+/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ActivityEmoji {
     /// the name of the emoji
     pub name: String,
-    /// TODO: use snowflake
     /// the id of the emoji
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
