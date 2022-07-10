@@ -151,7 +151,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "discord-bot"
+name = "disruption"
 version = "0.1.0"
 dependencies = [
  "async-channel",

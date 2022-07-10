@@ -1,5 +1,8 @@
-pub mod channel;
-pub mod entities;
-pub mod gateway;
-pub mod opcodes;
-pub mod payloads;
+mod channel;
+mod client;
+mod entities;
+mod gateway;
+mod opcodes;
+mod payloads;
+
+pub use self::client::*;

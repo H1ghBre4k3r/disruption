@@ -1,8 +1,11 @@
 [package]
-name = "discord-bot"
+name = "disruption"
 version = "0.1.0"
 edition = "2021"
 authors = ["Louis Meyer (H1ghBre4k3r) <h1ghbre4k3r@dev.bre4k3r.de>"]
+
+[lib]
+name = "disruption"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
