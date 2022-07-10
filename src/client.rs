@@ -1,4 +1,4 @@
-use super::{
+use super::api::{
     channel,
     gateway::{Event, Intents},
     opcodes::GatewayOpcode,
@@ -87,7 +87,7 @@ impl Client {
                             break;
                         }
                         Message::Text(msg) => {
-                            let payload: super::payloads::Payload =
+                            let payload: super::api::payloads::Payload =
                                 serde_json::from_str(msg.as_str())?;
                             self.last_seq = payload.s;
                             if let Err(e) = self.handle_payload(payload).await {
@@ -120,7 +120,8 @@ impl Client {
             None => panic!(""),
             Some(msg) => match msg? {
                 Message::Text(msg) => {
-                    let payload: super::payloads::Payload = serde_json::from_str(msg.as_str())?;
+                    let payload: super::api::payloads::Payload =
+                        serde_json::from_str(msg.as_str())?;
                     match payload.op {
                         GatewayOpcode::Hello => match payload.d {
                             Some(v) => {
@@ -175,7 +176,7 @@ impl Client {
     /// Handle payloads received via the websocket.
     async fn handle_payload(
         &mut self,
-        payload: super::payloads::Payload,
+        payload: super::api::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
         debug!("Handling payload: {:?}", payload);
         match payload.op {
@@ -190,7 +191,7 @@ impl Client {
     /// Handle GatewayOpcode::Dispatch (opcode 0)
     async fn handle_dispatch(
         &mut self,
-        payload: super::payloads::Payload,
+        payload: super::api::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
         debug!("Dispatch: {:?}", payload.t);
         match payload.t {
@@ -261,7 +262,7 @@ impl Client {
     }
 
     /// Send a payload over the websocket.
-    async fn send(&mut self, payload: super::payloads::Payload) -> Result<(), Box<dyn Error>> {
+    async fn send(&mut self, payload: super::api::payloads::Payload) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
 
         match self.writer.send(Message::Text(msg)).await {
@@ -288,7 +289,7 @@ impl Client {
                     rt.block_on(async move {
                         loop {
                             thread::sleep(Duration::from_millis(heartbeat_interval as u64));
-                            let payload = super::payloads::Payload {
+                            let payload = super::api::payloads::Payload {
                                 op: GatewayOpcode::Heartbeat,
                                 d: None,
                                 // TODO: Try to retrieve seq_num
@@ -315,7 +316,7 @@ impl Client {
     /// Send a heartbeat via the websocket
     async fn send_heartbeat(&mut self) -> Result<(), Box<dyn Error>> {
         // construct and send heartbeat
-        let payload = super::payloads::Payload {
+        let payload = super::api::payloads::Payload {
             op: GatewayOpcode::Heartbeat,
             d: match self.last_seq {
                 Some(seq) => Some(serde_json::to_value(seq)?),
