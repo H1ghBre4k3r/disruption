@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::discord::entities::{Application, UnavailableGuild, User};
+use crate::api::entities::{Application, UnavailableGuild, User};
 
 /// ? https://discord.com/developers/docs/topics/gateway#ready
 #[derive(Serialize, Deserialize, Debug)]

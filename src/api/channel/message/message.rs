@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::discord::{
+use crate::api::{
     channel::{Channel, ChannelMention},
     entities::{Application, Role, User},
 };

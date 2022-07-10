@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::discord::entities::User;
+use crate::api::entities::User;
 
 use super::{MessageType, Overwrites, ThreadMember, ThreadMetadata};
 

@@ -1,3 +1,3 @@
-mod discord;
+mod api;
 
-pub use discord::*;
+pub use api::*;
