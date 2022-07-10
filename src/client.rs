@@ -78,6 +78,7 @@ impl Client {
         self.init().await?;
 
         loop {
+            // TODO: Move this into own next() method. Or do it in own thread, which then calls registered listeners.
             // loop and check for new messages
             match self.reader.next().await {
                 Some(msg) => {
