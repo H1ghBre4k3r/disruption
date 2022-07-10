@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Embed {
     /// title of embed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,7 +45,7 @@ pub struct Embed {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedFooter {
     pub text: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,7 +55,7 @@ pub struct EmbedFooter {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedImage {
     pub url: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,7 +67,7 @@ pub struct EmbedImage {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedThumbnail {
     pub url: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,7 +79,7 @@ pub struct EmbedThumbnail {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedVideo {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
@@ -92,7 +92,7 @@ pub struct EmbedVideo {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedProvider {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -101,7 +101,7 @@ pub struct EmbedProvider {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedAuthor {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -113,7 +113,7 @@ pub struct EmbedAuthor {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedField {
     pub name: String,
     pub value: String,

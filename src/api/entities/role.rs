@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// ? https://discord.com/developers/docs/topics/permissions#role-object-role-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Role {
     /// role id
     pub id: String,
@@ -31,7 +31,7 @@ pub struct Role {
 }
 
 /// ? https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RoleTag {
     /// the id of the bot this role belongs to
     #[serde(skip_serializing_if = "Option::is_none")]

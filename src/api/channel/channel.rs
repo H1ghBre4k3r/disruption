@@ -6,7 +6,7 @@ use crate::api::entities::User;
 use super::{MessageType, Overwrites, ThreadMember, ThreadMetadata};
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Channel {
     /// the id of this channel
     pub id: String,
@@ -92,7 +92,7 @@ pub struct Channel {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes
-#[derive(Serialize_repr, Deserialize_repr, Debug, Default)]
+#[derive(Serialize_repr, Deserialize_repr, Debug, Default, Clone)]
 #[repr(u8)]
 pub enum VideoQualityMode {
     #[default]

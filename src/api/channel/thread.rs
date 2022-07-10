@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// ? https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ThreadMetadata {
     pub archived: bool,
     pub auto_archive_duration: u64,
@@ -14,7 +14,7 @@ pub struct ThreadMetadata {
 }
 
 /// ? https://discord.com/developers/docs/resources/channel#thread-member-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ThreadMember {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,

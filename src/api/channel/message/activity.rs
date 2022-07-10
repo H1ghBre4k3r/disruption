@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// ? https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MessageActivity {
     #[serde(rename = "type")]
     pub type_: MessageActivityType,
@@ -11,7 +11,7 @@ pub struct MessageActivity {
 }
 
 /// ?https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum MessageActivityType {
     JOIN = 1,

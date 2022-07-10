@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::User;
 
 /// ? https://discord.com/developers/docs/resources/emoji#emoji-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Emoji {
     pub id: Option<String>,
     pub name: Option<String>,

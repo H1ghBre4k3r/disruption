@@ -4,7 +4,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 use crate::api::entities::User;
 
 /// ? https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object-message-interaction-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MessageInteraction {
     pub id: String,
     #[serde(rename = "type")]
@@ -17,7 +17,7 @@ pub struct MessageInteraction {
 
 // TODO: move this to other module
 /// ? https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum InteractionType {
     PING = 1,

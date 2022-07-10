@@ -13,7 +13,7 @@ pub use self::thread::*;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-object-channel-types
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum ChannelType {
     /// a text channel within a server

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// ? https://discord.com/developers/docs/topics/gateway#update-presence
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PresenceUpdateStructure {
     /// unix time (in ms) of when the client went idle if the client is not idle
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -16,7 +16,7 @@ pub struct PresenceUpdateStructure {
 }
 
 /// TODO: https://discord.com/developers/docs/topics/gateway#activity-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Activity {
     /// the activity's name
     pub name: String,
@@ -64,7 +64,7 @@ pub struct Activity {
 }
 
 /// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-types
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum ActivityType {
     Game = 0,
@@ -76,7 +76,7 @@ pub enum ActivityType {
 }
 
 /// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityTimestamps {
     /// unix time (in milliseconds) of when the activity started
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,7 +87,7 @@ pub struct ActivityTimestamps {
 }
 
 /// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityEmoji {
     /// the name of the emoji
     pub name: String,
@@ -100,7 +100,7 @@ pub struct ActivityEmoji {
 }
 
 /// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-party
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityParty {
     /// the id of the party
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,7 +111,7 @@ pub struct ActivityParty {
 }
 
 /// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityAssets {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub large_image: Option<String>,
@@ -124,7 +124,7 @@ pub struct ActivityAssets {
 }
 
 /// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivitySecrets {
     /// the secret for joining a party
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -155,7 +155,7 @@ pub enum ActivityFlags {
 }
 
 /// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityButton {
     pub label: String,
     pub url: String,

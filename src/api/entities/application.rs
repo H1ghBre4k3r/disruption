@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::{Team, User};
 
 /// ? https://discord.com/developers/docs/resources/application#application-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Application {
     /// the id of the app
     pub id: String,
@@ -75,7 +75,7 @@ pub enum ApplicationFlags {
 }
 
 /// ? https://discord.com/developers/docs/resources/application#install-params-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct InstallParams {
     /// the scopes to add the application to the server with
     pub scopes: Vec<String>,

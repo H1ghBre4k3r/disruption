@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// ? https://discord.com/developers/docs/resources/channel#message-reference-object-message-reference-structure
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MessageReference {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<String>,

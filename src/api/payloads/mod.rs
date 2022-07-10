@@ -15,7 +15,7 @@ pub use self::ready::*;
 pub use self::resume::*;
 
 /// Payload for communicating with the discord API
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct Payload {
     /// opcode for this payload
     pub op: GatewayOpcode,

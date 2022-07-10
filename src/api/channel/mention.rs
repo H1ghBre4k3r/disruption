@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use super::ChannelType;
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-mention-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ChannelMention {
     /// id of the channel
     pub id: String,

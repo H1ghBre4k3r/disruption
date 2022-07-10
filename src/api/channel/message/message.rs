@@ -11,7 +11,7 @@ use super::{
 };
 
 /// ? https://discord.com/developers/docs/resources/channel#message-object
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Message {
     /// id of the message
     pub id: String,
