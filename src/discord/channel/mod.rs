@@ -1,6 +1,8 @@
+mod channel;
 mod mention;
 mod message;
 
+pub use self::channel::*;
 pub use self::mention::*;
 pub use self::message::*;
 

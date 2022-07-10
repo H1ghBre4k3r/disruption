@@ -6,6 +6,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 pub struct MessageActivity {
     #[serde(rename = "type")]
     pub type_: MessageActivityType,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub party_id: Option<String>,
 }
 

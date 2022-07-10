@@ -12,8 +12,10 @@ pub struct Role {
     /// if this role is pinned in the user listing
     pub hoist: bool,
     /// role icon hash
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
     /// role unicode emoji
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub unicode_emoji: Option<String>,
     /// position of this role
     pub position: u64,
@@ -24,6 +26,7 @@ pub struct Role {
     /// whether this role is mentionable
     pub mentionable: bool,
     /// the tags this role has
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<RoleTag>,
 }
 
@@ -31,7 +34,19 @@ pub struct Role {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RoleTag {
     /// the id of the bot this role belongs to
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_id: Option<String>,
     /// the id of the integration this role belongs to
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub integration_id: Option<String>,
+}
+
+/// ? https://discord.com/developers/docs/resources/channel#overwrite-object
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Overwrites {
+    pub id: String,
+    #[serde(rename = "type")]
+    pub type_: u8,
+    pub allow: String,
+    pub deny: String,
 }
