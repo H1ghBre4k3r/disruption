@@ -1,10 +1,14 @@
 mod channel;
 mod mention;
 mod message;
+mod overwrites;
+mod thread;
 
 pub use self::channel::*;
 pub use self::mention::*;
 pub use self::message::*;
+pub use self::overwrites::*;
+pub use self::thread::*;
 
 use serde_repr::{Deserialize_repr, Serialize_repr};
 

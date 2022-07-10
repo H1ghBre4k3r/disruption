@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::discord::entities::{Overwrites, User};
+use crate::discord::entities::User;
 
-use super::MessageType;
+use super::{MessageType, Overwrites, ThreadMember, ThreadMetadata};
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-object
 #[derive(Serialize, Deserialize, Debug)]
@@ -98,28 +98,4 @@ pub enum VideoQualityMode {
     #[default]
     AUTO = 1,
     FULL = 2,
-}
-
-/// ? https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ThreadMetadata {
-    pub archived: bool,
-    pub auto_archive_duration: u64,
-    pub archive_timestamp: String,
-    pub locked: bool,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub invitable: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub create_timestamp: Option<String>,
-}
-
-/// ? https://discord.com/developers/docs/resources/channel#thread-member-object
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ThreadMember {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub id: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_id: Option<String>,
-    pub join_timestamp: String,
-    pub flags: u64,
 }
