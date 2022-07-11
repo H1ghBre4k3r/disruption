@@ -1,4 +1,4 @@
-use crate::implementations::channel::Message;
+use crate::{implementations::channel::Message, internal::RestClient};
 
 use super::api::{
     channel,
@@ -35,6 +35,7 @@ pub struct Client {
     last_seq: Option<u64>,
     session_id: Option<String>,
     api_version: Option<u8>,
+    rest_client: Option<RestClient>,
 }
 
 impl Client {
@@ -74,6 +75,7 @@ impl Client {
             last_seq: None,
             session_id: None,
             api_version: None,
+            rest_client: None,
         })
     }
 
@@ -233,6 +235,7 @@ impl Client {
         );
         self.session_id = Some(data.session_id);
         self.api_version = Some(data.v);
+        self.rest_client = Some(RestClient::new(&self.token, data.v));
         Ok(())
     }
 
@@ -251,23 +254,19 @@ impl Client {
         let msg = Message::new(message);
 
         if *msg.content() == String::from("§ping") {
-            let client = reqwest::Client::new();
-            client
-                .post(format!(
-                    "https://discord.com/api/v{}/channels/{}/messages",
-                    self.api_version.unwrap(),
-                    channel_id
-                ))
-                .header("Authorization", format!("Bot {}", self.token))
-                .header(
-                    "User-Agent",
-                    "DiscordBot (https://github.com/H1ghBre4k3r/disruption, 0.1.0)",
-                )
-                .json(&json!({
-                    "content": "Pong!"
-                }))
-                .send()
-                .await?;
+            match &self.rest_client {
+                None => (),
+                Some(client) => {
+                    client
+                        .post(
+                            &format!("channels/{}/messages", channel_id),
+                            &json!({
+                                "content": "Pong!"
+                            }),
+                        )
+                        .await?;
+                }
+            };
         }
 
         Ok(())
