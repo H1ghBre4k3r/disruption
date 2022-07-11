@@ -1,3 +1,5 @@
+use crate::implementations::channel::Message;
+
 use super::api::{
     channel,
     gateway::{Event, Intents},
@@ -244,13 +246,17 @@ impl Client {
             message.author.username, message.author.discriminator, message.content
         );
 
-        if message.content == String::from("§ping") {
+        let channel_id = message.channel_id.clone();
+
+        let msg = Message::new(message);
+
+        if *msg.content() == String::from("§ping") {
             let client = reqwest::Client::new();
             client
                 .post(format!(
                     "https://discord.com/api/v{}/channels/{}/messages",
                     self.api_version.unwrap(),
-                    message.channel_id
+                    channel_id
                 ))
                 .header("Authorization", format!("Bot {}", self.token))
                 .header(
