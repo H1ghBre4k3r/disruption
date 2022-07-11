@@ -211,7 +211,7 @@ impl Client {
                     },
                     Event::MESSAGE_CREATE => match payload.d {
                         Some(d) => {
-                            let message: channel::Message = serde_json::from_value(d)?;
+                            let message: channel::MessageApiType = serde_json::from_value(d)?;
                             self.handle_message(message).await?;
                         }
                         _ => panic!("No data received for GatewayOpcode::Dispatch"),
@@ -235,7 +235,10 @@ impl Client {
     }
 
     /// Handle incomming messages.
-    async fn handle_message(&mut self, message: channel::Message) -> Result<(), Box<dyn Error>> {
+    async fn handle_message(
+        &mut self,
+        message: channel::MessageApiType,
+    ) -> Result<(), Box<dyn Error>> {
         info!(
             "{}#{}: {}",
             message.author.username, message.author.discriminator, message.content

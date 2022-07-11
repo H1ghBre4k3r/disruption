@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 /// ? https://discord.com/developers/docs/resources/channel#overwrite-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Overwrites {
+pub struct OverwritesApiType {
     pub id: String,
     #[serde(rename = "type")]
     pub type_: u8,

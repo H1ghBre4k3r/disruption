@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
 
-use super::{Team, User};
+use super::{TeamApiType, UserApiType};
 
 /// ? https://discord.com/developers/docs/resources/application#application-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Application {
+pub struct ApplicationApiType {
     /// the id of the app
     pub id: String,
     /// the name of the app
@@ -24,11 +24,11 @@ pub struct Application {
     /// the url of the app's privacy policy
     pub privacy_policy_url: Option<String>,
     /// partial user object containing info on the owner of the application
-    pub owner: Option<User>,
+    pub owner: Option<UserApiType>,
     /// the hex encoded key for verification in interactions and the GameSDK's GetTicket
     pub verify_key: Option<String>,
     /// if the application belongs to a team, this will be a list of the members of that team
-    pub team: Option<Team>,
+    pub team: Option<TeamApiType>,
     /// if this application is a game sold on Discord, this field will be the guild to which it has been linked
     pub guild_id: Option<String>,
     /// if this application is a game sold on Discord, this field will be the id of the "Game SKU" that is created, if exists
@@ -42,13 +42,13 @@ pub struct Application {
     /// up to 5 tags describing the content and functionality of the application
     pub tags: Option<Vec<String>>,
     /// settings for the application's default in-app authorization link, if enabled
-    pub install_params: Option<InstallParams>,
+    pub install_params: Option<InstallParamsApiType>,
     /// the application's default custom authorization link, if enabled
     pub custom_install_url: Option<String>,
 }
 
 /// ? https://discord.com/developers/docs/resources/application#application-object-application-flags
-pub enum ApplicationFlags {
+pub enum ApplicationFlagsApiType {
     /// Intent required for bots in 100 or more servers to receive presence_update events
     #[allow(non_camel_case_types)]
     GATEWAY_PRESENCE = 1 << 12,
@@ -76,7 +76,7 @@ pub enum ApplicationFlags {
 
 /// ? https://discord.com/developers/docs/resources/application#install-params-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct InstallParams {
+pub struct InstallParamsApiType {
     /// the scopes to add the application to the server with
     pub scopes: Vec<String>,
     /// the permissions to request for the bot role

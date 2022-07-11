@@ -1,18 +1,18 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::api::entities::User;
+use crate::api::entities::UserApiType;
 
-use super::{MessageType, Overwrites, ThreadMember, ThreadMetadata};
+use super::{MessageTypeApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Channel {
+pub struct ChannelApiType {
     /// the id of this channel
     pub id: String,
     /// the type of channel
     #[serde(rename = "type")]
-    pub type_: MessageType,
+    pub type_: MessageTypeApiType,
     /// the id of the guild (may be missing for some channel objects received over gateway guild dispatches)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<String>,
@@ -21,7 +21,7 @@ pub struct Channel {
     pub position: Option<u64>,
     /// explicit permission overwrites for members and roles
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub permission_overwrites: Option<Vec<Overwrites>>,
+    pub permission_overwrites: Option<Vec<OverwritesApiType>>,
     /// the name of the channel (1-100 characters)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -45,7 +45,7 @@ pub struct Channel {
     pub rate_limit_per_user: Option<u64>,
     /// the recipients of the DM
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub recipients: Option<Vec<User>>,
+    pub recipients: Option<Vec<UserApiType>>,
     /// icon hash of the group DM
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
@@ -66,7 +66,7 @@ pub struct Channel {
     pub rtc_region: Option<String>,
     /// the camera video quality mode of the voice channel, 1 when not present
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub video_quality_mode: Option<VideoQualityMode>,
+    pub video_quality_mode: Option<VideoQualityModeApiType>,
     /// an approximate count of messages in a thread, stops counting at 50
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message_count: Option<u64>,
@@ -75,10 +75,10 @@ pub struct Channel {
     pub member_count: Option<u64>,
     /// thread-specific fields not needed by other channels
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub thread_metadata: Option<ThreadMetadata>,
+    pub thread_metadata: Option<ThreadMetadataApiType>,
     /// thread member object for the current user, if they have joined the thread, only included on certain API endpoints
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub member: Option<ThreadMember>,
+    pub member: Option<ThreadMemberApiType>,
     /// default duration that the clients (not the API) will use for newly created threads, in minutes, to automatically archive the thread after recent activity, can be set to: 60, 1440, 4320, 10080
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_auto_archive_duration: Option<u64>,
@@ -94,7 +94,7 @@ pub struct Channel {
 /// ? https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes
 #[derive(Serialize_repr, Deserialize_repr, Debug, Default, Clone)]
 #[repr(u8)]
-pub enum VideoQualityMode {
+pub enum VideoQualityModeApiType {
     #[default]
     AUTO = 1,
     FULL = 2,

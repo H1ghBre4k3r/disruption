@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 /// ? https://discord.com/developers/docs/resources/channel#attachment-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Attachment {
+pub struct AttachmentApiType {
     /// attachment id
     pub id: String,
     /// name of file attached

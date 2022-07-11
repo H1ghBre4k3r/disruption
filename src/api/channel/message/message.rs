@@ -1,24 +1,24 @@
 use serde::{Deserialize, Serialize};
 
 use crate::api::{
-    channel::{Channel, ChannelMention},
-    entities::{Application, Role, User},
+    channel::{ChannelApiType, ChannelMentionApiType},
+    entities::{ApplicationApiType, RoleApiType, UserApiType},
 };
 
 use super::{
-    Attachment, Embed, MessageActivity, MessageComponent, MessageInteraction, MessageReference,
-    MessageType, Reaction,
+    AttachmentApiType, EmbedApiType, MessageActivityApiType, MessageComponentApiType,
+    MessageInteractionApiType, MessageReferenceApiType, MessageTypeApiType, ReactionApiType,
 };
 
 /// ? https://discord.com/developers/docs/resources/channel#message-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Message {
+pub struct MessageApiType {
     /// id of the message
     pub id: String,
     /// id of the channel the message was sent in
     pub channel_id: String,
     /// the author of this message (not guaranteed to be a valid user, see below)
-    pub author: User,
+    pub author: UserApiType,
     /// contents of the message
     pub content: String,
     /// when this message was sent
@@ -30,19 +30,19 @@ pub struct Message {
     /// whether this message mentions everyone
     pub mention_everyone: bool,
     /// users specifically mentioned in the message
-    pub mentions: Vec<User>,
+    pub mentions: Vec<UserApiType>,
     /// roles specifically mentioned in this message
-    pub mention_roles: Vec<Role>,
+    pub mention_roles: Vec<RoleApiType>,
     /// channels specifically mentioned in this message
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mention_channels: Option<Vec<ChannelMention>>,
+    pub mention_channels: Option<Vec<ChannelMentionApiType>>,
     /// any attached files
-    pub attachments: Vec<Attachment>,
+    pub attachments: Vec<AttachmentApiType>,
     /// any embedded content
-    pub embeds: Vec<Embed>,
+    pub embeds: Vec<EmbedApiType>,
     /// reactions to this message
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reactions: Option<Vec<Reaction>>,
+    pub reactions: Option<Vec<ReactionApiType>>,
     // TODO: integer or string?
     /// use for validatigng a message was sent
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,35 +54,35 @@ pub struct Message {
     pub webhook_id: Option<String>,
     /// type of the message
     #[serde(rename = "type")]
-    pub type_: MessageType,
+    pub type_: MessageTypeApiType,
     /// send with Rich Presence-related chat embeds
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub activity: Option<MessageActivity>,
+    pub activity: Option<MessageActivityApiType>,
     /// send with Rich Presence-related chat embeds
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub application: Option<Application>,
+    pub application: Option<ApplicationApiType>,
     /// if the message is an interaction or application-owned webhoo, this is the id of the application
     #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<String>,
     /// data showing the source of a crosspost, channel follow add, pin, or reply message
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub message_reference: Option<MessageReference>,
+    pub message_reference: Option<MessageReferenceApiType>,
     // TODO: introduce https://discord.com/developers/docs/resources/channel#message-object-message-flags
     /// message flags combined as a bitfield
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<u64>,
     /// the message associated with the message_reference
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub referenced_message: Box<Option<Message>>,
+    pub referenced_message: Box<Option<MessageApiType>>,
     /// sent if the message is a response to an interaction
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub interaction: Option<MessageInteraction>,
+    pub interaction: Option<MessageInteractionApiType>,
     /// the thread that was started from this message, includes thread member object
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub thread: Option<Channel>,
+    pub thread: Option<ChannelApiType>,
     /// sent if the message contains components like buttons, action rows, orother interactive components
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub components: Option<Vec<MessageComponent>>,
+    pub components: Option<Vec<MessageComponentApiType>>,
     // TODO: Add stickers https://discord.com/developers/docs/resources/sticker#sticker-item-object
     // sent if the mesasge contains stickers
     // pub sticker_items: Option<Vec<StickerItem>>,

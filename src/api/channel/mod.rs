@@ -15,7 +15,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 /// ? https://discord.com/developers/docs/resources/channel#channel-object-channel-types
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
-pub enum ChannelType {
+pub enum ChannelTypeApiType {
     /// a text channel within a server
     #[allow(non_camel_case_types)]
     GUILD_TEXT = 0,

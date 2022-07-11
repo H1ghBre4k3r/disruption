@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use crate::api::entities::Emoji;
+use crate::api::entities::EmojiApiType;
 
 /// ? https://discord.com/developers/docs/resources/channel#reaction-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Reaction {
+pub struct ReactionApiType {
     pub count: u64,
     pub me: bool,
-    pub emoji: Emoji,
+    pub emoji: EmojiApiType,
 }

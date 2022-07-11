@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 /// ? https://discord.com/developers/docs/resources/user#user-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct User {
+pub struct UserApiType {
     /// the user's id
     pub id: String,
     /// the user's username, not unique across the platform
