@@ -254,7 +254,7 @@ impl Client {
 
         let msg = Message::new(rest, message).await;
 
-        if *msg.content() == String::from("§ping") {
+        if msg.content() == "§ping" {
             msg.channel().say(String::from("Pong!")).await?;
         }
 

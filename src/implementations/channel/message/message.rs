@@ -20,14 +20,14 @@ impl Message {
     }
 
     /// Get the content of the message.
-    pub fn content(&self) -> &String {
-        &self.msg.content
+    pub fn content(&self) -> &str {
+        self.msg.content.as_str()
     }
 
     /// Get the author of the message.
-    pub fn author(&self) -> &String {
+    pub fn author(&self) -> &str {
         // TODO: Return actual user object
-        &self.msg.author.username
+        self.msg.author.username.as_str()
     }
 
     pub fn channel(&self) -> &Channel {

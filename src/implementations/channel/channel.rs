@@ -27,8 +27,8 @@ impl Channel {
     }
 
     /// The ID of this channel.
-    pub fn id(&self) -> &String {
-        &self._channel.id
+    pub fn id(&self) -> &str {
+        self._channel.id.as_str()
     }
 
     /// Say something in this channel.
