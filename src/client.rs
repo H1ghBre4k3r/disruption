@@ -1,4 +1,4 @@
-use crate::{implementations::channel::Message, internal::RestClient};
+use crate::{implementations::channel::Message, internal::RestClient, traits::MessageHandler};
 
 use super::api::{
     channel,
@@ -113,6 +113,10 @@ impl Client {
         }
 
         Ok(())
+    }
+
+    pub fn with_message_handler<T: MessageHandler>(mut self, handler: T) -> Self {
+        self
     }
 
     async fn init(&mut self) -> Result<(), Box<dyn Error>> {
@@ -240,33 +244,18 @@ impl Client {
     }
 
     /// Handle incomming messages.
-    async fn handle_message(
-        &mut self,
-        message: channel::MessageApiType,
-    ) -> Result<(), Box<dyn Error>> {
+    async fn handle_message(&self, message: channel::MessageApiType) -> Result<(), Box<dyn Error>> {
         info!(
             "{}#{}: {}",
             message.author.username, message.author.discriminator, message.content
         );
 
-        let channel_id = message.channel_id.clone();
+        let rest = self.rest_client.clone().unwrap();
 
-        let msg = Message::new(message);
+        let msg = Message::new(rest, message).await;
 
         if *msg.content() == String::from("§ping") {
-            match &self.rest_client {
-                None => (),
-                Some(client) => {
-                    client
-                        .post(
-                            &format!("channels/{}/messages", channel_id),
-                            &json!({
-                                "content": "Pong!"
-                            }),
-                        )
-                        .await?;
-                }
-            };
+            msg.channel().say(String::from("Pong!")).await?;
         }
 
         Ok(())

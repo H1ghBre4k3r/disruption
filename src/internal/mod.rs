@@ -1,6 +1,7 @@
 use reqwest::Response;
 use serde::Serialize;
 
+#[derive(Clone)]
 pub struct RestClient {
     bot_token: String,
     base_url: String,
@@ -17,6 +18,7 @@ impl RestClient {
         }
     }
 
+    /// Send a POST to the API.
     pub async fn post<T: Serialize + ?Sized>(
         &self,
         uri: &String,
@@ -30,6 +32,19 @@ impl RestClient {
                 "DiscordBot (https://github.com/H1ghBre4k3r/disruption, 0.1.0)",
             )
             .json(content)
+            .send()
+            .await
+    }
+
+    /// Issue a GET request to the API.
+    pub async fn get(&self, uri: &String) -> Result<Response, reqwest::Error> {
+        self.client
+            .get(format!("{}/{}", self.base_url, uri))
+            .header("Authorization", format!("Bot {}", self.bot_token))
+            .header(
+                "User-Agent",
+                "DiscordBot (https://github.com/H1ghBre4k3r/disruption, 0.1.0)",
+            )
             .send()
             .await
     }
