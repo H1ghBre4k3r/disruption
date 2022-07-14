@@ -1,8 +1,9 @@
 use std::error::Error;
 
-use serde_json::json;
-
-use crate::{api::channel::ChannelApiType, internal::RestClient};
+use crate::{
+    api::channel::{ChannelApiType, MessageApiType},
+    internal::RestClient,
+};
 
 pub struct Channel {
     _rest: RestClient,
@@ -32,12 +33,19 @@ impl Channel {
     }
 
     /// Say something in this channel.
-    pub async fn say(&self, message: String) -> Result<(), Box<dyn Error>> {
+    pub async fn say(&self, message: &str) -> Result<(), Box<dyn Error>> {
+        self.send(MessageApiType {
+            content: message.to_owned(),
+            ..Default::default()
+        })
+        .await?;
+        Ok(())
+    }
+
+    /// Send a message into this channel.
+    pub(crate) async fn send(&self, message: MessageApiType) -> Result<(), Box<dyn Error>> {
         self._rest
-            .post(
-                &format!("channels/{}/messages", self.id()),
-                &json!({ "content": message }),
-            )
+            .post(&format!("channels/{}/messages", self.id()), &message)
             .await?;
         Ok(())
     }

@@ -1,12 +1,16 @@
+use std::error::Error;
+
 use crate::{
-    api::channel::MessageApiType, implementations::channel::Channel, internal::RestClient,
+    api::channel::{MessageApiType, MessageReferenceApiType},
+    implementations::channel::Channel,
+    internal::RestClient,
 };
 
 /// Struct representing a message send in a Discord channel.
 pub struct Message {
     rest: RestClient,
     msg: MessageApiType,
-    channel: Channel,
+    channel: Option<Channel>,
 }
 
 impl Message {
@@ -15,7 +19,10 @@ impl Message {
         Message {
             rest,
             msg,
-            channel: channel.unwrap(),
+            channel: match channel {
+                Err(_) => None,
+                Ok(channel) => Some(channel),
+            },
         }
     }
 
@@ -30,7 +37,27 @@ impl Message {
         self.msg.author.username.as_str()
     }
 
-    pub fn channel(&self) -> &Channel {
+    pub fn channel(&self) -> &Option<Channel> {
         &self.channel
+    }
+
+    /// Reply to this message.
+    pub async fn reply(&self, content: &str) -> Result<(), Box<dyn Error>> {
+        match self.channel() {
+            None => (),
+            Some(channel) => {
+                channel
+                    .send(MessageApiType {
+                        content: content.to_owned(),
+                        message_reference: Some(MessageReferenceApiType {
+                            message_id: Some(self.msg.id.clone()),
+                            ..Default::default()
+                        }),
+                        ..Default::default()
+                    })
+                    .await?;
+            }
+        }
+        Ok(())
     }
 }

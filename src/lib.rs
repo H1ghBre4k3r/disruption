@@ -6,3 +6,4 @@ mod internal;
 pub mod traits;
 
 pub use client::*;
+pub use implementations::*;

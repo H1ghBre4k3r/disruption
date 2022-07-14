@@ -13,7 +13,6 @@ use async_channel::Sender;
 use futures::{stream::SplitStream, SinkExt};
 use futures_util::StreamExt;
 use log::{debug, error, info};
-use serde_json::json;
 use std::{
     error::Error,
     thread,
@@ -254,8 +253,13 @@ impl Client {
 
         let msg = Message::new(rest, message).await;
 
-        if msg.content() == "§ping" {
-            msg.channel().say(String::from("Pong!")).await?;
+        match msg.content() {
+            "§ping" => match msg.channel() {
+                Some(channel) => channel.say("Pong!").await?,
+                None => (),
+            },
+            "§test" => msg.reply("Whoop whoop").await?,
+            _ => (),
         }
 
         Ok(())
