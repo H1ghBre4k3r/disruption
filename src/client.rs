@@ -6,11 +6,11 @@ use super::api::{
     opcodes::GatewayOpcode,
     payloads::{
         HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload,
-        ReadyPayloadData, ResumePayloadData,
+        ReadyPayloadData,
     },
 };
 use async_channel::{Receiver, Sender};
-use futures::{executor::block_on, SinkExt};
+use futures::SinkExt;
 use futures_util::StreamExt;
 use log::{debug, error, info, trace};
 use std::{
@@ -18,7 +18,6 @@ use std::{
     thread,
     time::{Duration, SystemTime},
 };
-use tokio::runtime::Runtime;
 use tokio_tungstenite::{connect_async, tungstenite::Message as TMsg};
 use url::Url;
 
@@ -122,44 +121,40 @@ impl<C: MessageCallback + Copy> Client<C> {
 
         // spawn thread for receiving messages
         let (message_receiver, _) = self.rec_tuple.clone();
-        thread::spawn(move || {
-            block_on(async move {
-                loop {
-                    match ws_reader.next().await {
-                        Some(msg) => match msg {
-                            Ok(msg) => {
-                                if let Err(e) = message_receiver.send(msg).await {
-                                    trace!("[{}:{}] {}", file!(), line!(), e);
-                                }
+        tokio::spawn(async move {
+            loop {
+                match ws_reader.next().await {
+                    Some(msg) => match msg {
+                        Ok(msg) => {
+                            if let Err(e) = message_receiver.send(msg).await {
+                                trace!("[{}:{}] {}", file!(), line!(), e);
                             }
-                            Err(e) => {
-                                error!("Error reading form socket: {}", e);
-                            }
-                        },
-                        // TODO: think about, which instance should handle close events
-                        _ => todo!(),
-                    }
+                        }
+                        Err(e) => {
+                            error!("Error reading form socket: {}", e);
+                        }
+                    },
+                    // TODO: think about, which instance should handle close events
+                    _ => todo!(),
                 }
-            })
+            }
         });
 
         // spawn a thread which is responsible for sending messages over the websocket
         let (_, sending_queue) = self.send_tuple.clone();
-        thread::spawn(move || {
-            block_on(async move {
-                loop {
-                    match sending_queue.recv().await {
-                        Ok(msg) => {
-                            debug!("Sending message: {}", msg);
-                            if let Err(e) = ws_writer.send(msg.clone()).await {
-                                error!("Error while sending message: {} ({})", msg, e);
-                                panic!();
-                            }
+        tokio::spawn(async move {
+            loop {
+                match sending_queue.recv().await {
+                    Ok(msg) => {
+                        debug!("Sending message: {}", msg);
+                        if let Err(e) = ws_writer.send(msg.clone()).await {
+                            error!("Error while sending message: {} ({})", msg, e);
+                            panic!();
                         }
-                        Err(e) => error!("Error during reading: {}", e),
                     }
+                    Err(e) => error!("Error during reading: {}", e),
                 }
-            });
+            }
         });
 
         Ok(())
@@ -336,32 +331,25 @@ impl<C: MessageCallback + Copy> Client<C> {
         let (writer, _) = self.send_tuple.clone();
         let heartbeat_interval = self.heartbeat.unwrap();
 
-        thread::spawn(move || {
-            match Runtime::new() {
-                Ok(rt) => {
-                    rt.block_on(async move {
-                        loop {
-                            thread::sleep(Duration::from_millis(heartbeat_interval as u64));
-                            let payload = super::api::payloads::Payload {
-                                op: GatewayOpcode::Heartbeat,
-                                d: None,
-                                // TODO: Try to retrieve seq_num
-                                // d: match seq_num {
-                                //     Some(seq) => Some(serde_json::to_value(seq).unwrap()),
-                                //     None => None,
-                                // },
-                                ..Default::default()
-                            };
+        tokio::spawn(async move {
+            loop {
+                thread::sleep(Duration::from_millis(heartbeat_interval as u64));
+                let payload = super::api::payloads::Payload {
+                    op: GatewayOpcode::Heartbeat,
+                    d: None,
+                    // TODO: Try to retrieve seq_num
+                    // d: match seq_num {
+                    //     Some(seq) => Some(serde_json::to_value(seq).unwrap()),
+                    //     None => None,
+                    // },
+                    ..Default::default()
+                };
 
-                            debug!("Sending heartbeat...");
-                            let msg = serde_json::to_string(&payload).unwrap();
-                            if let Err(e) = writer.send(TMsg::Text(msg)).await {
-                                panic!("Error sending heartbeat ({})", e);
-                            }
-                        }
-                    })
+                debug!("Sending heartbeat...");
+                let msg = serde_json::to_string(&payload).unwrap();
+                if let Err(e) = writer.send(TMsg::Text(msg)).await {
+                    panic!("Error sending heartbeat ({})", e);
                 }
-                _ => panic!("Failed to start heartbeating runtime"),
             }
         });
     }
