@@ -1,34 +1,32 @@
 use disruption::channel::Message;
 use disruption::Client;
-use futures::executor::block_on;
 use log::trace;
+use std::env;
 use std::error::Error;
-use std::{env, thread};
+use tokio;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     env_logger::init();
 
     let callback = |msg: Message| {
-        thread::spawn(move || {
-            block_on(async {
-                match msg.content() {
-                    "§ping" => match msg.channel() {
-                        Some(channel) => {
-                            if let Err(e) = channel.say("Pong!").await {
-                                trace!("{}", e)
-                            }
-                        }
-                        None => (),
-                    },
-                    "§test" => {
-                        if let Err(e) = msg.reply("Whoop whoop").await {
-                            trace!("{}", e);
+        tokio::spawn(async move {
+            match msg.content() {
+                "§ping" => match msg.channel() {
+                    Some(channel) => {
+                        if let Err(e) = channel.say("Pong!").await {
+                            trace!("{}", e)
                         }
                     }
-                    _ => (),
+                    None => (),
+                },
+                "§test" => {
+                    if let Err(e) = msg.reply("Whoop whoop").await {
+                        trace!("{}", e);
+                    }
                 }
-            })
+                _ => (),
+            }
         });
     };
 
