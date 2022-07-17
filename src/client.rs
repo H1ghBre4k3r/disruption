@@ -9,25 +9,25 @@ use super::api::{
         ReadyPayloadData, ResumePayloadData,
     },
 };
-use async_channel::Sender;
-use futures::{stream::SplitStream, SinkExt};
+use async_channel::{Receiver, Sender};
+use futures::{executor::block_on, SinkExt};
 use futures_util::StreamExt;
-use log::{debug, error, info};
+use log::{debug, error, info, trace};
 use std::{
     error::Error,
     thread,
     time::{Duration, SystemTime},
 };
-use tokio::{net::TcpStream, runtime::Runtime};
-use tokio_tungstenite::{
-    connect_async, tungstenite::Message as TMsg, MaybeTlsStream, WebSocketStream,
-};
+use tokio::runtime::Runtime;
+use tokio_tungstenite::{connect_async, tungstenite::Message as TMsg};
 use url::Url;
 
 pub struct Client<C> {
     token: String,
-    writer: Sender<TMsg>,
-    reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
+    /// Tuple containing sender and receiver for the channel receiving messages from the websocket
+    rec_tuple: (Sender<TMsg>, Receiver<TMsg>),
+    /// Tuple containing sender and receiver for the channel sending messages over the websocket
+    send_tuple: (Sender<TMsg>, Receiver<TMsg>),
     heartbeat: Option<u128>,
     last_heartbeat: Option<SystemTime>,
     last_heartbeat_ack: bool,
@@ -40,35 +40,16 @@ pub struct Client<C> {
 
 impl<C: MessageCallback + Copy> Client<C> {
     pub async fn new(token: String) -> Result<Self, Box<dyn Error>> {
-        let (socket, _res) =
-            connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
-        let (mut writer, reader) = socket.split();
+        // stuff related to sending messages over the websocket
+        let send_tuple = async_channel::unbounded::<TMsg>();
 
-        // TODO: Move this to own function
-        let (s, msg_queue) = async_channel::unbounded::<TMsg>();
-        // spawn a thread which is responsible for sending messages over the websocket
-        thread::spawn(move || match Runtime::new() {
-            Ok(rt) => rt.block_on(async move {
-                loop {
-                    match msg_queue.recv().await {
-                        Ok(msg) => {
-                            debug!("Sending message: {}", msg);
-                            if let Err(e) = writer.send(msg.clone()).await {
-                                error!("Error while sending message: {} ({})", msg, e);
-                                panic!();
-                            }
-                        }
-                        Err(e) => error!("Error during reading: {}", e),
-                    }
-                }
-            }),
-            _ => panic!(),
-        });
+        // Stuff related to receiving messages from the websocket
+        let rec_tuple = async_channel::unbounded::<TMsg>();
 
         Ok(Client {
             token,
-            writer: s,
-            reader,
+            rec_tuple,
+            send_tuple,
             heartbeat: None,
             last_heartbeat: None,
             last_heartbeat_ack: true,
@@ -83,14 +64,17 @@ impl<C: MessageCallback + Copy> Client<C> {
     /// Start the discord client.
     pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         self.init().await?;
+        let (_, mut reader) = self.rec_tuple.clone();
 
         loop {
             // TODO: Move this into own next() method. Or do it in own thread, which then calls registered listeners.
             // loop and check for new messages
-            match self.reader.next().await {
+            match reader.next().await {
                 Some(msg) => {
-                    match msg? {
+                    match msg {
                         TMsg::Close(r) => {
+                            // TODO: Does this belong here?
+                            // ? we should think of a good place to handle
                             info!("Closing connection: {:?}", r);
                             break;
                         }
@@ -104,9 +88,10 @@ impl<C: MessageCallback + Copy> Client<C> {
                         }
                         TMsg::Ping(v) => {
                             debug!("Pinging ({:?})", v);
-                            self.writer.send(TMsg::Pong(v)).await?;
+                            let (writer, _) = self.send_tuple.clone();
+                            writer.send(TMsg::Pong(v)).await?;
                         }
-                        _ => panic!(),
+                        _ => todo!(),
                     };
                 }
                 _ => continue,
@@ -122,16 +107,70 @@ impl<C: MessageCallback + Copy> Client<C> {
     }
 
     async fn init(&mut self) -> Result<(), Box<dyn Error>> {
+        // TODO: Do this in resume aswell.
+        self.connect_to_gateway().await?;
         self.handle_hello().await?;
         self.identify().await?;
         Ok(())
     }
 
+    /// Connect this client to the gateway.
+    async fn connect_to_gateway(&mut self) -> Result<(), Box<dyn Error>> {
+        let (socket, _res) =
+            connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
+        let (mut ws_writer, mut ws_reader) = socket.split();
+
+        // spawn thread for receiving messages
+        let (message_receiver, _) = self.rec_tuple.clone();
+        thread::spawn(move || {
+            block_on(async move {
+                loop {
+                    match ws_reader.next().await {
+                        Some(msg) => match msg {
+                            Ok(msg) => {
+                                if let Err(e) = message_receiver.send(msg).await {
+                                    trace!("[{}:{}] {}", file!(), line!(), e);
+                                }
+                            }
+                            Err(e) => {
+                                error!("Error reading form socket: {}", e);
+                            }
+                        },
+                        // TODO: think about, which instance should handle close events
+                        _ => todo!(),
+                    }
+                }
+            })
+        });
+
+        // spawn a thread which is responsible for sending messages over the websocket
+        let (_, sending_queue) = self.send_tuple.clone();
+        thread::spawn(move || {
+            block_on(async move {
+                loop {
+                    match sending_queue.recv().await {
+                        Ok(msg) => {
+                            debug!("Sending message: {}", msg);
+                            if let Err(e) = ws_writer.send(msg.clone()).await {
+                                error!("Error while sending message: {} ({})", msg, e);
+                                panic!();
+                            }
+                        }
+                        Err(e) => error!("Error during reading: {}", e),
+                    }
+                }
+            });
+        });
+
+        Ok(())
+    }
+
     /// Handle the intial message after connecting to the discord gateway.
     async fn handle_hello(&mut self) -> Result<(), Box<dyn Error>> {
-        match self.reader.next().await {
+        let (_, mut reader) = self.rec_tuple.clone();
+        match reader.next().await {
             None => panic!(""),
-            Some(msg) => match msg? {
+            Some(msg) => match msg {
                 TMsg::Text(msg) => {
                     let payload: super::api::payloads::Payload =
                         serde_json::from_str(msg.as_str())?;
@@ -278,7 +317,8 @@ impl<C: MessageCallback + Copy> Client<C> {
     async fn send(&mut self, payload: super::api::payloads::Payload) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
 
-        match self.writer.send(TMsg::Text(msg)).await {
+        let (writer, _) = self.send_tuple.clone();
+        match writer.send(TMsg::Text(msg)).await {
             Err(e) => error!(
                 "[{}:{}] Error sending message: {:?}, ({})",
                 file!(),
@@ -293,7 +333,7 @@ impl<C: MessageCallback + Copy> Client<C> {
 
     /// Start heartbeating with the API.
     fn start_heartbeating(&mut self) {
-        let writer = self.writer.clone();
+        let (writer, _) = self.send_tuple.clone();
         let heartbeat_interval = self.heartbeat.unwrap();
 
         thread::spawn(move || {
