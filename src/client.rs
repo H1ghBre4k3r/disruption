@@ -389,26 +389,28 @@ impl<C: MessageCallback + Copy> Client<C> {
 
     /// Try to resume the connection to the gateway
     async fn resume(&mut self) -> Result<(), Box<dyn Error>> {
-        if let Some(session_id) = self.session_id.clone() {
-            let data = ResumePayloadData {
-                /// TODO: What do we take here?
-                token: self.token.clone(),
-                session_id,
-                seq: match self.last_seq {
-                    Some(n) => n,
-                    None => 0,
-                },
-            };
+        // TODO: Implement resume functionaltiy
+        todo!()
+        // if let Some(session_id) = self.session_id.clone() {
+        //     let data = ResumePayloadData {
+        //         /// TODO: What do we take here?
+        //         token: self.token.clone(),
+        //         session_id,
+        //         seq: match self.last_seq {
+        //             Some(n) => n,
+        //             None => 0,
+        //         },
+        //     };
 
-            let payload = Payload {
-                op: GatewayOpcode::Resume,
-                d: Some(serde_json::to_value(data)?),
-                ..Default::default()
-            };
-            self.send(payload).await?;
-        } else {
-            todo!();
-        }
-        Ok(())
+        //     let payload = Payload {
+        //         op: GatewayOpcode::Resume,
+        //         d: Some(serde_json::to_value(data)?),
+        //         ..Default::default()
+        //     };
+        //     self.send(payload).await?;
+        // } else {
+        //     todo!();
+        // }
+        // Ok(())
     }
 }
