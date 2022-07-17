@@ -1,10 +1,9 @@
 use disruption::channel::Message;
 use disruption::Client;
 use futures::executor::block_on;
-use log::{trace, warn};
+use log::trace;
 use std::error::Error;
 use std::{env, thread};
-use tokio_tungstenite::tungstenite::handshake::server::Callback;
 
 trait MessageCallback: Fn(Message) -> () {}
 

@@ -63,6 +63,7 @@ pub enum Intents {
 /// Enum for working with dispatch event types
 pub enum Event {
     READY,
+    #[allow(non_camel_case_types)]
     MESSAGE_CREATE,
 }
 

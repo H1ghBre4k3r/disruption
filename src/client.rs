@@ -1,4 +1,4 @@
-use crate::{implementations::channel::Message, internal::RestClient};
+use crate::{implementations::channel::Message, internal::RestClient, traits::MessageCallback};
 
 use super::api::{
     channel,
@@ -23,20 +23,6 @@ use tokio_tungstenite::{
     connect_async, tungstenite::Message as TMsg, MaybeTlsStream, WebSocketStream,
 };
 use url::Url;
-
-// TODO: Move this to own module
-pub trait MessageCallback: Sized {
-    fn handle_message(&self, msg: Message);
-}
-
-impl<F> MessageCallback for F
-where
-    F: Fn(Message) -> (),
-{
-    fn handle_message(&self, msg: Message) {
-        self(msg);
-    }
-}
 
 pub struct Client<C> {
     token: String,
