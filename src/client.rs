@@ -1,4 +1,4 @@
-use crate::{implementations::channel::Message, internal::RestClient, traits::MessageHandler};
+use crate::{implementations::channel::Message, internal::RestClient};
 
 use super::api::{
     channel,
@@ -24,7 +24,21 @@ use tokio_tungstenite::{
 };
 use url::Url;
 
-pub struct Client {
+// TODO: Move this to own module
+pub trait MessageCallback: Sized {
+    fn handle_message(&self, msg: Message);
+}
+
+impl<F> MessageCallback for F
+where
+    F: Fn(Message) -> (),
+{
+    fn handle_message(&self, msg: Message) {
+        self(msg);
+    }
+}
+
+pub struct Client<C> {
     token: String,
     writer: Sender<TMsg>,
     reader: SplitStream<WebSocketStream<MaybeTlsStream<TcpStream>>>,
@@ -35,9 +49,10 @@ pub struct Client {
     session_id: Option<String>,
     api_version: Option<u8>,
     rest_client: Option<RestClient>,
+    message_callback: Option<C>,
 }
 
-impl Client {
+impl<C: MessageCallback + Copy> Client<C> {
     pub async fn new(token: String) -> Result<Self, Box<dyn Error>> {
         let (socket, _res) =
             connect_async(Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")?).await?;
@@ -75,6 +90,7 @@ impl Client {
             session_id: None,
             api_version: None,
             rest_client: None,
+            message_callback: None,
         })
     }
 
@@ -114,7 +130,8 @@ impl Client {
         Ok(())
     }
 
-    pub fn with_message_handler<T: MessageHandler>(mut self, handler: T) -> Self {
+    pub fn with_message_callback(mut self, callback: C) -> Self {
+        self.message_callback = Some(callback);
         self
     }
 
@@ -249,18 +266,24 @@ impl Client {
             message.author.username, message.author.discriminator, message.content
         );
 
-        let rest = self.rest_client.clone().unwrap();
-
-        let msg = Message::new(rest, message).await;
-
-        match msg.content() {
-            "§ping" => match msg.channel() {
-                Some(channel) => channel.say("Pong!").await?,
-                None => (),
-            },
-            "§test" => msg.reply("Whoop whoop").await?,
-            _ => (),
+        if let Some(callback) = self.message_callback {
+            let rest = self.rest_client.clone().unwrap();
+            let msg = Message::new(rest, message.clone()).await;
+            callback.handle_message(msg);
         }
+
+        // let rest = self.rest_client.clone().unwrap();
+
+        // let msg = Message::new(rest, message).await;
+
+        // match msg.content() {
+        //     "§ping" => match msg.channel() {
+        //         Some(channel) => channel.say("Pong!").await?,
+        //         None => (),
+        //     },
+        //     "§test" => msg.reply("Whoop whoop").await?,
+        //     _ => (),
+        // }
 
         Ok(())
     }
