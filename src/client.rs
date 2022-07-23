@@ -10,7 +10,7 @@ use super::api::{
     },
 };
 use async_channel::{Receiver, Sender};
-use futures::SinkExt;
+use futures::{executor::block_on, SinkExt};
 use futures_util::StreamExt;
 use log::{debug, error, info, trace};
 use std::{
@@ -331,26 +331,29 @@ impl<C: MessageCallback + Copy> Client<C> {
         let (writer, _) = self.send_tuple.clone();
         let heartbeat_interval = self.heartbeat.unwrap();
 
-        tokio::spawn(async move {
-            loop {
-                thread::sleep(Duration::from_millis(heartbeat_interval as u64));
-                let payload = super::api::payloads::Payload {
-                    op: GatewayOpcode::Heartbeat,
-                    d: None,
-                    // TODO: Try to retrieve seq_num
-                    // d: match seq_num {
-                    //     Some(seq) => Some(serde_json::to_value(seq).unwrap()),
-                    //     None => None,
-                    // },
-                    ..Default::default()
-                };
+        // TODO: Why does tokio::spawn not work here?
+        thread::spawn(move || {
+            block_on(async move {
+                loop {
+                    thread::sleep(Duration::from_millis(heartbeat_interval as u64));
+                    let payload = super::api::payloads::Payload {
+                        op: GatewayOpcode::Heartbeat,
+                        d: None,
+                        // TODO: Try to retrieve seq_num
+                        // d: match seq_num {
+                        //     Some(seq) => Some(serde_json::to_value(seq).unwrap()),
+                        //     None => None,
+                        // },
+                        ..Default::default()
+                    };
 
-                debug!("Sending heartbeat...");
-                let msg = serde_json::to_string(&payload).unwrap();
-                if let Err(e) = writer.send(TMsg::Text(msg)).await {
-                    panic!("Error sending heartbeat ({})", e);
+                    debug!("Sending heartbeat...");
+                    let msg = serde_json::to_string(&payload).unwrap();
+                    if let Err(e) = writer.send(TMsg::Text(msg)).await {
+                        panic!("Error sending heartbeat ({})", e);
+                    }
                 }
-            }
+            })
         });
     }
 
