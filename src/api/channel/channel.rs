@@ -3,7 +3,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use crate::api::entities::UserApiType;
 
-use super::{MessageTypeApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
+use super::{ChannelTypeApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
 
 /// ? https://discord.com/developers/docs/resources/channel#channel-object
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -12,7 +12,7 @@ pub struct ChannelApiType {
     pub id: String,
     /// the type of channel
     #[serde(rename = "type")]
-    pub type_: MessageTypeApiType,
+    pub type_: ChannelTypeApiType,
     /// the id of the guild (may be missing for some channel objects received over gateway guild dispatches)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<String>,
