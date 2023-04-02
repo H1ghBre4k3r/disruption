@@ -38,7 +38,7 @@ pub struct Client<C> {
 }
 
 impl<C: MessageCallback + Copy> Client<C> {
-    pub async fn new(token: String) -> Result<Self, Box<dyn Error>> {
+    pub fn new(token: String) -> Result<Self, Box<dyn Error>> {
         // stuff related to sending messages over the websocket
         let send_tuple = async_channel::unbounded::<TMsg>();
 
@@ -197,8 +197,8 @@ impl<C: MessageCallback + Copy> Client<C> {
             token: self.token.clone(),
             properties: IdentifyConnectionProperties {
                 os: "linux".to_owned(),
-                browser: "discoruption".to_owned(),
-                device: "discoruption".to_owned(),
+                browser: "disruption".to_owned(),
+                device: "disruption".to_owned(),
             },
             // TODO: Think about useful intents
             intents: Intents::GUILD_MEMBERS as u64
@@ -225,7 +225,7 @@ impl<C: MessageCallback + Copy> Client<C> {
         &mut self,
         payload: super::api::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
-        debug!("Handling payload: {:?}", payload);
+        debug!("Handling payload: {:#?}", payload);
         match payload.op {
             GatewayOpcode::HeartbeatACK => self.last_heartbeat_ack = true,
             GatewayOpcode::Heartbeat => self.send_heartbeat().await?,
@@ -243,9 +243,9 @@ impl<C: MessageCallback + Copy> Client<C> {
         debug!("Dispatch: {:?}", payload.t);
         match payload.t {
             None => panic!("Invalid payload received for GatewayOpcode::Dispatch"),
-            Some(event) => match Event::from(&event) {
-                None => error!("Event {} not implemented yet...", event),
-                Some(e) => match e {
+            Some(event) => match Event::try_from(event.as_str()) {
+                Err(_)=> error!("Event {} not implemented yet...", event),
+                Ok(e) => match e {
                     Event::READY => match payload.d {
                         Some(d) => {
                             let data: ReadyPayloadData = serde_json::from_value(d)?;
@@ -292,19 +292,6 @@ impl<C: MessageCallback + Copy> Client<C> {
             callback.handle_message(msg);
         }
 
-        // let rest = self.rest_client.clone().unwrap();
-
-        // let msg = Message::new(rest, message).await;
-
-        // match msg.content() {
-        //     "§ping" => match msg.channel() {
-        //         Some(channel) => channel.say("Pong!").await?,
-        //         None => (),
-        //     },
-        //     "§test" => msg.reply("Whoop whoop").await?,
-        //     _ => (),
-        // }
-
         Ok(())
     }
 
@@ -313,15 +300,14 @@ impl<C: MessageCallback + Copy> Client<C> {
         let msg = serde_json::to_string(&payload)?;
 
         let (writer, _) = self.send_tuple.clone();
-        match writer.send(TMsg::Text(msg)).await {
-            Err(e) => error!(
+        if let Err(e) = writer.send(TMsg::Text(msg)).await {
+            error!(
                 "[{}:{}] Error sending message: {:?}, ({})",
                 file!(),
                 line!(),
                 payload,
                 e
-            ),
-            _ => (),
+            );
         }
         Ok(())
     }

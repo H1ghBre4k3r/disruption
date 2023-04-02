@@ -6,8 +6,8 @@ use crate::{
 };
 
 pub struct Channel {
-    _rest: RestClient,
-    _channel: ChannelApiType,
+    rest: RestClient,
+    channel: ChannelApiType,
 }
 
 /// Wrapper around a channel object.
@@ -15,8 +15,8 @@ impl Channel {
     /// Create a new channel from it's API type.
     pub fn from_api_type(rest: RestClient, channel: ChannelApiType) -> Self {
         Channel {
-            _rest: rest,
-            _channel: channel,
+            rest,
+            channel,
         }
     }
 
@@ -29,24 +29,21 @@ impl Channel {
 
     /// The ID of this channel.
     pub fn id(&self) -> &str {
-        self._channel.id.as_str()
+        self.channel.id.as_str()
     }
 
     /// Say something in this channel.
     pub async fn say(&self, message: &str) -> Result<(), Box<dyn Error>> {
-        self.send(MessageApiType {
-            content: message.to_owned(),
-            ..Default::default()
-        })
-        .await?;
+        self.send(message).await?;
         Ok(())
     }
 
     /// Send a message into this channel.
-    pub(crate) async fn send(&self, message: MessageApiType) -> Result<(), Box<dyn Error>> {
-        self._rest
-            .post(&format!("channels/{}/messages", self.id()), &message)
+    pub(crate) async fn send(&self, message: impl Into<MessageApiType>) -> Result<(), Box<dyn Error>> {
+        self.rest
+            .post(&format!("channels/{}/messages", self.id()), &message.into())
             .await?;
         Ok(())
     }
 }
+

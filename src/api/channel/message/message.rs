@@ -87,3 +87,15 @@ pub struct MessageApiType {
     // sent if the mesasge contains stickers
     // pub sticker_items: Option<Vec<StickerItem>>,
 }
+
+impl<T> From<T> for MessageApiType
+where
+    T: ToString,
+{
+    fn from(value: T) -> Self {
+        MessageApiType {
+            content: value.to_string(),
+            ..Default::default()
+        }
+    }
+}

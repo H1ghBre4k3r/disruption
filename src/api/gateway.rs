@@ -67,12 +67,14 @@ pub enum Event {
     MESSAGE_CREATE,
 }
 
-impl Event {
-    pub fn from(val: &String) -> Option<Self> {
-        match val.as_str() {
-            "READY" => Some(Self::READY),
-            "MESSAGE_CREATE" => Some(Self::MESSAGE_CREATE),
-            _ => None,
+impl TryFrom<&str> for Event {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "READY" => Ok(Self::READY),
+            "MESSAGE_CREATE" => Ok(Self::MESSAGE_CREATE),
+            _ => Err(()),
         }
     }
 }

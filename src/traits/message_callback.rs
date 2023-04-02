@@ -6,7 +6,7 @@ pub trait MessageCallback: Sized {
 
 impl<F> MessageCallback for F
 where
-    F: Fn(Message) -> (),
+    F: Fn(Message),
 {
     fn handle_message(&self, msg: Message) {
         self(msg);

@@ -10,10 +10,10 @@ pub struct RestClient {
 
 /// Client for the Discord REST API. (basically a wrapper around reqwest)
 impl RestClient {
-    pub fn new(bot_token: &String, api_version: u8) -> Self {
+    pub fn new(bot_token: &str, api_version: u8) -> Self {
         Self {
             base_url: format!("https://discord.com/api/v{}/", api_version),
-            bot_token: bot_token.clone(),
+            bot_token: bot_token.to_owned(),
             client: reqwest::Client::new(),
         }
     }
