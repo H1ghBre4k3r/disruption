@@ -5,6 +5,7 @@ use crate::{
     internal::RestClient,
 };
 
+#[derive(Debug, Clone)]
 pub struct Channel {
     rest: RestClient,
     channel: ChannelApiType,

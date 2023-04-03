@@ -1,5 +1,6 @@
 use reqwest::Response;
 use serde::Serialize;
+use core::fmt::Debug;
 
 #[derive(Clone)]
 pub struct RestClient {
@@ -47,5 +48,11 @@ impl RestClient {
             )
             .send()
             .await
+    }
+}
+
+impl Debug for RestClient {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&format!("RestClient {{ base_url: '{}' }}", self.base_url))
     }
 }

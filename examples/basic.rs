@@ -24,6 +24,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         trace!("{}", e);
                     }
                 }
+                "§channel" => {
+                    println!("{:#?}", msg.channel());
+                }
                 _ => (),
             }
         });

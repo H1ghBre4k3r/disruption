@@ -7,6 +7,7 @@ use crate::{
 };
 
 /// Struct representing a message send in a Discord channel.
+#[derive(Debug, Clone)]
 pub struct Message {
     rest: RestClient,
     msg: MessageApiType,
