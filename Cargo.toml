@@ -18,6 +18,6 @@ futures-util = "0.3.28"
 futures-channel = "0.3"
 futures = "0.3.28"
 reqwest = { version = "0.11", features = ["json"] }
-async-channel = "1.8.0"
+async-channel = "1.9.0"
 env_logger = "0.10.0"
 log = "0.4.19"
