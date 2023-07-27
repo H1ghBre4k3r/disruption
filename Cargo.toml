@@ -8,7 +8,7 @@ authors = ["Louis Meyer (H1ghBre4k3r) <h1ghbre4k3r@dev.bre4k3r.de>"]
 name = "disruption"
 
 [dependencies]
-serde = { version = "1.0.171", features = ["derive"] }
+serde = { version = "1.0.176", features = ["derive"] }
 serde_json = "1.0.103"
 serde_repr = "0.1.15"
 tokio = {version =  "1.29.1", features = ["full"] }
