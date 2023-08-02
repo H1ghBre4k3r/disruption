@@ -15,8 +15,13 @@ use futures_util::StreamExt;
 use log::{debug, error, info, trace};
 use std::{
     error::Error,
+    sync::Arc,
     thread,
     time::{Duration, SystemTime},
+};
+use tokio::sync::{
+    mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
+    Mutex,
 };
 use tokio_tungstenite::{
     connect_async,
@@ -27,9 +32,9 @@ use url::Url;
 pub struct Client<C> {
     token: String,
     /// Tuple containing sender and receiver for the channel receiving messages from the websocket
-    rec_tuple: (Sender<TMsg>, Receiver<TMsg>),
+    rec_tuple: (UnboundedSender<TMsg>, Arc<Mutex<UnboundedReceiver<TMsg>>>),
     /// Tuple containing sender and receiver for the channel sending messages over the websocket
-    send_tuple: (Sender<TMsg>, Receiver<TMsg>),
+    send_tuple: (UnboundedSender<TMsg>, Arc<Mutex<UnboundedReceiver<TMsg>>>),
     heartbeat: Option<u128>,
     last_heartbeat: Option<SystemTime>,
     last_heartbeat_ack: bool,
@@ -43,15 +48,15 @@ pub struct Client<C> {
 impl<C: MessageCallback + Copy> Client<C> {
     pub fn new(token: String) -> Result<Self, Box<dyn Error>> {
         // stuff related to sending messages over the websocket
-        let send_tuple = async_channel::unbounded::<TMsg>();
+        let (send_tuple_sender, send_tuple_receiver) = unbounded_channel::<TMsg>();
 
         // Stuff related to receiving messages from the websocket
-        let rec_tuple = async_channel::unbounded::<TMsg>();
+        let (rec_tuple_sender, rec_tuple_receiver) = unbounded_channel::<TMsg>();
 
         Ok(Client {
             token,
-            rec_tuple,
-            send_tuple,
+            rec_tuple: (rec_tuple_sender, Arc::new(Mutex::new(rec_tuple_receiver))),
+            send_tuple: (send_tuple_sender, Arc::new(Mutex::new(send_tuple_receiver))),
             heartbeat: None,
             last_heartbeat: None,
             last_heartbeat_ack: true,
@@ -66,12 +71,12 @@ impl<C: MessageCallback + Copy> Client<C> {
     /// Start the discord client.
     pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
         self.init().await?;
-        let (_, mut reader) = self.rec_tuple.clone();
+        let reader = self.rec_tuple.1.clone();
 
         loop {
             // TODO: Move this into own next() method. Or do it in own thread, which then calls registered listeners.
             // loop and check for new messages
-            match reader.next().await {
+            match reader.lock().await.recv().await {
                 Some(msg) => {
                     match msg {
                         TMsg::Close(r) => {
@@ -101,8 +106,8 @@ impl<C: MessageCallback + Copy> Client<C> {
                         }
                         TMsg::Ping(v) => {
                             debug!("Pinging ({:?})", v);
-                            let (writer, _) = self.send_tuple.clone();
-                            writer.send(TMsg::Pong(v)).await?;
+                            let writer = self.send_tuple.0.clone();
+                            writer.send(TMsg::Pong(v))?;
                         }
                         _ => todo!(),
                     };
@@ -134,13 +139,13 @@ impl<C: MessageCallback + Copy> Client<C> {
         let (mut ws_writer, mut ws_reader) = socket.split();
 
         // spawn thread for receiving messages
-        let (message_receiver, _) = self.rec_tuple.clone();
+        let message_receiver = self.rec_tuple.0.clone();
         tokio::spawn(async move {
             loop {
                 match ws_reader.next().await {
                     Some(msg) => match msg {
                         Ok(msg) => {
-                            if let Err(e) = message_receiver.send(msg).await {
+                            if let Err(e) = message_receiver.send(msg) {
                                 trace!("[{}:{}] {}", file!(), line!(), e);
                             }
                         }
@@ -155,18 +160,18 @@ impl<C: MessageCallback + Copy> Client<C> {
         });
 
         // spawn a thread which is responsible for sending messages over the websocket
-        let (_, sending_queue) = self.send_tuple.clone();
+        let sending_queue = self.send_tuple.1.clone();
         tokio::spawn(async move {
             loop {
-                match sending_queue.recv().await {
-                    Ok(msg) => {
+                match sending_queue.lock().await.recv().await {
+                    Some(msg) => {
                         debug!("Sending message: {}", msg);
                         if let Err(e) = ws_writer.send(msg.clone()).await {
                             error!("Error while sending message: {} ({})", msg, e);
                             panic!();
                         }
                     }
-                    Err(e) => error!("Error during reading: {}", e),
+                    None => error!("Error during reading"),
                 }
             }
         });
@@ -176,8 +181,8 @@ impl<C: MessageCallback + Copy> Client<C> {
 
     /// Handle the intial message after connecting to the discord gateway.
     async fn handle_hello(&mut self) -> Result<(), Box<dyn Error>> {
-        let (_, mut reader) = self.rec_tuple.clone();
-        match reader.next().await {
+        let (_, reader) = self.rec_tuple.clone();
+        match reader.lock().await.recv().await {
             None => panic!(""),
             Some(msg) => match msg {
                 TMsg::Text(msg) => {
@@ -317,7 +322,7 @@ impl<C: MessageCallback + Copy> Client<C> {
         let msg = serde_json::to_string(&payload)?;
 
         let (writer, _) = self.send_tuple.clone();
-        if let Err(e) = writer.send(TMsg::Text(msg)).await {
+        if let Err(e) = writer.send(TMsg::Text(msg)) {
             error!(
                 "[{}:{}] Error sending message: {:?}, ({})",
                 file!(),
@@ -336,7 +341,7 @@ impl<C: MessageCallback + Copy> Client<C> {
 
         // TODO: Why does tokio::spawn not work here?
         thread::spawn(move || {
-            block_on(async move {
+            block_on(async {
                 loop {
                     thread::sleep(Duration::from_millis(heartbeat_interval as u64));
                     let payload = disruption_types::payloads::Payload {
@@ -352,7 +357,7 @@ impl<C: MessageCallback + Copy> Client<C> {
 
                     debug!("Sending heartbeat...");
                     let msg = serde_json::to_string(&payload).unwrap();
-                    if let Err(e) = writer.send(TMsg::Text(msg)).await {
+                    if let Err(e) = writer.send(TMsg::Text(msg)) {
                         panic!("Error sending heartbeat ({})", e);
                     }
                 }
