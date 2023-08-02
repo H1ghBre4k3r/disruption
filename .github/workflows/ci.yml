@@ -15,9 +15,9 @@ jobs:
         name: Build Library
         with:
           command: build
-          args: --release --all-features
+          args: --workspace --release --all-features
       - uses: actions-rs/cargo@v1
         name: Run Tests
         with:
           command: test
-          args: --release --all-features
+          args: --workspace --release --all-features
