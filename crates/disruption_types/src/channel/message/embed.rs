@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object
+/// <https://discord.com/developers/docs/resources/channel#embed-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedApiType {
     /// title of embed
@@ -44,7 +44,7 @@ pub struct EmbedApiType {
     pub fields: Option<Vec<EmbedFieldApiType>>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure
+/// <https://discord.com/developers/docs/resources/channel#embed-object-embed-footer-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedFooterApiType {
     pub text: String,
@@ -54,7 +54,7 @@ pub struct EmbedFooterApiType {
     pub proxy_icon_url: Option<String>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure
+/// <https://discord.com/developers/docs/resources/channel#embed-object-embed-image-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedImageApiType {
     pub url: String,
@@ -66,7 +66,7 @@ pub struct EmbedImageApiType {
     pub width: Option<u64>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure
+/// <https://discord.com/developers/docs/resources/channel#embed-object-embed-thumbnail-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedThumbnailApiType {
     pub url: String,
@@ -78,7 +78,7 @@ pub struct EmbedThumbnailApiType {
     pub width: Option<u64>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure
+/// <https://discord.com/developers/docs/resources/channel#embed-object-embed-video-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedVideoApiType {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -91,7 +91,7 @@ pub struct EmbedVideoApiType {
     pub width: Option<u64>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure
+/// <https://discord.com/developers/docs/resources/channel#embed-object-embed-provider-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedProviderApiType {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -100,7 +100,7 @@ pub struct EmbedProviderApiType {
     pub url: Option<String>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure
+/// <https://discord.com/developers/docs/resources/channel#embed-object-embed-author-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedAuthorApiType {
     pub name: String,
@@ -112,7 +112,7 @@ pub struct EmbedAuthorApiType {
     pub proxy_icon_url: Option<String>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure
+/// <https://discord.com/developers/docs/resources/channel#embed-object-embed-field-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmbedFieldApiType {
     pub name: String,

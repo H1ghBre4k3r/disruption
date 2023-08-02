@@ -5,7 +5,7 @@ use crate::entities::UserApiType;
 
 use super::{ChannelTypeApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
 
-/// ? https://discord.com/developers/docs/resources/channel#channel-object
+/// <https://discord.com/developers/docs/resources/channel#channel-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ChannelApiType {
     /// the id of this channel
@@ -85,13 +85,13 @@ pub struct ChannelApiType {
     /// computed permissions for the invoking user in the channel, including overwrites, only included when part of the resolved data received on a slash command interaction
     #[serde(skip_serializing_if = "Option::is_none")]
     pub permissions: Option<String>,
-    // ? https://discord.com/developers/docs/resources/channel#channel-object-channel-flags
+    // <https://discord.com/developers/docs/resources/channel#channel-object-channel-flags>
     /// channel flags combined as a bitfield
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<u64>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes
+/// <https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes>
 #[derive(Serialize_repr, Deserialize_repr, Debug, Default, Clone)]
 #[repr(u8)]
 pub enum VideoQualityModeApiType {

@@ -1,5 +1,5 @@
 /// TODO: Allow ORing of intents
-/// ? https://discord.com/developers/docs/topics/gateway#gateway-intents
+/// <https://discord.com/developers/docs/topics/gateway#gateway-intents>
 pub enum Intents {
     #[allow(non_camel_case_types, dead_code)]
     GUILDS = 1 << 0,
@@ -59,7 +59,7 @@ pub enum Intents {
     AUTO_MODERATION_EXECUTION = 1 << 21,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events
+/// <https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events>
 /// Enum for working with dispatch event types
 pub enum Event {
     READY,

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// ? https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure
+/// <https://discord.com/developers/docs/resources/channel#thread-metadata-object-thread-metadata-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ThreadMetadataApiType {
     pub archived: bool,
@@ -13,7 +13,7 @@ pub struct ThreadMetadataApiType {
     pub create_timestamp: Option<String>,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#thread-member-object
+/// <https://discord.com/developers/docs/resources/channel#thread-member-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ThreadMemberApiType {
     #[serde(skip_serializing_if = "Option::is_none")]

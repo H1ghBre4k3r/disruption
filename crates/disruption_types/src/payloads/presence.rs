@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-/// ? https://discord.com/developers/docs/topics/gateway#update-presence
+/// <https://discord.com/developers/docs/topics/gateway#update-presence>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PresenceUpdateStructure {
     /// unix time (in ms) of when the client went idle if the client is not idle
@@ -15,7 +15,7 @@ pub struct PresenceUpdateStructure {
     pub afk: bool,
 }
 
-/// TODO: https://discord.com/developers/docs/topics/gateway#activity-object
+/// TODO: <https://discord.com/developers/docs/topics/gateway#activity-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Activity {
     /// the activity's name
@@ -63,7 +63,7 @@ pub struct Activity {
     pub buttons: Option<Vec<ActivityButton>>,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-types
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-types>
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum ActivityType {
@@ -75,7 +75,7 @@ pub enum ActivityType {
     Competing = 5,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityTimestamps {
     /// unix time (in milliseconds) of when the activity started
@@ -86,7 +86,7 @@ pub struct ActivityTimestamps {
     pub end: Option<u64>,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityEmoji {
     /// the name of the emoji
@@ -99,7 +99,7 @@ pub struct ActivityEmoji {
     pub animated: Option<bool>,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-party
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-party>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityParty {
     /// the id of the party
@@ -110,7 +110,7 @@ pub struct ActivityParty {
     pub size: Option<Vec<u64>>,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityAssets {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,7 +123,7 @@ pub struct ActivityAssets {
     pub small_text: Option<String>,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivitySecrets {
     /// the secret for joining a party
@@ -137,7 +137,7 @@ pub struct ActivitySecrets {
     pub match_: Option<String>,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags>
 #[allow(dead_code)]
 pub enum ActivityFlags {
     INSTANCE = 1 << 0,
@@ -154,7 +154,7 @@ pub enum ActivityFlags {
     EMBEDDED = 1 << 8,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons
+/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityButton {
     pub label: String,

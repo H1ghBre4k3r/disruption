@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::UserApiType;
 
-/// ? https://discord.com/developers/docs/resources/emoji#emoji-object
+/// <https://discord.com/developers/docs/resources/emoji#emoji-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct EmojiApiType {
     pub id: Option<String>,

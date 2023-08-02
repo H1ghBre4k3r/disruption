@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// ? https://discord.com/developers/docs/resources/user#user-object
+/// <https://discord.com/developers/docs/resources/user#user-object>
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct UserApiType {
     /// the user's id

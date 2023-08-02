@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::PresenceUpdateStructure;
 
-/// ? https://discord.com/developers/docs/topics/gateway#identify
+/// <https://discord.com/developers/docs/topics/gateway#identify>
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct IdentifyPayloadData {
     /// authentication token
@@ -25,7 +25,7 @@ pub struct IdentifyPayloadData {
     pub intents: u64,
 }
 
-/// ? https://discord.com/developers/docs/topics/gateway#identify-identify-connection-properties
+/// <https://discord.com/developers/docs/topics/gateway#identify-identify-connection-properties>
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct IdentifyConnectionProperties {
     /// your operating system

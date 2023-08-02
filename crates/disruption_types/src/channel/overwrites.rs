@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// ? https://discord.com/developers/docs/resources/channel#overwrite-object
+/// <https://discord.com/developers/docs/resources/channel#overwrite-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct OverwritesApiType {
     pub id: String,

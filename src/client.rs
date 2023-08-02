@@ -88,6 +88,7 @@ impl<C: MessageCallback + Copy> Client<C> {
                                 break;
                             };
 
+                            info!("close code: {code}");
                             break;
                         }
                         TMsg::Text(msg) => {

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::ChannelTypeApiType;
 
-/// ? https://discord.com/developers/docs/resources/channel#channel-mention-object
+/// <https://discord.com/developers/docs/resources/channel#channel-mention-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ChannelMentionApiType {
     /// id of the channel
@@ -16,7 +16,7 @@ pub struct ChannelMentionApiType {
     pub name: String,
 }
 
-/// ? https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mentions-structure
+/// <https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mentions-structure>
 #[derive(Serialize, Deserialize)]
 pub struct AllowedMentionsApiType {
     /// An array of allowed mention types to parse from the content.

@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::entities::{ApplicationApiType, UnavailableGuildApiType, UserApiType};
 
-/// ? https://discord.com/developers/docs/topics/gateway#ready
+/// <https://discord.com/developers/docs/topics/gateway#ready>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ReadyPayloadData {
     pub v: u8,

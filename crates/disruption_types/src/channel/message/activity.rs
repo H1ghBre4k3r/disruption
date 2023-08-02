@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-/// ? https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure
+/// <https://discord.com/developers/docs/resources/channel#message-object-message-activity-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MessageActivityApiType {
     #[serde(rename = "type")]
@@ -10,7 +10,7 @@ pub struct MessageActivityApiType {
     pub party_id: Option<String>,
 }
 
-/// ?https://discord.com/developers/docs/resources/channel#message-object-message-activity-types
+/// <https://discord.com/developers/docs/resources/channel#message-object-message-activity-types>
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum MessageActivityTypeApiType {

@@ -3,7 +3,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use super::UserApiType;
 
-/// ? https://discord.com/developers/docs/topics/teams#data-models-team-object
+/// <https://discord.com/developers/docs/topics/teams#data-models-team-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TeamApiType {
     /// a hash of the image of the team's icon
@@ -18,7 +18,7 @@ pub struct TeamApiType {
     pub owner_user_id: String,
 }
 
-/// ? https://discord.com/developers/docs/topics/teams#data-models-team-member-object
+/// <https://discord.com/developers/docs/topics/teams#data-models-team-member-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct TeamMemberApiType {
     /// the user's membership state on the team
@@ -30,7 +30,7 @@ pub struct TeamMemberApiType {
     pub user: UserApiType,
 }
 
-/// ? https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum
+/// <https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum>
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum MembershipStateApiType {

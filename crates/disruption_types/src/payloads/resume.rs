@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-/// ? https://discord.com/developers/docs/topics/gateway#resume-resume-structure
+/// <https://discord.com/developers/docs/topics/gateway#resume-resume-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResumePayloadData {
     /// session token

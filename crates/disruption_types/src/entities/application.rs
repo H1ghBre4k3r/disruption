@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use super::{TeamApiType, UserApiType};
 
-/// ? https://discord.com/developers/docs/resources/application#application-object
+/// <https://discord.com/developers/docs/resources/application#application-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ApplicationApiType {
     /// the id of the app
@@ -47,7 +47,7 @@ pub struct ApplicationApiType {
     pub custom_install_url: Option<String>,
 }
 
-/// ? https://discord.com/developers/docs/resources/application#application-object-application-flags
+/// <https://discord.com/developers/docs/resources/application#application-object-application-flags>
 pub enum ApplicationFlagsApiType {
     /// Intent required for bots in 100 or more servers to receive presence_update events
     #[allow(non_camel_case_types)]
@@ -74,7 +74,7 @@ pub enum ApplicationFlagsApiType {
     GATEWAY_MESSAGE_CONTENT_LIMITED = 1 << 19,
 }
 
-/// ? https://discord.com/developers/docs/resources/application#install-params-object
+/// <https://discord.com/developers/docs/resources/application#install-params-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct InstallParamsApiType {
     /// the scopes to add the application to the server with

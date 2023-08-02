@@ -3,7 +3,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use crate::entities::UserApiType;
 
-/// ? https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object-message-interaction-structure
+/// <https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object-message-interaction-structure>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MessageInteractionApiType {
     pub id: String,
@@ -16,7 +16,7 @@ pub struct MessageInteractionApiType {
 }
 
 // TODO: move this to other module
-/// ? https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
+/// <https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type>
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
 #[repr(u8)]
 pub enum InteractionTypeApiType {
