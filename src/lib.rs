@@ -1,4 +1,5 @@
 mod client;
+pub mod gateway;
 mod implementations;
 mod internal;
 

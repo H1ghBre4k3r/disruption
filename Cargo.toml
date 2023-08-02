@@ -11,9 +11,7 @@ readme = "README.md"
 name = "disruption"
 
 [workspace]
-members = [
-    "crates/*"
-]
+members = ["crates/*"]
 
 [dependencies]
 disruption_types = { path = "./crates/disruption_types" }
