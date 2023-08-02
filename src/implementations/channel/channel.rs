@@ -1,9 +1,8 @@
 use std::error::Error;
 
-use crate::{
-    api::channel::{ChannelApiType, MessageApiType},
-    internal::RestClient,
-};
+use disruption_types::channel::{ChannelApiType, MessageApiType};
+
+use crate::internal::RestClient;
 
 #[derive(Debug, Clone)]
 pub struct Channel {
@@ -15,10 +14,7 @@ pub struct Channel {
 impl Channel {
     /// Create a new channel from it's API type.
     pub fn from_api_type(rest: RestClient, channel: ChannelApiType) -> Self {
-        Channel {
-            rest,
-            channel,
-        }
+        Channel { rest, channel }
     }
 
     /// Create a new channel from it's channel id.
@@ -40,11 +36,13 @@ impl Channel {
     }
 
     /// Send a message into this channel.
-    pub(crate) async fn send(&self, message: impl Into<MessageApiType>) -> Result<(), Box<dyn Error>> {
+    pub(crate) async fn send(
+        &self,
+        message: impl Into<MessageApiType>,
+    ) -> Result<(), Box<dyn Error>> {
         self.rest
             .post(&format!("channels/{}/messages", self.id()), &message.into())
             .await?;
         Ok(())
     }
 }
-

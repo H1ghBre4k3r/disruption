@@ -3,11 +3,20 @@ name = "disruption"
 version = "0.1.0"
 edition = "2021"
 authors = ["Louis Meyer (H1ghBre4k3r) <h1ghbre4k3r@dev.bre4k3r.de>"]
+repository = "https://github.com/H1ghBre4k3r/disruption"
+license = "MIT"
+readme = "README.md"
 
 [lib]
 name = "disruption"
 
+[workspace]
+members = [
+    "crates/*"
+]
+
 [dependencies]
+disruption_types = { path = "./crates/disruption_types" }
 serde = { version = "1.0.180", features = ["derive"] }
 serde_json = "1.0.104"
 serde_repr = "0.1.16"

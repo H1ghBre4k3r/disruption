@@ -1,10 +1,8 @@
 use std::error::Error;
 
-use crate::{
-    api::channel::{MessageApiType, MessageReferenceApiType},
-    implementations::channel::Channel,
-    internal::RestClient,
-};
+use disruption_types::channel::{MessageApiType, MessageReferenceApiType};
+
+use crate::{implementations::channel::Channel, internal::RestClient};
 
 /// Struct representing a message send in a Discord channel.
 #[derive(Debug, Clone)]

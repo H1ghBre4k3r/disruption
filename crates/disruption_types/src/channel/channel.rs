@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::api::entities::UserApiType;
+use crate::entities::UserApiType;
 
 use super::{ChannelTypeApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
 

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::api::entities::EmojiApiType;
+use crate::entities::EmojiApiType;
 
 /// ? https://discord.com/developers/docs/resources/channel#reaction-object
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::api::{
+use crate::{
     channel::{ChannelApiType, ChannelMentionApiType},
     entities::{ApplicationApiType, RoleApiType, UserApiType},
 };

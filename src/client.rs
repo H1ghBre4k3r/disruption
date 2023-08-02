@@ -1,6 +1,7 @@
 use crate::{implementations::channel::Message, internal::RestClient, traits::MessageCallback};
 
-use super::api::{
+use async_channel::{Receiver, Sender};
+use disruption_types::{
     channel,
     gateway::{Event, Intents},
     opcodes::GatewayOpcode,
@@ -9,7 +10,6 @@ use super::api::{
         ReadyPayloadData,
     },
 };
-use async_channel::{Receiver, Sender};
 use futures::{executor::block_on, SinkExt};
 use futures_util::StreamExt;
 use log::{debug, error, info, trace};
@@ -18,7 +18,10 @@ use std::{
     thread,
     time::{Duration, SystemTime},
 };
-use tokio_tungstenite::{connect_async, tungstenite::Message as TMsg};
+use tokio_tungstenite::{
+    connect_async,
+    tungstenite::{protocol::frame::coding::CloseCode, Message as TMsg},
+};
 use url::Url;
 
 pub struct Client<C> {
@@ -75,10 +78,20 @@ impl<C: MessageCallback + Copy> Client<C> {
                             // TODO: Does this belong here?
                             // ? we should think of a good place to handle
                             info!("Closing connection: {:?}", r);
+
+                            let Some(close_frame) = r else {
+                                break;
+                            };
+
+                            // TODO: determine the reason
+                            let CloseCode::Library(code) = close_frame.code else {
+                                break;
+                            };
+
                             break;
                         }
                         TMsg::Text(msg) => {
-                            let payload: super::api::payloads::Payload =
+                            let payload: disruption_types::payloads::Payload =
                                 serde_json::from_str(msg.as_str())?;
                             self.last_seq = payload.s;
                             if let Err(e) = self.handle_payload(payload).await {
@@ -167,7 +180,7 @@ impl<C: MessageCallback + Copy> Client<C> {
             None => panic!(""),
             Some(msg) => match msg {
                 TMsg::Text(msg) => {
-                    let payload: super::api::payloads::Payload =
+                    let payload: disruption_types::payloads::Payload =
                         serde_json::from_str(msg.as_str())?;
                     match payload.op {
                         GatewayOpcode::Hello => match payload.d {
@@ -223,7 +236,7 @@ impl<C: MessageCallback + Copy> Client<C> {
     /// Handle payloads received via the websocket.
     async fn handle_payload(
         &mut self,
-        payload: super::api::payloads::Payload,
+        payload: disruption_types::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
         debug!("Handling payload: {:#?}", payload);
         match payload.op {
@@ -238,13 +251,13 @@ impl<C: MessageCallback + Copy> Client<C> {
     /// Handle GatewayOpcode::Dispatch (opcode 0)
     async fn handle_dispatch(
         &mut self,
-        payload: super::api::payloads::Payload,
+        payload: disruption_types::payloads::Payload,
     ) -> Result<(), Box<dyn Error>> {
         debug!("Dispatch: {:?}", payload.t);
         match payload.t {
             None => panic!("Invalid payload received for GatewayOpcode::Dispatch"),
             Some(event) => match Event::try_from(event.as_str()) {
-                Err(_)=> error!("Event {} not implemented yet...", event),
+                Err(_) => error!("Event {} not implemented yet...", event),
                 Ok(e) => match e {
                     Event::READY => match payload.d {
                         Some(d) => {
@@ -296,7 +309,10 @@ impl<C: MessageCallback + Copy> Client<C> {
     }
 
     /// Send a payload over the websocket.
-    async fn send(&mut self, payload: super::api::payloads::Payload) -> Result<(), Box<dyn Error>> {
+    async fn send(
+        &mut self,
+        payload: disruption_types::payloads::Payload,
+    ) -> Result<(), Box<dyn Error>> {
         let msg = serde_json::to_string(&payload)?;
 
         let (writer, _) = self.send_tuple.clone();
@@ -322,7 +338,7 @@ impl<C: MessageCallback + Copy> Client<C> {
             block_on(async move {
                 loop {
                     thread::sleep(Duration::from_millis(heartbeat_interval as u64));
-                    let payload = super::api::payloads::Payload {
+                    let payload = disruption_types::payloads::Payload {
                         op: GatewayOpcode::Heartbeat,
                         d: None,
                         // TODO: Try to retrieve seq_num
@@ -346,7 +362,7 @@ impl<C: MessageCallback + Copy> Client<C> {
     /// Send a heartbeat via the websocket
     async fn send_heartbeat(&mut self) -> Result<(), Box<dyn Error>> {
         // construct and send heartbeat
-        let payload = super::api::payloads::Payload {
+        let payload = disruption_types::payloads::Payload {
             op: GatewayOpcode::Heartbeat,
             d: match self.last_seq {
                 Some(seq) => Some(serde_json::to_value(seq)?),

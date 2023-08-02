@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::api::entities::UserApiType;
+use crate::entities::UserApiType;
 
 /// ? https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object-message-interaction-structure
 #[derive(Serialize, Deserialize, Debug, Clone)]
