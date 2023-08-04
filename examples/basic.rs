@@ -1,4 +1,4 @@
-use disruption_gateway::Gateway;
+use disruption::Gateway;
 use std::env;
 use std::error::Error;
 
@@ -40,15 +40,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let receiver = gateway.receiver().await;
 
-    let mut a = 0;
     loop {
-        if a == 5 {
-            break;
-        }
         let msg = receiver.recv().await?;
         println!("{msg:?}");
-        a += 1;
     }
-
-    Ok(())
 }

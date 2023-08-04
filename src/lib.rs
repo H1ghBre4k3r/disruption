@@ -1,8 +1,8 @@
-mod client;
 mod implementations;
 mod internal;
 
 pub mod traits;
 
-pub use client::*;
 pub use implementations::*;
+
+pub use disruption_gateway::*;
