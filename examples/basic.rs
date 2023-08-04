@@ -1,4 +1,5 @@
 use disruption::gateway::Gateway;
+use log::debug;
 use std::env;
 use std::error::Error;
 
@@ -41,8 +42,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let receiver = gateway.receiver().await;
 
     loop {
-        let tokio_tungstenite::tungstenite::Message::Text(e) = receiver.recv().await? else { continue; };
-        let payload: disruption_types::payloads::Payload = serde_json::from_str(e.as_str())?;
-        println!("{payload:#?}");
+        debug!("waiting to receive...");
+        let msg = receiver.recv().await?;
+        println!("{msg:?}");
     }
 }
