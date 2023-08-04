@@ -192,6 +192,7 @@ name = "disruption"
 version = "0.1.0"
 dependencies = [
  "async-channel",
+ "disruption_gateway",
  "disruption_types",
  "env_logger",
  "futures",
@@ -202,6 +203,21 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_repr",
+ "tokio",
+ "tokio-tungstenite",
+ "url",
+]
+
+[[package]]
+name = "disruption_gateway"
+version = "0.1.0"
+dependencies = [
+ "async-channel",
+ "disruption_types",
+ "futures",
+ "futures-util",
+ "log",
+ "serde_json",
  "tokio",
  "tokio-tungstenite",
  "url",

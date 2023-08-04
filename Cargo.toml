@@ -17,6 +17,7 @@ members = ["crates/*"]
 disruption_types = { path = "./crates/disruption_types" }
 serde = { version = "1.0.188", features = ["derive"] }
 serde_json = "1.0.107"
+disruption_gateway = { path = "./crates/disruption_gateway" }
 serde_repr = "0.1.16"
 tokio = {version =  "1.33.0", features = ["full"] }
 tokio-tungstenite = { version = "0.20.1", features = ["native-tls"] }
