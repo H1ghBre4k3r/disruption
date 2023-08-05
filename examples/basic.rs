@@ -37,11 +37,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
     //     trace!("{}", e);
     // }
     let gateway = Gateway::connect(env::var("BOT_TOKEN")?).await?;
-
     let receiver = gateway.receiver().await;
 
     loop {
-        let msg = receiver.recv().await?;
-        println!("{msg:?}");
+        let payload = receiver.recv().await?;
+        println!("{payload:#?}");
     }
 }

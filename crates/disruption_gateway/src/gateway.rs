@@ -32,7 +32,7 @@ pub struct Gateway {
     token: String,
     writer: WriterLock,
     /// Tuple containing sender and receiver for the channel receiving messages from the websocket
-    rec_tuple: (Sender<Message>, Receiver<Message>),
+    rec_tuple: (Sender<Payload>, Receiver<Payload>),
     receiver_handle: Option<JoinHandle<()>>,
     heartbeat_handle: Arc<Mutex<Option<JoinHandle<()>>>>,
 }
@@ -40,7 +40,7 @@ pub struct Gateway {
 impl Gateway {
     pub async fn connect(token: impl ToString) -> Result<Self, Box<dyn std::error::Error>> {
         // Stuff related to receiving messages from the websocket
-        let rec_tuple = async_channel::unbounded::<Message>();
+        let rec_tuple = async_channel::unbounded::<Payload>();
 
         let mut gateway = Gateway {
             token: token.to_string(),
@@ -86,8 +86,11 @@ impl Gateway {
                 loop {
                     match socket_reader.next().await {
                         Some(Ok(message)) => {
-                            if let Err(e) = channel_writer.send(message).await {
-                                trace!("[{}:{}] {}", file!(), line!(), e);
+                            if let Err(e) =
+                                Self::handle_socket_message(message, &channel_writer, &writer_lock)
+                                    .await
+                            {
+                                error!("[{}:{}] {}", file!(), line!(), e);
                             }
                         }
                         Some(Err(e)) => {
@@ -100,6 +103,33 @@ impl Gateway {
         });
         self.receiver_handle = Some(receiver_handle);
         Ok(())
+    }
+
+    async fn handle_socket_message(
+        message: Message,
+        channel_writer: &Sender<Payload>,
+        writer_lock: &WriterLock,
+    ) -> Result<(), Box<dyn Error>> {
+        match message {
+            Message::Text(message) => Self::handle_text(channel_writer, message).await?,
+            Message::Ping(payload) => Self::handle_ping(writer_lock, payload).await?,
+            message => unimplemented!("{message:#?}"),
+        }
+
+        Ok(())
+    }
+
+    async fn handle_text(
+        channel_writer: &Sender<Payload>,
+        message: String,
+    ) -> Result<(), Box<dyn Error>> {
+        let payload: Payload = serde_json::from_str(message.as_str())?;
+        channel_writer.send(payload).await?;
+        Ok(())
+    }
+
+    async fn handle_ping(writer_lock: &WriterLock, payload: Vec<u8>) -> Result<(), Box<dyn Error>> {
+        Self::static_send_message(writer_lock, Message::Pong(payload)).await
     }
 
     async fn connect_to_gateway(
@@ -177,7 +207,7 @@ impl Gateway {
             ..Default::default()
         };
 
-        Self::static_send(writer_lock, payload).await?;
+        Self::static_send_payload(writer_lock, payload).await?;
 
         Ok(())
     }
@@ -194,7 +224,7 @@ impl Gateway {
             loop {
                 tokio::time::sleep(Duration::from_millis(heartbeat_interval as u64)).await;
 
-                let payload = disruption_types::payloads::Payload {
+                let payload = Payload {
                     op: GatewayOpcode::Heartbeat,
                     d: None,
                     // TODO: Try to retrieve seq_num
@@ -206,7 +236,7 @@ impl Gateway {
                 };
 
                 trace!("Sending heartbeat...");
-                if let Err(e) = Self::static_send(&writer_lock, payload).await {
+                if let Err(e) = Self::static_send_payload(&writer_lock, payload).await {
                     panic!("Error sending heartbeat ({})", e);
                 }
                 trace!("Send heartbeat!");
@@ -220,23 +250,26 @@ impl Gateway {
         *current_hearbeat = Some(heartbeat_handle);
     }
 
-    pub async fn send(
-        &self,
-        payload: disruption_types::payloads::Payload,
-    ) -> Result<(), Box<dyn Error>> {
-        Self::static_send(&self.writer, payload).await
+    pub async fn send_message(&self, message: Message) -> Result<(), Box<dyn Error>> {
+        Self::static_send_message(&self.writer, message).await
     }
 
-    pub async fn static_send(
+    pub async fn static_send_message(
         writer: &WriterLock,
-        payload: disruption_types::payloads::Payload,
+        message: Message,
     ) -> Result<(), Box<dyn Error>> {
-        let message = serde_json::to_string(&payload)?;
-
         if let Some(writer) = writer.lock().await.as_mut() {
-            writer.send(Message::Text(message)).await?;
+            writer.send(message).await?;
         }
         Ok(())
+    }
+
+    pub async fn static_send_payload(
+        writer: &WriterLock,
+        payload: Payload,
+    ) -> Result<(), Box<dyn Error>> {
+        let message = serde_json::to_string(&payload)?;
+        Self::static_send_message(writer, Message::Text(message)).await
     }
 
     async fn static_receive(socket_reader: &mut SocketReader) -> Message {
@@ -250,7 +283,7 @@ impl Gateway {
         }
     }
 
-    pub async fn receiver(&self) -> &Receiver<Message> {
+    pub async fn receiver(&self) -> &Receiver<Payload> {
         &self.rec_tuple.1
     }
 }
