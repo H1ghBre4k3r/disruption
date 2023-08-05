@@ -58,46 +58,44 @@ impl Gateway {
         let heartbeat_handle_lock = self.heartbeat_handle.clone();
 
         let (channel_writer, _) = self.rec_tuple.clone();
-        thread::spawn(move || {
-            let rt = tokio::runtime::Runtime::new().unwrap();
-            rt.block_on(async move {
+        tokio::spawn(async move {
+            loop {
+                let (socket, _response) = connect_async(
+                    Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")
+                        .expect("could not parse URL"),
+                )
+                .await
+                .expect("could not connect to gateway");
+
+                let (socket_writer, mut socket_reader) = socket.split();
+                {
+                    let mut writer_inner = writer_lock.lock().await;
+                    *writer_inner = Some(socket_writer);
+                }
+
+                Self::connect_to_gateway(
+                    token.clone(),
+                    &mut socket_reader,
+                    writer_lock.clone(),
+                    heartbeat_handle_lock.clone(),
+                )
+                .await;
+
+                debug!("Continuuuuuuee");
                 loop {
-                    let (socket, _response) = connect_async(
-                        Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")
-                            .expect("could not parse URL"),
-                    )
-                    .await
-                    .expect("could not connect to gateway");
-
-                    let (socket_writer, mut socket_reader) = socket.split();
-                    {
-                        let mut writer_inner = writer_lock.lock().await;
-                        *writer_inner = Some(socket_writer);
-                    }
-
-                    Self::connect_to_gateway(
-                        token.clone(),
-                        &mut socket_reader,
-                        writer_lock.clone(),
-                        heartbeat_handle_lock.clone(),
-                    )
-                    .await;
-
-                    loop {
-                        match socket_reader.next().await {
-                            Some(Ok(message)) => {
-                                if let Err(e) = channel_writer.send(message).await {
-                                    trace!("[{}:{}] {}", file!(), line!(), e);
-                                }
+                    match socket_reader.next().await {
+                        Some(Ok(message)) => {
+                            if let Err(e) = channel_writer.send(message).await {
+                                trace!("[{}:{}] {}", file!(), line!(), e);
                             }
-                            Some(Err(e)) => {
-                                error!("Error reading from socket: {e}");
-                            }
-                            None => break,
                         }
+                        Some(Err(e)) => {
+                            error!("Error reading from socket: {e}");
+                        }
+                        None => break,
                     }
                 }
-            })
+            }
         });
         Ok(())
     }
@@ -116,7 +114,6 @@ impl Gateway {
         if let Err(e) = Self::identify(&token, &writer_lock).await {
             panic!("{e}");
         };
-        debug!("identify successful!");
     }
 
     pub async fn send(
@@ -239,11 +236,11 @@ impl Gateway {
                     ..Default::default()
                 };
 
-                debug!("Sending heartbeat...");
+                trace!("Sending heartbeat...");
                 if let Err(e) = Self::static_send(&writer_lock, payload).await {
                     panic!("Error sending heartbeat ({})", e);
                 }
-                debug!("Send heartbeat!");
+                trace!("Send heartbeat!");
             }
         });
 
