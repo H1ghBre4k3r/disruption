@@ -85,6 +85,7 @@ impl Gateway {
 
                 loop {
                     match socket_reader.next().await {
+                        Some(Ok(Message::Close(_))) => break,
                         Some(Ok(message)) => {
                             if let Err(e) =
                                 Self::handle_socket_message(message, &channel_writer, &writer_lock)

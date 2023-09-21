@@ -1,46 +1,28 @@
-use disruption::Gateway;
+use async_trait::async_trait;
+use disruption::{Client, Handler};
 use std::env;
 use std::error::Error;
+
+struct MyHandler;
+
+#[async_trait]
+impl Handler for MyHandler {
+    async fn on_message(&mut self, message: disruption::channel::Message) {
+        match message.content() {
+            "!ping" => message.reply("Pong!").await.unwrap(),
+            "!echo" => message.reply("ECHO").await.unwrap(),
+            _ => {}
+        }
+    }
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     env_logger::init();
 
-    // let callback = |msg: Message| {
-    //     tokio::spawn(async move {
-    //         match msg.content() {
-    //             "§ping" => match msg.channel() {
-    //                 Some(channel) => {
-    //                     if let Err(e) = channel.say("Pong!").await {
-    //                         trace!("{}", e)
-    //                     }
-    //                 }
-    //                 None => (),
-    //             },
-    //             "§test" => {
-    //                 if let Err(e) = msg.reply("Whoop whoop").await {
-    //                     trace!("{}", e);
-    //                 }
-    //             }
-    //             "§channel" => {
-    //                 println!("{:#?}", msg.channel());
-    //             }
-    //             _ => (),
-    //         }
-    //     });
-    // };
-    //
-    // let mut client = Client::new(env::var("BOT_TOKEN")?)?
-    //     .with_message_callback(callback);
-    //
-    // if let Err(e) = client.start().await {
-    //     trace!("{}", e);
-    // }
-    let gateway = Gateway::connect(env::var("BOT_TOKEN")?).await?;
-    let receiver = gateway.receiver().await;
+    let mut handler = MyHandler;
 
-    loop {
-        let payload = receiver.recv().await?;
-        println!("{payload:#?}");
-    }
+    let mut client = Client::new(&mut handler, env::var("BOT_TOKEN")?);
+    client.connect().await?;
+    client.start().await
 }
