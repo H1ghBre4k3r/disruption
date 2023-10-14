@@ -2,6 +2,7 @@
 name = "disruption_gateway"
 version = "0.1.0"
 edition = "2021"
+description = "A small wrapper around the Discord gateway."
 authors = ["Louis Meyer (H1ghBre4k3r) <h1ghbre4k3r@dev.bre4k3r.de>"]
 repository = "https://github.com/H1ghBre4k3r/disruption"
 license = "MIT"
@@ -9,8 +10,8 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+disruption_types = { version = "0.1.0", path = "../disruption_types/" }
 async-channel = "1.9.0"
-disruption_types = { path = "../disruption_types/" }
 futures = "0.3.28"
 futures-util = "0.3.28"
 log = "0.4.19"

@@ -2,6 +2,7 @@
 name = "disruption_types"
 version = "0.1.0"
 edition = "2021"
+description = "Types for communicating with the Discord API and gateway"
 authors = ["Louis Meyer (H1ghBre4k3r) <h1ghbre4k3r@dev.bre4k3r.de>"]
 repository = "https://github.com/H1ghBre4k3r/disruption"
 license = "MIT"
