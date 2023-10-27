@@ -13,7 +13,7 @@ license = "MIT"
 disruption_types = { version = "0.1.0", path = "../disruption_types/" }
 async-channel = "2.0.0"
 futures = "0.3.28"
-futures-util = "0.3.28"
+futures-util = "0.3.29"
 log = "0.4.19"
 serde_json = "1.0.104"
 tokio = { version = "1.29.1", features = ["full"] }
