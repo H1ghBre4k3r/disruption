@@ -11,7 +11,7 @@ license = "MIT"
 
 [dependencies]
 disruption_types = { version = "0.1.0", path = "../disruption_types/" }
-async-channel = "2.2.1"
+async-channel = "2.3.0"
 futures = "0.3.30"
 futures-util = "0.3.30"
 log = "0.4.21"
