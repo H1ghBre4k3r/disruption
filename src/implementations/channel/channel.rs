@@ -13,12 +13,15 @@ pub struct Channel {
 /// Wrapper around a channel object.
 impl Channel {
     /// Create a new channel from it's API type.
-    pub fn from_api_type(rest: RestClient, channel: ChannelApiType) -> Self {
+    fn from_api_type(rest: RestClient, channel: ChannelApiType) -> Self {
         Channel { rest, channel }
     }
 
     /// Create a new channel from it's channel id.
-    pub async fn from_id(rest: RestClient, channel_id: &String) -> Result<Self, Box<dyn Error>> {
+    pub(crate) async fn from_id(
+        rest: RestClient,
+        channel_id: &String,
+    ) -> Result<Self, Box<dyn Error>> {
         let res = rest.get(&format!("channels/{}", channel_id)).await?;
         let channel = res.json::<ChannelApiType>().await?;
         Ok(Channel::from_api_type(rest, channel))
