@@ -13,7 +13,7 @@ pub struct Message {
 }
 
 impl Message {
-    pub async fn new(rest: RestClient, msg: MessageApiType) -> Self {
+    pub(crate) async fn new(rest: RestClient, msg: MessageApiType) -> Self {
         let channel = Channel::from_id(rest.clone(), &msg.channel_id).await;
         Message {
             rest,
