@@ -23,7 +23,7 @@ serde_repr = "0.1.19"
 tokio = {version =  "1.40.0", features = ["full"] }
 tokio-tungstenite = { version = "0.21.0", features = ["native-tls"] }
 url = "2.5.2"
-futures-util = "0.3.30"
+futures-util = "0.3.31"
 futures-channel = "0.3"
 futures = "0.3.30"
 reqwest = { version = "0.12", features = ["json"] }
