@@ -18,10 +18,7 @@ impl Message {
         Message {
             rest,
             msg,
-            channel: match channel {
-                Err(_) => None,
-                Ok(channel) => Some(channel),
-            },
+            channel: channel.ok(),
         }
     }
 

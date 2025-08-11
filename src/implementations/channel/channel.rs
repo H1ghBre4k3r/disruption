@@ -19,7 +19,7 @@ impl Channel {
 
     /// Create a new channel from it's channel id.
     pub async fn from_id(rest: RestClient, channel_id: &String) -> Result<Self, Box<dyn Error>> {
-        let res = rest.get(&format!("channels/{}", channel_id)).await?;
+        let res = rest.get(&format!("channels/{channel_id}")).await?;
         let channel = res.json::<ChannelApiType>().await?;
         Ok(Channel::from_api_type(rest, channel))
     }
