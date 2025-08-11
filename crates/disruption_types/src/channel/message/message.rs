@@ -10,7 +10,7 @@ use super::{
     MessageInteractionApiType, MessageReferenceApiType, MessageTypeApiType, ReactionApiType,
 };
 
-/// <https://discord.com/developers/docs/resources/channel#message-object>
+/// <https://discord.com/developers/docs/resources/message#message-object>
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct MessageApiType {
     /// id of the message
