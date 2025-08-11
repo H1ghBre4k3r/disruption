@@ -12,8 +12,11 @@ use futures_util::{
 };
 use log::{debug, error, info, trace};
 use tokio::{net::TcpStream, sync::Mutex, task::JoinHandle};
-use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
-use url::Url;
+use tokio_tungstenite::{
+    connect_async,
+    tungstenite::{client::IntoClientRequest, Message},
+    MaybeTlsStream, WebSocketStream,
+};
 
 type WriterLock = Arc<
     Mutex<
@@ -63,7 +66,8 @@ impl Gateway {
         let receiver_handle = tokio::spawn(async move {
             loop {
                 let (socket, _response) = connect_async(
-                    Url::parse("wss://gateway.discord.gg/?v=10&encoding=json")
+                    "wss://gateway.discord.gg/?v=10&encoding=json"
+                        .into_client_request()
                         .expect("could not parse URL"),
                 )
                 .await
@@ -112,8 +116,10 @@ impl Gateway {
         writer_lock: &WriterLock,
     ) -> Result<(), Box<dyn Error>> {
         match message {
-            Message::Text(message) => Self::handle_text(channel_writer, message).await?,
-            Message::Ping(payload) => Self::handle_ping(writer_lock, payload).await?,
+            Message::Text(message) => {
+                Self::handle_text(channel_writer, message.to_string()).await?
+            }
+            Message::Ping(payload) => Self::handle_ping(writer_lock, payload.to_vec()).await?,
             message => unimplemented!("{message:#?}"),
         }
 
@@ -130,7 +136,7 @@ impl Gateway {
     }
 
     async fn handle_ping(writer_lock: &WriterLock, payload: Vec<u8>) -> Result<(), Box<dyn Error>> {
-        Self::static_send_message(writer_lock, Message::Pong(payload)).await
+        Self::static_send_message(writer_lock, Message::Pong(payload.into())).await
     }
 
     async fn connect_to_gateway(
@@ -238,7 +244,7 @@ impl Gateway {
 
                 trace!("Sending heartbeat...");
                 if let Err(e) = Self::static_send_payload(&writer_lock, payload).await {
-                    panic!("Error sending heartbeat ({})", e);
+                    panic!("Error sending heartbeat ({e})");
                 }
                 trace!("Send heartbeat!");
             }
@@ -270,7 +276,7 @@ impl Gateway {
         payload: Payload,
     ) -> Result<(), Box<dyn Error>> {
         let message = serde_json::to_string(&payload)?;
-        Self::static_send_message(writer, Message::Text(message)).await
+        Self::static_send_message(writer, Message::Text(message.into())).await
     }
 
     async fn static_receive(socket_reader: &mut SocketReader) -> Message {
