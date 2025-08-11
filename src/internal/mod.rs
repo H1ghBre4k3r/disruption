@@ -13,7 +13,7 @@ pub struct RestClient {
 impl RestClient {
     pub fn new(bot_token: &str, api_version: u8) -> Self {
         Self {
-            base_url: format!("https://discord.com/api/v{}/", api_version),
+            base_url: format!("https://discord.com/api/v{api_version}/"),
             bot_token: bot_token.to_owned(),
             client: reqwest::Client::new(),
         }
