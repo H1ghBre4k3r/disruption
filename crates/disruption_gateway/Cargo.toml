@@ -14,7 +14,7 @@ disruption_types = { version = "0.1.0", path = "../disruption_types/" }
 async-channel = "2.5.0"
 futures = "0.3.31"
 futures-util = "0.3.30"
-log = "0.4.27"
+log = "0.4.28"
 serde_json = "1.0.142"
 tokio = { version = "1.47.1", features = ["full"] }
 tokio-tungstenite = "0.27.0"
