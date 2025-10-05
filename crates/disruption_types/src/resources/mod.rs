@@ -1,7 +1,27 @@
+mod audit_log;
+mod auto_moderation;
+mod entitlement;
+mod guild_scheduled_event;
+mod guild_template;
+mod invite;
 mod poll;
+mod sku;
+mod soundboard;
+mod stage_instance;
 mod sticker;
+mod voice;
 mod webhook;
 
+pub use self::audit_log::*;
+pub use self::auto_moderation::*;
+pub use self::entitlement::*;
+pub use self::guild_scheduled_event::*;
+pub use self::guild_template::*;
+pub use self::invite::*;
 pub use self::poll::*;
+pub use self::sku::*;
+pub use self::soundboard::*;
+pub use self::stage_instance::*;
 pub use self::sticker::*;
+pub use self::voice::*;
 pub use self::webhook::*;
