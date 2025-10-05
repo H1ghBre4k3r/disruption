@@ -1,4 +1,5 @@
 mod channel;
+mod flags;
 mod forum;
 mod mention;
 mod message;
@@ -6,6 +7,7 @@ mod overwrites;
 mod thread;
 
 pub use self::channel::*;
+pub use self::flags::*;
 pub use self::forum::*;
 pub use self::mention::*;
 pub use self::message::*;
