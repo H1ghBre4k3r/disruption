@@ -1,17 +1,21 @@
 mod channel;
 mod flags;
+mod followed_channel;
 mod forum;
 mod mention;
 mod message;
 mod overwrites;
+mod sort_order;
 mod thread;
 
 pub use self::channel::*;
 pub use self::flags::*;
+pub use self::followed_channel::*;
 pub use self::forum::*;
 pub use self::mention::*;
 pub use self::message::*;
 pub use self::overwrites::*;
+pub use self::sort_order::*;
 pub use self::thread::*;
 
 use serde_repr::{Deserialize_repr, Serialize_repr};

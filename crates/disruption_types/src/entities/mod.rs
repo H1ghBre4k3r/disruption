@@ -1,17 +1,25 @@
 mod application;
+mod application_role_connection;
 mod emoji;
 mod guild_enums;
 mod guilds;
+mod onboarding;
+mod presence;
 mod role;
 mod teams;
 mod user;
 mod user_flags;
+mod welcome_screen;
 
 pub use self::application::*;
+pub use self::application_role_connection::*;
 pub use self::emoji::*;
 pub use self::guild_enums::*;
 pub use self::guilds::*;
+pub use self::onboarding::*;
+pub use self::presence::*;
 pub use self::role::*;
 pub use self::teams::*;
 pub use self::user::*;
 pub use self::user_flags::*;
+pub use self::welcome_screen::*;

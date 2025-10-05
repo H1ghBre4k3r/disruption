@@ -69,6 +69,10 @@ impl<'a> Client<'a> {
                     let message = Message::new(rest_client.clone(), message).await;
                     self.handler.on_message(message).await;
                 }
+                _ => {
+                    // TODO: Handle other event types
+                    continue;
+                }
             }
         }
     }
