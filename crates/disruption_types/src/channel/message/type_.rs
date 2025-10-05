@@ -50,4 +50,30 @@ pub enum MessageTypeApiType {
     CONTEXT_MENU_COMMAND = 23,
     #[allow(non_camel_case_types)]
     AUTO_MODERATION_ACTION = 24,
+    #[allow(non_camel_case_types)]
+    ROLE_SUBSCRIPTION_PURCHASE = 25,
+    #[allow(non_camel_case_types)]
+    INTERACTION_PREMIUM_UPSELL = 26,
+    #[allow(non_camel_case_types)]
+    STAGE_START = 27,
+    #[allow(non_camel_case_types)]
+    STAGE_END = 28,
+    #[allow(non_camel_case_types)]
+    STAGE_SPEAKER = 29,
+    #[allow(non_camel_case_types)]
+    STAGE_TOPIC = 31,
+    #[allow(non_camel_case_types)]
+    GUILD_APPLICATION_PREMIUM_SUBSCRIPTION = 32,
+    #[allow(non_camel_case_types)]
+    GUILD_INCIDENT_ALERT_MODE_ENABLED = 36,
+    #[allow(non_camel_case_types)]
+    GUILD_INCIDENT_ALERT_MODE_DISABLED = 37,
+    #[allow(non_camel_case_types)]
+    GUILD_INCIDENT_REPORT_RAID = 38,
+    #[allow(non_camel_case_types)]
+    GUILD_INCIDENT_REPORT_FALSE_ALARM = 39,
+    #[allow(non_camel_case_types)]
+    PURCHASE_NOTIFICATION = 44,
+    #[allow(non_camel_case_types)]
+    POLL_RESULT = 46,
 }
