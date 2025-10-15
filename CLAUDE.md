@@ -424,11 +424,45 @@ cargo run --example basic
 3. Create a `Client` with your handler
 4. Call `connect()` and `start()`
 
+## Type Coverage Status
+
+**Last Updated**: 2024-10-05
+
+The `disruption_types` crate is undergoing a comprehensive refactoring to achieve 100% coverage of the Discord API as documented in the `docs/` directory.
+
+### Current Coverage: ~20%
+
+- **Total Discord API Structures**: ~169 structures
+- **Implemented**: ~30 structures
+- **Partial**: ~18 structures  
+- **Not Started**: ~121 structures
+
+### Recent Improvements (Phase 1 - October 2024)
+
+✅ **User Object**: Added `global_name`, `avatar_decoration_data`, `collectibles`, `primary_guild` fields
+✅ **Channel Object**: Fixed typo (`last_pint_timestamp` → `last_pin_timestamp`), added forum/media channel support
+✅ **Forum Support**: Added `ForumTagApiType`, `DefaultReactionApiType` structures
+✅ **Channel Types**: Added `GUILD_MEDIA` (type 16)
+✅ **New User Structures**: `AvatarDecorationDataApiType`, `CollectiblesApiType`, `NameplateApiType`, `UserPrimaryGuildApiType`, `ConnectionApiType`
+
+### Roadmap
+
+See `ROADMAP.md` for detailed tracking of API coverage progress. The roadmap includes:
+- Phase 1: Critical fixes to existing structures (✅ In Progress)
+- Phase 2: Core structures (Guild, Interaction, etc.)
+- Phase 3: Extended resources (Webhook, Invite, Sticker, etc.)
+- Phase 4: Complete gateway event coverage
+- Phase 5: Moderation & advanced features
+- Phase 6: Monetization & extras
+- Phase 7: Testing & documentation
+
 ## Summary
 
 Disruption is a promising lightweight Discord bot library for Rust that prioritizes simplicity and type safety. While still in early development, it provides a solid foundation for basic Discord bots with a clean async API. The modular architecture separates concerns well (gateway, types, main library), making the codebase maintainable and extensible.
 
+**Current Focus**: Achieving 100% Discord API type coverage (see `ROADMAP.md`)
+
 **Best suited for**: Simple Discord bots, learning projects, developers who want low-level control
 **Not yet suitable for**: Production bots, complex applications, voice bots, large-scale deployments
 
-The project would benefit from expanded event coverage, comprehensive testing, better documentation, and production-ready features like rate limiting and proper error handling before being considered production-ready.
+The project is actively working toward production-ready features including comprehensive API coverage, testing, better documentation, and features like rate limiting and proper error handling.

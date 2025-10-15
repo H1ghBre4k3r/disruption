@@ -3,7 +3,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use crate::entities::UserApiType;
 
-use super::{ChannelTypeApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
+use super::{ChannelTypeApiType, DefaultReactionApiType, ForumTagApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
 
 /// <https://discord.com/developers/docs/resources/channel#channel-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -60,7 +60,7 @@ pub struct ChannelApiType {
     pub parent_id: Option<String>,
     /// when the last pinned message was pinned. This may be null in events such as GUILD_CREATE when a message is not pinned.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_pint_timestamp: Option<String>,
+    pub last_pin_timestamp: Option<String>,
     /// voice region id for the voice channel, automatic when set to null
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rtc_region: Option<String>,
@@ -89,6 +89,30 @@ pub struct ChannelApiType {
     /// channel flags combined as a bitfield
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<u64>,
+    /// number of messages ever sent in a thread
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_message_sent: Option<u64>,
+    /// the set of tags that can be used in a GUILD_FORUM or a GUILD_MEDIA channel
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub available_tags: Option<Vec<ForumTagApiType>>,
+    /// the IDs of the set of tags that have been applied to a thread in a GUILD_FORUM or a GUILD_MEDIA channel
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub applied_tags: Option<Vec<String>>,
+    /// the emoji to show in the add reaction button on a thread in a GUILD_FORUM or a GUILD_MEDIA channel
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_reaction_emoji: Option<DefaultReactionApiType>,
+    /// the initial rate_limit_per_user to set on newly created threads in a channel
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_thread_rate_limit_per_user: Option<u64>,
+    /// the default sort order type used to order posts in GUILD_FORUM and GUILD_MEDIA channels
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_sort_order: Option<u8>,
+    /// the default forum layout view used to display posts in GUILD_FORUM channels
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_forum_layout: Option<u8>,
+    /// for group DM channels: whether the channel is managed by an application via the gdm.join OAuth2 scope
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub managed: Option<bool>,
 }
 
 /// <https://discord.com/developers/docs/resources/channel#channel-object-video-quality-modes>
