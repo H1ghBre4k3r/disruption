@@ -1,0 +1,21 @@
+{
+  "id": "197038439483310086",
+  "name": "Discord Testers",
+  "icon": "f64c482b807da4f539cff778d174971c",
+  "description": "The official place to report Discord Bugs!",
+  "splash": null,
+  "discovery_splash": null,
+  "owner_id": "73193882359173120",
+  "afk_channel_id": null,
+  "afk_timeout": 300,
+  "verification_level": 1,
+  "default_message_notifications": 1,
+  "explicit_content_filter": 2,
+  "roles": [],
+  "emojis": [],
+  "features": ["NEWS", "ANIMATED_ICON"],
+  "mfa_level": 1,
+  "system_channel_id": "197038439483310086",
+  "premium_tier": 0,
+  "preferred_locale": "en-US"
+}

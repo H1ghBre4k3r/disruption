@@ -1,0 +1,39 @@
+{
+  "id": "222222222222222222",
+  "channel_id": "131391742183342080",
+  "author": {
+    "id": "140564834364416000",
+    "username": "test",
+    "discriminator": "1234",
+    "avatar": "a1b2c3d4e5f6"
+  },
+  "content": "Check this out!",
+  "timestamp": "2016-03-24T23:15:59.605000+00:00",
+  "edited_timestamp": null,
+  "tts": false,
+  "mention_everyone": false,
+  "mentions": [],
+  "mention_roles": [],
+  "attachments": [],
+  "embeds": [
+    {
+      "title": "Embed Title",
+      "description": "This is an embed description",
+      "color": 3066993,
+      "fields": [
+        {
+          "name": "Field 1",
+          "value": "Value 1",
+          "inline": false
+        },
+        {
+          "name": "Field 2",
+          "value": "Value 2",
+          "inline": true
+        }
+      ]
+    }
+  ],
+  "pinned": false,
+  "type": 0
+}
