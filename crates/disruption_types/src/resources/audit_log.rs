@@ -2,9 +2,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::entities::UserApiType;
+use crate::channel::ChannelApiType;
+use crate::entities::{UserApiType, IntegrationApiType};
 use crate::interactions::ApplicationCommandApiType;
-use crate::resources::WebhookApiType;
+use crate::resources::{WebhookApiType, AutoModerationRuleApiType, GuildScheduledEventApiType};
 
 /// <https://discord.com/developers/docs/resources/audit-log#audit-log-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -14,13 +15,13 @@ pub struct AuditLogApiType {
     /// List of audit log entries, sorted from most to least recent
     pub audit_log_entries: Vec<AuditLogEntryApiType>,
     /// List of auto moderation rules referenced in the audit log
-    pub auto_moderation_rules: Vec<Value>, // TODO: Use AutoModerationRuleApiType
+    pub auto_moderation_rules: Vec<AutoModerationRuleApiType>,
     /// List of guild scheduled events referenced in the audit log
-    pub guild_scheduled_events: Vec<Value>, // TODO: Use GuildScheduledEventApiType
+    pub guild_scheduled_events: Vec<GuildScheduledEventApiType>,
     /// List of partial integration objects
-    pub integrations: Vec<Value>, // Partial integrations
+    pub integrations: Vec<IntegrationApiType>,
     /// List of threads referenced in the audit log
-    pub threads: Vec<Value>, // Thread-specific channels
+    pub threads: Vec<ChannelApiType>,
     /// List of users referenced in the audit log
     pub users: Vec<UserApiType>,
     /// List of webhooks referenced in the audit log

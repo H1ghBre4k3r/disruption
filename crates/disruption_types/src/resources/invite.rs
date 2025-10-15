@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::entities::UserApiType;
+use crate::entities::{UserApiType, GuildMemberApiType};
+use crate::resources::GuildScheduledEventApiType;
 
 /// <https://discord.com/developers/docs/resources/invite#invite-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -41,7 +42,7 @@ pub struct InviteApiType {
     pub expires_at: Option<String>,
     /// guild scheduled event data
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub guild_scheduled_event: Option<Value>, // TODO: Use GuildScheduledEventApiType
+    pub guild_scheduled_event: Option<GuildScheduledEventApiType>,
     /// guild invite flags for guild invites
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<u32>,
@@ -90,7 +91,7 @@ pub struct InviteMetadataApiType {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct InviteStageInstanceApiType {
     /// the members speaking in the Stage
-    pub members: Vec<Value>, // TODO: Use GuildMemberApiType
+    pub members: Vec<GuildMemberApiType>,
     /// the number of users in the Stage
     pub participant_count: u32,
     /// the number of users speaking in the Stage

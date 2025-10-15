@@ -31,6 +31,9 @@ pub struct ApplicationApiType {
     pub team: Option<TeamApiType>,
     /// if this application is a game sold on Discord, this field will be the guild to which it has been linked
     pub guild_id: Option<String>,
+    /// Partial guild object for the linked guild
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guild: Option<serde_json::Value>, // Partial guild (some fields omitted)
     /// if this application is a game sold on Discord, this field will be the id of the "Game SKU" that is created, if exists
     pub primary_sku_id: Option<String>,
     /// if this application is a game sold on Discord, this field will be the URL slug that links to the store page
@@ -39,12 +42,46 @@ pub struct ApplicationApiType {
     pub cover_image: Option<String>,
     /// the application's public flags
     pub flags: Option<u64>,
+    /// Approximate count of guilds the app has been added to
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub approximate_guild_count: Option<u32>,
+    /// Approximate count of users that have installed the app
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub approximate_user_install_count: Option<u32>,
+    /// Approximate count of users that have authorized the app
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub approximate_user_authorization_count: Option<u32>,
+    /// Array of redirect URIs for the app
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub redirect_uris: Option<Vec<String>>,
+    /// Interactions endpoint URL for the app
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub interactions_endpoint_url: Option<String>,
+    /// Role connection verification URL for the app
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role_connections_verification_url: Option<String>,
+    /// Event webhooks URL for the app
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event_webhooks_url: Option<String>,
+    /// Event webhooks status
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event_webhooks_status: Option<ApplicationEventWebhookStatusApiType>,
+    /// Event webhook types the app is subscribed to
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event_webhooks_types: Option<Vec<String>>,
     /// up to 5 tags describing the content and functionality of the application
     pub tags: Option<Vec<String>>,
     /// settings for the application's default in-app authorization link, if enabled
     pub install_params: Option<InstallParamsApiType>,
     /// the application's default custom authorization link, if enabled
     pub custom_install_url: Option<String>,
+    /// Bot user associated with the app
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bot: Option<UserApiType>,
+    /// Default scopes and permissions for each supported installation context
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub integration_types_config:
+        Option<HashMap<ApplicationIntegrationTypesApiType, ApplicationIntegrationTypeConfigApiType>>,
 }
 
 /// <https://discord.com/developers/docs/resources/application#application-object-application-flags>

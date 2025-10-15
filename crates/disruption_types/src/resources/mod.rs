@@ -9,6 +9,7 @@ mod sku;
 mod soundboard;
 mod stage_instance;
 mod sticker;
+mod subscription;
 mod voice;
 mod webhook;
 
@@ -23,5 +24,6 @@ pub use self::sku::*;
 pub use self::soundboard::*;
 pub use self::stage_instance::*;
 pub use self::sticker::*;
+pub use self::subscription::*;
 pub use self::voice::*;
 pub use self::webhook::*;
