@@ -2,8 +2,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::entities::{GuildMemberApiType, UserApiType};
 use crate::channel::MessageApiType;
+use crate::entities::{GuildMemberApiType, UserApiType};
+use crate::resources::EntitlementApiType;
 
 /// <https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -52,7 +53,7 @@ pub struct InteractionApiType {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_locale: Option<String>,
     /// For monetized apps, any entitlements for the invoking user
-    pub entitlements: Vec<Value>, // TODO: Use EntitlementApiType when implemented
+    pub entitlements: Vec<EntitlementApiType>,
     /// Mapping of installation contexts that the interaction was authorized for
     pub authorizing_integration_owners: Value,
     /// Context where the interaction was triggered from

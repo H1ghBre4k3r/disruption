@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use super::{AvatarDecorationDataApiType, EmojiApiType, RoleApiType, UserApiType};
+use super::{AvatarDecorationDataApiType, EmojiApiType, RoleApiType, UserApiType, WelcomeScreenApiType};
+use crate::resources::StickerApiType;
 
 /// <https://discord.com/developers/docs/resources/guild#guild-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -108,12 +109,12 @@ pub struct GuildApiType {
     pub approximate_presence_count: Option<u32>,
     /// the welcome screen of a Community guild, shown to new members
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub welcome_screen: Option<Value>, // TODO: Use WelcomeScreenApiType when implemented
+    pub welcome_screen: Option<WelcomeScreenApiType>,
     /// guild NSFW level
     pub nsfw_level: u8,
     /// custom guild stickers
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stickers: Option<Vec<Value>>, // TODO: Use StickerApiType when implemented
+    pub stickers: Option<Vec<StickerApiType>>,
     /// whether the guild has the boost progress bar enabled
     pub premium_progress_bar_enabled: bool,
     /// the id of the channel where admins and moderators of Community guilds receive safety alerts from Discord
