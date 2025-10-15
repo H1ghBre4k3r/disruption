@@ -1,0 +1,21 @@
+{
+  "id": "162701077035089920",
+  "channel_id": "131391742183342080",
+  "author": {
+    "id": "140564834364416000",
+    "username": "test",
+    "discriminator": "1234",
+    "avatar": "a1b2c3d4e5f6"
+  },
+  "content": "Hello, world!",
+  "timestamp": "2016-03-24T23:15:59.605000+00:00",
+  "edited_timestamp": null,
+  "tts": false,
+  "mention_everyone": false,
+  "mentions": [],
+  "mention_roles": [],
+  "attachments": [],
+  "embeds": [],
+  "pinned": false,
+  "type": 0
+}

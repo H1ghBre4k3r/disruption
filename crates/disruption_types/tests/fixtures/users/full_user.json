@@ -1,0 +1,18 @@
+{
+  "id": "80351110224678912",
+  "username": "Nelly",
+  "discriminator": "1337",
+  "global_name": "Nelly",
+  "avatar": "8342729096ea3675442027381ff50dfe",
+  "bot": false,
+  "system": false,
+  "mfa_enabled": true,
+  "banner": "06c16474723fe537c283b8efa61a30c8",
+  "accent_color": 16711680,
+  "locale": "en-US",
+  "verified": true,
+  "email": "nelly@example.com",
+  "flags": 64,
+  "premium_type": 2,
+  "public_flags": 64
+}
