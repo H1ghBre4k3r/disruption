@@ -2,6 +2,7 @@
 pub mod channel;
 pub mod entities;
 pub mod gateway;
+pub mod interactions;
 pub mod opcodes;
 pub mod payloads;
 pub mod resources;

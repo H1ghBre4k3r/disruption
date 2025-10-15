@@ -28,6 +28,9 @@ pub struct RoleApiType {
     /// the tags this role has
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<RoleTagApiType>,
+    /// role flags combined as a bitfield
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub flags: Option<u32>,
 }
 
 /// <https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure>
@@ -39,4 +42,23 @@ pub struct RoleTagApiType {
     /// the id of the integration this role belongs to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub integration_id: Option<String>,
+    /// whether this is the guild's Booster role
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub premium_subscriber: Option<bool>,
+    /// the id of this role's subscription sku and listing
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subscription_listing_id: Option<String>,
+    /// whether this role is available for purchase
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub available_for_purchase: Option<bool>,
+    /// whether this role is a guild's linked role
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub guild_connections: Option<bool>,
+}
+
+/// <https://discord.com/developers/docs/topics/permissions#role-object-role-flags>
+#[allow(non_camel_case_types)]
+pub enum RoleFlags {
+    /// role can be selected by members in an onboarding prompt
+    IN_PROMPT = 1 << 0,
 }
