@@ -1,10 +1,12 @@
 mod channel;
+mod forum;
 mod mention;
 mod message;
 mod overwrites;
 mod thread;
 
 pub use self::channel::*;
+pub use self::forum::*;
 pub use self::mention::*;
 pub use self::message::*;
 pub use self::overwrites::*;
@@ -52,4 +54,7 @@ pub enum ChannelTypeApiType {
     #[allow(non_camel_case_types)]
     #[warn(unstable_features)]
     GUILD_FORUM = 15,
+    /// Channel that can only contain threads, similar to GUILD_FORUM channels
+    #[allow(non_camel_case_types)]
+    GUILD_MEDIA = 16,
 }
