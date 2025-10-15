@@ -33,12 +33,14 @@ pub struct WebhookApiType {
     /// the bot/OAuth2 application that created this webhook
     #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<String>,
-    /// the guild of the channel that this webhook is following (returned for Channel Follower Webhooks)
+    /// partial guild object - the guild of the channel that this webhook is following (returned for Channel Follower Webhooks)
+    /// Note: Kept as Value because it's a true partial object with an unpredictable subset of fields
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub source_guild: Option<Value>, // TODO: Use partial GuildApiType
-    /// the channel that this webhook is following (returned for Channel Follower Webhooks)
+    pub source_guild: Option<Value>,
+    /// partial channel object - the channel that this webhook is following (returned for Channel Follower Webhooks)
+    /// Note: Kept as Value because it's a true partial object with an unpredictable subset of fields
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub source_channel: Option<Value>, // TODO: Use partial ChannelApiType
+    pub source_channel: Option<Value>,
     /// the url used for executing the webhook (returned by the webhooks OAuth2 flow)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,

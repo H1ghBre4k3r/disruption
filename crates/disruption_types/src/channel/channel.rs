@@ -3,7 +3,10 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use crate::entities::UserApiType;
 
-use super::{ChannelTypeApiType, DefaultReactionApiType, ForumTagApiType, OverwritesApiType, ThreadMemberApiType, ThreadMetadataApiType};
+use super::{
+    ChannelTypeApiType, DefaultReactionApiType, ForumTagApiType, OverwritesApiType,
+    ThreadMemberApiType, ThreadMetadataApiType,
+};
 
 /// <https://discord.com/developers/docs/resources/channel#channel-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]

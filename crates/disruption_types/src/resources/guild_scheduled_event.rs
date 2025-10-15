@@ -1,8 +1,7 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::entities::UserApiType;
+use crate::entities::{GuildMemberApiType, UserApiType};
 
 /// <https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -50,7 +49,7 @@ pub struct GuildScheduledEventApiType {
     pub image: Option<String>,
     /// the definition for how often this event should recur
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub recurrence_rule: Option<Value>, // TODO: Create RecurrenceRuleApiType
+    pub recurrence_rule: Option<GuildScheduledEventRecurrenceRuleApiType>,
 }
 
 /// <https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level>
@@ -99,5 +98,87 @@ pub struct GuildScheduledEventUserApiType {
     pub user: UserApiType,
     /// guild member data for this user for the guild which this event belongs to, if any
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub member: Option<Value>, // TODO: Use GuildMemberApiType
+    pub member: Option<GuildMemberApiType>,
+}
+
+/// <https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object>
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GuildScheduledEventRecurrenceRuleApiType {
+    /// Starting time of the recurrence interval
+    pub start: String, // ISO8601 timestamp
+    /// Ending time of the recurrence interval (cannot be set externally currently)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end: Option<String>, // ISO8601 timestamp
+    /// How often the event occurs
+    pub frequency: GuildScheduledEventRecurrenceRuleFrequency,
+    /// The spacing between the events, defined by frequency
+    pub interval: u32,
+    /// Set of specific days within a week for the event to recur on
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_weekday: Option<Vec<GuildScheduledEventRecurrenceRuleWeekday>>,
+    /// List of specific days within a specific week (1-5) to recur on
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_n_weekday: Option<Vec<GuildScheduledEventRecurrenceRuleNWeekdayApiType>>,
+    /// Set of specific months to recur on
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_month: Option<Vec<GuildScheduledEventRecurrenceRuleMonth>>,
+    /// Set of specific dates within a month to recur on
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_month_day: Option<Vec<u8>>, // 1-31
+    /// Set of days within a year to recur on (1-364) (cannot be set externally currently)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub by_year_day: Option<Vec<u16>>, // 1-364
+    /// The total amount of times that the event is allowed to recur before stopping (cannot be set externally currently)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub count: Option<u32>,
+}
+
+/// <https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-frequency>
+#[derive(Serialize_repr, Deserialize_repr, Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum GuildScheduledEventRecurrenceRuleFrequency {
+    Yearly = 0,
+    Monthly = 1,
+    Weekly = 2,
+    Daily = 3,
+}
+
+/// <https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-weekday>
+#[derive(Serialize_repr, Deserialize_repr, Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum GuildScheduledEventRecurrenceRuleWeekday {
+    Monday = 0,
+    Tuesday = 1,
+    Wednesday = 2,
+    Thursday = 3,
+    Friday = 4,
+    Saturday = 5,
+    Sunday = 6,
+}
+
+/// <https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-nweekday-structure>
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GuildScheduledEventRecurrenceRuleNWeekdayApiType {
+    /// The week to reoccur on (1-5)
+    pub n: u8,
+    /// The day within the week to reoccur on
+    pub day: GuildScheduledEventRecurrenceRuleWeekday,
+}
+
+/// <https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-recurrence-rule-object-guild-scheduled-event-recurrence-rule-month>
+#[derive(Serialize_repr, Deserialize_repr, Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum GuildScheduledEventRecurrenceRuleMonth {
+    January = 1,
+    February = 2,
+    March = 3,
+    April = 4,
+    May = 5,
+    June = 6,
+    July = 7,
+    August = 8,
+    September = 9,
+    October = 10,
+    November = 11,
+    December = 12,
 }
