@@ -4,7 +4,7 @@ use serde_repr::{Deserialize_repr, Serialize_repr};
 /// <https://discord.com/developers/docs/topics/gateway#update-presence>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PresenceUpdateStructure {
-    /// unix time (in ms) of when the client went idle if the client is not idle
+    /// unix time (in ms) of when the client went idle, or null if the client is not idle
     #[serde(skip_serializing_if = "Option::is_none")]
     pub since: Option<u64>,
     /// the user's activities
@@ -15,7 +15,8 @@ pub struct PresenceUpdateStructure {
     pub afk: bool,
 }
 
-/// TODO: <https://discord.com/developers/docs/topics/gateway#activity-object>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object>
+/// Note: Bot users can only set name, state, type, and url
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Activity {
     /// the activity's name
@@ -31,15 +32,24 @@ pub struct Activity {
     /// unix timestamps for start and/or end of the game
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timestamps: Option<ActivityTimestamps>,
-    /// TODO: use snowflake
+    /// application id for the game (snowflake)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<String>,
+    /// Status display type; controls which field is displayed in the user's status text
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status_display_type: Option<u8>,
     /// what the player is currently doing
     #[serde(skip_serializing_if = "Option::is_none")]
     pub details: Option<String>,
+    /// URL that is linked when clicking on the details text
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details_url: Option<String>,
     /// the user's current party status
     #[serde(skip_serializing_if = "Option::is_none")]
     pub state: Option<String>,
+    /// URL that is linked when clicking on the state text
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub state_url: Option<String>,
     /// the emoji used for a custom status
     #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ActivityEmoji>,
@@ -63,19 +73,25 @@ pub struct Activity {
     pub buttons: Option<Vec<ActivityButton>>,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-types>
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone)]
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-types>
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Clone, Copy)]
 #[repr(u8)]
 pub enum ActivityType {
+    /// Playing {name}
     Game = 0,
+    /// Streaming {details}
     Streaming = 1,
+    /// Listening to {name}
     Listening = 2,
+    /// Watching {name}
     Watching = 3,
+    /// {emoji} {state}
     Custom = 4,
+    /// Competing in {name}
     Competing = 5,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-timestamps>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-timestamps>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityTimestamps {
     /// unix time (in milliseconds) of when the activity started
@@ -86,12 +102,12 @@ pub struct ActivityTimestamps {
     pub end: Option<u64>,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-emoji>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-emoji>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityEmoji {
     /// the name of the emoji
     pub name: String,
-    /// the id of the emoji
+    /// the id of the emoji (snowflake)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
     /// whether this emoji is animated
@@ -99,31 +115,41 @@ pub struct ActivityEmoji {
     pub animated: Option<bool>,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-party>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-party>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityParty {
     /// the id of the party
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    /// used to show the party's current and maximum size
+    /// used to show the party's current and maximum size [current_size, max_size]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub size: Option<Vec<u64>>,
+    pub size: Option<[u64; 2]>,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-assets>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-assets>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityAssets {
+    /// Activity asset image - see Discord docs for format details
     #[serde(skip_serializing_if = "Option::is_none")]
     pub large_image: Option<String>,
+    /// text displayed when hovering over the large image of the activity
     #[serde(skip_serializing_if = "Option::is_none")]
     pub large_text: Option<String>,
+    /// URL that is opened when clicking on the large image
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub large_url: Option<String>,
+    /// Activity asset image - see Discord docs for format details
     #[serde(skip_serializing_if = "Option::is_none")]
     pub small_image: Option<String>,
+    /// text displayed when hovering over the small image of the activity
     #[serde(skip_serializing_if = "Option::is_none")]
     pub small_text: Option<String>,
+    /// URL that is opened when clicking on the small image
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub small_url: Option<String>,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-secrets>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-secrets>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivitySecrets {
     /// the secret for joining a party
@@ -137,26 +163,27 @@ pub struct ActivitySecrets {
     pub match_: Option<String>,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-flags>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-flags>
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u64)]
 #[allow(dead_code)]
 pub enum ActivityFlags {
-    INSTANCE = 1 << 0,
-    JOIN = 1 << 1,
-    SPECTATE = 1 << 2,
-    #[allow(non_camel_case_types)]
-    JOIN_REQUEST = 1 << 3,
-    SYNC = 1 << 4,
-    PLAY = 1 << 5,
-    #[allow(non_camel_case_types)]
-    PARTY_PRIVACY_FRIENDS = 1 << 6,
-    #[allow(non_camel_case_types)]
-    PARTY_PRIVACY_VOICE_CHANNEL = 1 << 7,
-    EMBEDDED = 1 << 8,
+    Instance = 1 << 0,
+    Join = 1 << 1,
+    Spectate = 1 << 2,
+    JoinRequest = 1 << 3,
+    Sync = 1 << 4,
+    Play = 1 << 5,
+    PartyPrivacyFriends = 1 << 6,
+    PartyPrivacyVoiceChannel = 1 << 7,
+    Embedded = 1 << 8,
 }
 
-/// <https://discord.com/developers/docs/topics/gateway#activity-object-activity-buttons>
+/// <https://discord.com/developers/docs/events/gateway-events#activity-object-activity-buttons>
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ActivityButton {
+    /// the text shown on the button (1-32 characters)
     pub label: String,
+    /// the url opened when clicking the button (1-512 characters)
     pub url: String,
 }

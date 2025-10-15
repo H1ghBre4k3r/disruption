@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 use super::{TeamApiType, UserApiType};
 
@@ -80,28 +81,35 @@ pub struct ApplicationApiType {
     pub bot: Option<UserApiType>,
     /// Default scopes and permissions for each supported installation context
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub integration_types_config:
-        Option<HashMap<ApplicationIntegrationTypesApiType, ApplicationIntegrationTypeConfigApiType>>,
+    pub integration_types_config: Option<
+        HashMap<ApplicationIntegrationTypesApiType, ApplicationIntegrationTypeConfigApiType>,
+    >,
 }
 
 /// <https://discord.com/developers/docs/resources/application#application-object-application-flags>
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u64)]
 pub enum ApplicationFlagsApiType {
+    /// Indicates if an app uses the Auto Moderation API
+    #[allow(non_camel_case_types)]
+    APPLICATION_AUTO_MODERATION_RULE_CREATE_BADGE = 1 << 6,
     /// Intent required for bots in 100 or more servers to receive presence_update events
     #[allow(non_camel_case_types)]
     GATEWAY_PRESENCE = 1 << 12,
     /// Intent required for bots in under 100 servers to receive presence_update events, found in Bot Settings
     #[allow(non_camel_case_types)]
     GATEWAY_PRESENCE_LIMITED = 1 << 13,
-    /// Intent required for bots in 100 or more servers to receive member-related events like guild_member_add. See list of member-related events under GUILD_MEMBERS
+    /// Intent required for bots in 100 or more servers to receive member-related events like guild_member_add
     #[allow(non_camel_case_types)]
     GATEWAY_GUILD_MEMBERS = 1 << 14,
-    /// Intent required for bots in under 100 servers to receive member-related events like guild_member_add, found in Bot Settings. See list of member-related events under GUILD_MEMBERS
+    /// Intent required for bots in under 100 servers to receive member-related events like guild_member_add, found in Bot Settings
     #[allow(non_camel_case_types)]
     GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15,
-    /// ndicates unusual growth of an app that prevents verification
+    /// Indicates unusual growth of an app that prevents verification
     #[allow(non_camel_case_types)]
     VERIFICATION_PENDING_GUILD_LIMIT = 1 << 16,
     /// Indicates if an app is embedded within the Discord client (currently unavailable publicly)
+    #[allow(non_camel_case_types)]
     EMBEDDED = 1 << 17,
     /// Intent required for bots in 100 or more servers to receive message content
     #[allow(non_camel_case_types)]
@@ -109,6 +117,9 @@ pub enum ApplicationFlagsApiType {
     /// Intent required for bots in under 100 servers to receive message content, found in Bot Settings
     #[allow(non_camel_case_types)]
     GATEWAY_MESSAGE_CONTENT_LIMITED = 1 << 19,
+    /// Indicates if an app has registered global application commands
+    #[allow(non_camel_case_types)]
+    APPLICATION_COMMAND_BADGE = 1 << 23,
 }
 
 /// <https://discord.com/developers/docs/resources/application#install-params-object>
@@ -118,4 +129,36 @@ pub struct InstallParamsApiType {
     pub scopes: Vec<String>,
     /// the permissions to request for the bot role
     pub permissions: String,
+}
+
+/// <https://discord.com/developers/docs/resources/application#application-object-application-integration-types>
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
+pub enum ApplicationIntegrationTypesApiType {
+    /// App is installable to servers
+    #[serde(rename = "0")]
+    GuildInstall = 0,
+    /// App is installable to users
+    #[serde(rename = "1")]
+    UserInstall = 1,
+}
+
+/// <https://discord.com/developers/docs/resources/application#application-object-application-integration-type-configuration-object>
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ApplicationIntegrationTypeConfigApiType {
+    /// Install params for each installation context's default in-app authorization link
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub oauth2_install_params: Option<InstallParamsApiType>,
+}
+
+/// <https://discord.com/developers/docs/resources/application#application-object-application-event-webhook-status>
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum ApplicationEventWebhookStatusApiType {
+    /// Webhook events are disabled by developer
+    Disabled = 1,
+    /// Webhook events are enabled by developer
+    Enabled = 2,
+    /// Webhook events are disabled by Discord, usually due to inactivity
+    DisabledByDiscord = 3,
 }

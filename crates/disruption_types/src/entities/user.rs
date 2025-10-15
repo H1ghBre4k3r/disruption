@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::IntegrationApiType;
+
 /// <https://discord.com/developers/docs/resources/user#user-object>
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct UserApiType {
@@ -120,7 +122,7 @@ pub struct ConnectionApiType {
     pub revoked: Option<bool>,
     /// an array of partial server integrations
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub integrations: Option<Vec<serde_json::Value>>, // TODO: Use proper Integration type when implemented
+    pub integrations: Option<Vec<IntegrationApiType>>,
     /// whether the connection is verified
     pub verified: bool,
     /// whether friend sync is enabled for this connection

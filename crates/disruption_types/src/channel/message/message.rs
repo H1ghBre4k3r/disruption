@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     channel::{ChannelApiType, ChannelMentionApiType},
     entities::{ApplicationApiType, UserApiType},
+    interactions::ResolvedDataApiType,
     resources::{PollApiType, StickerApiType, StickerItemApiType},
 };
 
@@ -104,7 +105,7 @@ pub struct MessageApiType {
     pub role_subscription_data: Option<RoleSubscriptionDataApiType>,
     /// data for users, members, channels, and roles referenced in this message
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub resolved: Option<serde_json::Value>, // TODO: Use proper Resolved type when implemented
+    pub resolved: Option<ResolvedDataApiType>,
     /// A poll!
     #[serde(skip_serializing_if = "Option::is_none")]
     pub poll: Option<PollApiType>,

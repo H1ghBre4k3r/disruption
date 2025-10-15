@@ -3,9 +3,9 @@ use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 use crate::channel::ChannelApiType;
-use crate::entities::{UserApiType, IntegrationApiType};
+use crate::entities::{IntegrationApiType, UserApiType};
 use crate::interactions::ApplicationCommandApiType;
-use crate::resources::{WebhookApiType, AutoModerationRuleApiType, GuildScheduledEventApiType};
+use crate::resources::{AutoModerationRuleApiType, GuildScheduledEventApiType, WebhookApiType};
 
 /// <https://discord.com/developers/docs/resources/audit-log#audit-log-object>
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -1,6 +1,6 @@
+use core::fmt::Debug;
 use reqwest::Response;
 use serde::Serialize;
-use core::fmt::Debug;
 
 #[derive(Clone)]
 pub struct RestClient {

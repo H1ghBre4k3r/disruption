@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
-use super::{AvatarDecorationDataApiType, EmojiApiType, RoleApiType, UserApiType, WelcomeScreenApiType};
+use super::{
+    AvatarDecorationDataApiType, EmojiApiType, RoleApiType, UserApiType, WelcomeScreenApiType,
+};
 use crate::resources::StickerApiType;
 
 /// <https://discord.com/developers/docs/resources/guild#guild-object>
@@ -122,7 +123,7 @@ pub struct GuildApiType {
     pub safety_alerts_channel_id: Option<String>,
     /// the incidents data for this guild
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub incidents_data: Option<Value>, // TODO: Use IncidentsDataApiType when implemented
+    pub incidents_data: Option<IncidentsDataApiType>,
 }
 
 /// <https://discord.com/developers/docs/resources/guild#unavailable-guild-object>
@@ -219,7 +220,7 @@ pub struct IntegrationApiType {
     pub revoked: Option<bool>,
     /// The bot/OAuth2 application for discord integrations
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub application: Option<Value>, // TODO: Use IntegrationApplicationApiType when implemented
+    pub application: Option<IntegrationApplicationApiType>,
     /// the scopes the application has been authorized for
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scopes: Option<Vec<String>>,
@@ -242,4 +243,37 @@ pub struct BanApiType {
     pub reason: Option<String>,
     /// the banned user
     pub user: UserApiType,
+}
+
+/// <https://discord.com/developers/docs/resources/guild#incidents-data-object>
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IncidentsDataApiType {
+    /// when invites get enabled again
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub invites_disabled_until: Option<String>, // ISO8601 timestamp
+    /// when direct messages get enabled again
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dms_disabled_until: Option<String>, // ISO8601 timestamp
+    /// when the dm spam was detected
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dm_spam_detected_at: Option<String>, // ISO8601 timestamp
+    /// when the raid was detected
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub raid_detected_at: Option<String>, // ISO8601 timestamp
+}
+
+/// <https://discord.com/developers/docs/resources/guild#integration-application-object>
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IntegrationApplicationApiType {
+    /// the id of the app
+    pub id: String,
+    /// the name of the app
+    pub name: String,
+    /// the icon hash of the app
+    pub icon: Option<String>,
+    /// the description of the app
+    pub description: String,
+    /// the bot associated with this application
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bot: Option<UserApiType>,
 }

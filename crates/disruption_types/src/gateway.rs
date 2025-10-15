@@ -57,10 +57,10 @@ pub enum Intents {
 
     #[allow(non_camel_case_types, dead_code)]
     AUTO_MODERATION_EXECUTION = 1 << 21,
-    
+
     #[allow(non_camel_case_types, dead_code)]
     GUILD_MESSAGE_POLLS = 1 << 24,
-    
+
     #[allow(non_camel_case_types, dead_code)]
     DIRECT_MESSAGE_POLLS = 1 << 25,
 }
@@ -72,16 +72,16 @@ pub enum Event {
     // Lifecycle
     READY,
     RESUMED,
-    
+
     // Application Commands
     APPLICATION_COMMAND_PERMISSIONS_UPDATE,
-    
+
     // Auto Moderation
     AUTO_MODERATION_RULE_CREATE,
     AUTO_MODERATION_RULE_UPDATE,
     AUTO_MODERATION_RULE_DELETE,
     AUTO_MODERATION_ACTION_EXECUTION,
-    
+
     // Channels
     CHANNEL_CREATE,
     CHANNEL_UPDATE,
@@ -93,12 +93,12 @@ pub enum Event {
     THREAD_LIST_SYNC,
     THREAD_MEMBER_UPDATE,
     THREAD_MEMBERS_UPDATE,
-    
+
     // Entitlements
     ENTITLEMENT_CREATE,
     ENTITLEMENT_UPDATE,
     ENTITLEMENT_DELETE,
-    
+
     // Guilds
     GUILD_CREATE,
     GUILD_UPDATE,
@@ -125,16 +125,16 @@ pub enum Event {
     GUILD_SOUNDBOARD_SOUND_UPDATE,
     GUILD_SOUNDBOARD_SOUND_DELETE,
     SOUNDBOARD_SOUNDS,
-    
+
     // Integrations
     INTEGRATION_CREATE,
     INTEGRATION_UPDATE,
     INTEGRATION_DELETE,
-    
+
     // Invites
     INVITE_CREATE,
     INVITE_DELETE,
-    
+
     // Messages
     MESSAGE_CREATE,
     MESSAGE_UPDATE,
@@ -146,28 +146,28 @@ pub enum Event {
     MESSAGE_REACTION_REMOVE_EMOJI,
     MESSAGE_POLL_VOTE_ADD,
     MESSAGE_POLL_VOTE_REMOVE,
-    
+
     // Presence
     PRESENCE_UPDATE,
     TYPING_START,
     USER_UPDATE,
-    
+
     // Voice
     VOICE_CHANNEL_EFFECT_SEND,
     VOICE_STATE_UPDATE,
     VOICE_SERVER_UPDATE,
-    
+
     // Webhooks
     WEBHOOKS_UPDATE,
-    
+
     // Interactions
     INTERACTION_CREATE,
-    
+
     // Stage Instances
     STAGE_INSTANCE_CREATE,
     STAGE_INSTANCE_UPDATE,
     STAGE_INSTANCE_DELETE,
-    
+
     // Subscriptions
     SUBSCRIPTION_CREATE,
     SUBSCRIPTION_UPDATE,
@@ -182,16 +182,18 @@ impl TryFrom<&str> for Event {
             // Lifecycle
             "READY" => Ok(Self::READY),
             "RESUMED" => Ok(Self::RESUMED),
-            
+
             // Application Commands
-            "APPLICATION_COMMAND_PERMISSIONS_UPDATE" => Ok(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE),
-            
+            "APPLICATION_COMMAND_PERMISSIONS_UPDATE" => {
+                Ok(Self::APPLICATION_COMMAND_PERMISSIONS_UPDATE)
+            }
+
             // Auto Moderation
             "AUTO_MODERATION_RULE_CREATE" => Ok(Self::AUTO_MODERATION_RULE_CREATE),
             "AUTO_MODERATION_RULE_UPDATE" => Ok(Self::AUTO_MODERATION_RULE_UPDATE),
             "AUTO_MODERATION_RULE_DELETE" => Ok(Self::AUTO_MODERATION_RULE_DELETE),
             "AUTO_MODERATION_ACTION_EXECUTION" => Ok(Self::AUTO_MODERATION_ACTION_EXECUTION),
-            
+
             // Channels
             "CHANNEL_CREATE" => Ok(Self::CHANNEL_CREATE),
             "CHANNEL_UPDATE" => Ok(Self::CHANNEL_UPDATE),
@@ -203,12 +205,12 @@ impl TryFrom<&str> for Event {
             "THREAD_LIST_SYNC" => Ok(Self::THREAD_LIST_SYNC),
             "THREAD_MEMBER_UPDATE" => Ok(Self::THREAD_MEMBER_UPDATE),
             "THREAD_MEMBERS_UPDATE" => Ok(Self::THREAD_MEMBERS_UPDATE),
-            
+
             // Entitlements
             "ENTITLEMENT_CREATE" => Ok(Self::ENTITLEMENT_CREATE),
             "ENTITLEMENT_UPDATE" => Ok(Self::ENTITLEMENT_UPDATE),
             "ENTITLEMENT_DELETE" => Ok(Self::ENTITLEMENT_DELETE),
-            
+
             // Guilds
             "GUILD_CREATE" => Ok(Self::GUILD_CREATE),
             "GUILD_UPDATE" => Ok(Self::GUILD_UPDATE),
@@ -235,16 +237,16 @@ impl TryFrom<&str> for Event {
             "GUILD_SOUNDBOARD_SOUND_UPDATE" => Ok(Self::GUILD_SOUNDBOARD_SOUND_UPDATE),
             "GUILD_SOUNDBOARD_SOUND_DELETE" => Ok(Self::GUILD_SOUNDBOARD_SOUND_DELETE),
             "SOUNDBOARD_SOUNDS" => Ok(Self::SOUNDBOARD_SOUNDS),
-            
+
             // Integrations
             "INTEGRATION_CREATE" => Ok(Self::INTEGRATION_CREATE),
             "INTEGRATION_UPDATE" => Ok(Self::INTEGRATION_UPDATE),
             "INTEGRATION_DELETE" => Ok(Self::INTEGRATION_DELETE),
-            
+
             // Invites
             "INVITE_CREATE" => Ok(Self::INVITE_CREATE),
             "INVITE_DELETE" => Ok(Self::INVITE_DELETE),
-            
+
             // Messages
             "MESSAGE_CREATE" => Ok(Self::MESSAGE_CREATE),
             "MESSAGE_UPDATE" => Ok(Self::MESSAGE_UPDATE),
@@ -256,33 +258,33 @@ impl TryFrom<&str> for Event {
             "MESSAGE_REACTION_REMOVE_EMOJI" => Ok(Self::MESSAGE_REACTION_REMOVE_EMOJI),
             "MESSAGE_POLL_VOTE_ADD" => Ok(Self::MESSAGE_POLL_VOTE_ADD),
             "MESSAGE_POLL_VOTE_REMOVE" => Ok(Self::MESSAGE_POLL_VOTE_REMOVE),
-            
+
             // Presence
             "PRESENCE_UPDATE" => Ok(Self::PRESENCE_UPDATE),
             "TYPING_START" => Ok(Self::TYPING_START),
             "USER_UPDATE" => Ok(Self::USER_UPDATE),
-            
+
             // Voice
             "VOICE_CHANNEL_EFFECT_SEND" => Ok(Self::VOICE_CHANNEL_EFFECT_SEND),
             "VOICE_STATE_UPDATE" => Ok(Self::VOICE_STATE_UPDATE),
             "VOICE_SERVER_UPDATE" => Ok(Self::VOICE_SERVER_UPDATE),
-            
+
             // Webhooks
             "WEBHOOKS_UPDATE" => Ok(Self::WEBHOOKS_UPDATE),
-            
+
             // Interactions
             "INTERACTION_CREATE" => Ok(Self::INTERACTION_CREATE),
-            
+
             // Stage Instances
             "STAGE_INSTANCE_CREATE" => Ok(Self::STAGE_INSTANCE_CREATE),
             "STAGE_INSTANCE_UPDATE" => Ok(Self::STAGE_INSTANCE_UPDATE),
             "STAGE_INSTANCE_DELETE" => Ok(Self::STAGE_INSTANCE_DELETE),
-            
+
             // Subscriptions
             "SUBSCRIPTION_CREATE" => Ok(Self::SUBSCRIPTION_CREATE),
             "SUBSCRIPTION_UPDATE" => Ok(Self::SUBSCRIPTION_UPDATE),
             "SUBSCRIPTION_DELETE" => Ok(Self::SUBSCRIPTION_DELETE),
-            
+
             _ => Err(()),
         }
     }

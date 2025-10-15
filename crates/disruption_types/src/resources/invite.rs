@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
-use crate::entities::{UserApiType, GuildMemberApiType};
+use crate::entities::{GuildMemberApiType, UserApiType};
 use crate::resources::GuildScheduledEventApiType;
 
 /// <https://discord.com/developers/docs/resources/invite#invite-object>
