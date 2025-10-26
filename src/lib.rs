@@ -1,4 +1,5 @@
 mod error;
+mod events;
 mod implementations;
 mod internal;
 
@@ -17,6 +18,7 @@ pub use error::{Error, RestError, Result};
 pub use implementations::*;
 
 pub use disruption_gateway::*;
+use events::*;
 use implementations::channel::Message;
 use internal::RestClient;
 
@@ -136,6 +138,7 @@ impl<'a> Client<'a> {
             };
 
             match event {
+                // ===== Lifecycle Events =====
                 Event::READY => {
                     let Some(d) = payload.d else {
                         continue;
@@ -143,6 +146,100 @@ impl<'a> Client<'a> {
                     let data: ReadyPayloadData = serde_json::from_value(d)?;
                     self.handle_ready(data).await;
                 }
+
+                // ===== Guild Events =====
+                Event::GUILD_CREATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let guild: GuildApiType = serde_json::from_value(d)?;
+                    self.handler.on_guild_create(guild).await;
+                }
+                Event::GUILD_UPDATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let guild: GuildApiType = serde_json::from_value(d)?;
+                    self.handler.on_guild_update(guild).await;
+                }
+                Event::GUILD_DELETE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: GuildDeleteEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_guild_delete(event.id, event.unavailable)
+                        .await;
+                }
+
+                // ===== Guild Member Events =====
+                Event::GUILD_MEMBER_ADD => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: GuildMemberAddEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_guild_member_add(event.guild_id, event.member)
+                        .await;
+                }
+                Event::GUILD_MEMBER_REMOVE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: GuildMemberRemoveEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_guild_member_remove(event.guild_id, event.user)
+                        .await;
+                }
+                Event::GUILD_MEMBER_UPDATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: GuildMemberUpdateEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_guild_member_update(event.guild_id, event.member)
+                        .await;
+                }
+
+                // ===== Guild Role Events =====
+                Event::GUILD_ROLE_CREATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: GuildRoleCreateEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_guild_role_create(event.guild_id, event.role)
+                        .await;
+                }
+                Event::GUILD_ROLE_UPDATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: GuildRoleUpdateEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_guild_role_update(event.guild_id, event.role)
+                        .await;
+                }
+                Event::GUILD_ROLE_DELETE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: GuildRoleDeleteEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_guild_role_delete(event.guild_id, event.role_id)
+                        .await;
+                }
+
+                // ===== Interaction Events =====
+                Event::INTERACTION_CREATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let interaction: InteractionApiType = serde_json::from_value(d)?;
+                    self.handler.on_interaction(interaction).await;
+                }
+
+                // ===== Message Events =====
                 Event::MESSAGE_CREATE => {
                     let (Some(d), Some(rest_client)) = (payload.d, &self.rest_client) else {
                         continue;
@@ -151,8 +248,72 @@ impl<'a> Client<'a> {
                     let message = Message::new(rest_client.clone(), message).await;
                     self.handler.on_message(message).await;
                 }
+                Event::MESSAGE_UPDATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let message: MessageApiType = serde_json::from_value(d)?;
+                    self.handler.on_message_update(message).await;
+                }
+                Event::MESSAGE_DELETE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: MessageDeleteEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_message_delete(event.id, event.channel_id, event.guild_id)
+                        .await;
+                }
+                Event::MESSAGE_REACTION_ADD => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: MessageReactionAddEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_message_reaction_add(
+                            event.user_id,
+                            event.channel_id,
+                            event.message_id,
+                            event.guild_id,
+                            event.emoji,
+                        )
+                        .await;
+                }
+                Event::MESSAGE_REACTION_REMOVE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let event: MessageReactionRemoveEvent = serde_json::from_value(d)?;
+                    self.handler
+                        .on_message_reaction_remove(
+                            event.user_id,
+                            event.channel_id,
+                            event.message_id,
+                            event.guild_id,
+                            event.emoji,
+                        )
+                        .await;
+                }
+
+                // ===== Channel Events =====
+                Event::CHANNEL_CREATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let channel: ChannelApiType = serde_json::from_value(d)?;
+                    self.handler.on_channel_create(channel).await;
+                }
+                Event::CHANNEL_UPDATE => {
+                    let Some(d) = payload.d else {
+                        continue;
+                    };
+                    let channel: ChannelApiType = serde_json::from_value(d)?;
+                    self.handler.on_channel_update(channel).await;
+                }
+
+                // ===== Other Events (Not Yet Implemented) =====
                 _ => {
-                    // TODO: Handle other event types
+                    // Future Phase 2-4 events will be implemented here
                     continue;
                 }
             }
