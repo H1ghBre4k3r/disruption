@@ -322,7 +322,7 @@ dependencies = [
 
 [[package]]
 name = "disruption"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-channel",
  "async-trait",
@@ -348,7 +348,7 @@ dependencies = [
 
 [[package]]
 name = "disruption_gateway"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-channel",
  "disruption_types",
@@ -366,7 +366,7 @@ dependencies = [
 
 [[package]]
 name = "disruption_types"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "pretty_assertions",
  "proptest",

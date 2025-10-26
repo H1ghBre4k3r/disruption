@@ -1,6 +1,6 @@
 [package]
 name = "disruption"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["Louis Meyer (H1ghBre4k3r) <h1ghbre4k3r@dev.bre4k3r.de>"]
 repository = "https://github.com/H1ghBre4k3r/disruption"
@@ -15,12 +15,12 @@ name = "disruption"
 members = ["crates/*"]
 
 [dependencies]
-disruption_types = { version = "0.1.0", path = "./crates/disruption_types" }
-disruption_gateway = { version = "0.1.0", path = "./crates/disruption_gateway" }
+disruption_types = { version = "0.2.0", path = "./crates/disruption_types" }
+disruption_gateway = { version = "0.2.0", path = "./crates/disruption_gateway" }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.145"
 serde_repr = "0.1.20"
-tokio = {version =  "1.47.1", features = ["full"] }
+tokio = { version = "1.47.1", features = ["full"] }
 tokio-tungstenite = { version = "0.28.0", features = ["native-tls"] }
 url = "2.5.7"
 futures-util = "0.3.30"
