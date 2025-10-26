@@ -4,7 +4,10 @@ use async_channel::{Receiver, Sender};
 use disruption_types::{
     gateway::Intents,
     opcodes::GatewayOpcode,
-    payloads::{HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload},
+    payloads::{
+        HelloPayloadData, IdentifyConnectionProperties, IdentifyPayloadData, Payload,
+        ResumePayloadData,
+    },
 };
 use futures_util::{
     stream::{SplitSink, SplitStream},
@@ -40,6 +43,10 @@ pub struct Gateway {
     rec_tuple: (Sender<Payload>, Receiver<Payload>),
     receiver_handle: Option<JoinHandle<()>>,
     heartbeat_handle: Arc<Mutex<Option<JoinHandle<()>>>>,
+    /// Last sequence number received from Discord (used for RESUME)
+    seq_num: Arc<Mutex<Option<u64>>>,
+    /// Session ID from READY event (used for RESUME)
+    session_id: Arc<Mutex<Option<String>>>,
 }
 
 impl Gateway {
@@ -53,6 +60,8 @@ impl Gateway {
             rec_tuple,
             receiver_handle: None,
             heartbeat_handle: Arc::new(Mutex::new(None)),
+            seq_num: Arc::new(Mutex::new(None)),
+            session_id: Arc::new(Mutex::new(None)),
         };
 
         gateway.spawn_receiver_thread().await?;
@@ -63,25 +72,39 @@ impl Gateway {
         let token = self.token.clone();
         let writer_lock = self.writer.clone();
         let heartbeat_handle_lock = self.heartbeat_handle.clone();
+        let seq_num_lock = self.seq_num.clone();
+        let session_id_lock = self.session_id.clone();
 
         let (channel_writer, _) = self.rec_tuple.clone();
         let receiver_handle = tokio::spawn(async move {
+            let mut backoff_seconds = 1u64;
             loop {
                 let url = match "wss://gateway.discord.gg/?v=10&encoding=json".into_client_request()
                 {
                     Ok(req) => req,
                     Err(e) => {
                         error!("Failed to parse gateway URL: {}", e);
-                        tokio::time::sleep(Duration::from_secs(5)).await;
+                        info!("Retrying in {}s...", backoff_seconds);
+                        tokio::time::sleep(Duration::from_secs(backoff_seconds)).await;
+                        backoff_seconds = (backoff_seconds * 2).min(60);
                         continue;
                     }
                 };
 
                 let (socket, _response) = match connect_async(url).await {
-                    Ok(s) => s,
+                    Ok(s) => {
+                        info!("Successfully connected to gateway");
+                        backoff_seconds = 1; // Reset backoff on successful connection
+                        s
+                    }
                     Err(e) => {
                         error!("Failed to connect to gateway: {}", e);
-                        tokio::time::sleep(Duration::from_secs(5)).await;
+                        info!(
+                            "Retrying in {}s with exponential backoff...",
+                            backoff_seconds
+                        );
+                        tokio::time::sleep(Duration::from_secs(backoff_seconds)).await;
+                        backoff_seconds = (backoff_seconds * 2).min(60);
                         continue;
                     }
                 };
@@ -97,6 +120,8 @@ impl Gateway {
                     &mut socket_reader,
                     writer_lock.clone(),
                     heartbeat_handle_lock.clone(),
+                    seq_num_lock.clone(),
+                    session_id_lock.clone(),
                 )
                 .await
                 {
@@ -108,9 +133,13 @@ impl Gateway {
                     match socket_reader.next().await {
                         Some(Ok(Message::Close(_))) => break,
                         Some(Ok(message)) => {
-                            if let Err(e) =
-                                Self::handle_socket_message(message, &channel_writer, &writer_lock)
-                                    .await
+                            if let Err(e) = Self::handle_socket_message(
+                                message,
+                                &channel_writer,
+                                &writer_lock,
+                                &seq_num_lock,
+                            )
+                            .await
                             {
                                 error!("[{}:{}] {}", file!(), line!(), e);
                             }
@@ -131,10 +160,11 @@ impl Gateway {
         message: Message,
         channel_writer: &Sender<Payload>,
         writer_lock: &WriterLock,
+        seq_num_lock: &Arc<Mutex<Option<u64>>>,
     ) -> Result<()> {
         match message {
             Message::Text(message) => {
-                Self::handle_text(channel_writer, message.to_string()).await?
+                Self::handle_text(channel_writer, message.to_string(), seq_num_lock).await?
             }
             Message::Ping(payload) => Self::handle_ping(writer_lock, payload.to_vec()).await?,
             Message::Pong(_) | Message::Binary(_) | Message::Frame(_) => {
@@ -148,8 +178,20 @@ impl Gateway {
         Ok(())
     }
 
-    async fn handle_text(channel_writer: &Sender<Payload>, message: String) -> Result<()> {
+    async fn handle_text(
+        channel_writer: &Sender<Payload>,
+        message: String,
+        seq_num_lock: &Arc<Mutex<Option<u64>>>,
+    ) -> Result<()> {
         let payload: Payload = serde_json::from_str(message.as_str())?;
+
+        // Update sequence number if this is a Dispatch event (op: 0)
+        if let Some(s) = payload.s {
+            let mut seq_num = seq_num_lock.lock().await;
+            *seq_num = Some(s);
+            trace!("Updated sequence number to {}", s);
+        }
+
         channel_writer.send(payload).await?;
         Ok(())
     }
@@ -163,8 +205,39 @@ impl Gateway {
         socket_reader: &mut SocketReader,
         writer_lock: WriterLock,
         heartbeat_handle_lock: Arc<Mutex<Option<JoinHandle<()>>>>,
+        seq_num_lock: Arc<Mutex<Option<u64>>>,
+        session_id_lock: Arc<Mutex<Option<String>>>,
     ) -> Result<()> {
-        Self::handle_hello(socket_reader, &writer_lock, heartbeat_handle_lock).await?;
+        Self::handle_hello(
+            socket_reader,
+            &writer_lock,
+            heartbeat_handle_lock,
+            seq_num_lock.clone(),
+        )
+        .await?;
+
+        // Try to RESUME if we have session_id and seq_num (reconnection scenario)
+        let session_id = session_id_lock.lock().await.clone();
+        let seq_num = *seq_num_lock.lock().await;
+
+        if let (Some(sid), Some(seq)) = (session_id, seq_num) {
+            info!("Reconnection detected, attempting RESUME");
+            // Try RESUME first
+            match Self::resume(&token, &sid, seq, &writer_lock).await {
+                Ok(_) => {
+                    info!("RESUME sent successfully");
+                    // Note: Discord will either accept (RESUMED event) or reject (INVALID_SESSION)
+                    // The main event loop will handle those opcodes
+                    return Ok(());
+                }
+                Err(e) => {
+                    error!("Failed to send RESUME, falling back to IDENTIFY: {}", e);
+                    // Fall through to IDENTIFY
+                }
+            }
+        }
+
+        // First connection or RESUME failed - use IDENTIFY
         Self::identify(&token, &writer_lock).await?;
         Ok(())
     }
@@ -174,6 +247,7 @@ impl Gateway {
         socket_reader: &mut SocketReader,
         writer_lock: &WriterLock,
         heartbeat_handle_lock: Arc<Mutex<Option<JoinHandle<()>>>>,
+        seq_num_lock: Arc<Mutex<Option<u64>>>,
     ) -> Result<()> {
         let message = Self::static_receive(socket_reader).await?;
         match message {
@@ -188,6 +262,7 @@ impl Gateway {
                                 hello_payload.heartbeat_interval,
                                 writer_lock.clone(),
                                 heartbeat_handle_lock,
+                                seq_num_lock,
                             )
                             .await;
                         }
@@ -245,11 +320,41 @@ impl Gateway {
         Ok(())
     }
 
+    /// Resume a previous gateway session.
+    async fn resume(
+        token: &str,
+        session_id: &str,
+        seq_num: u64,
+        writer_lock: &WriterLock,
+    ) -> Result<()> {
+        info!(
+            "Attempting to RESUME session {} with seq_num {}",
+            session_id, seq_num
+        );
+
+        let payload_data = ResumePayloadData {
+            token: token.to_owned(),
+            session_id: session_id.to_owned(),
+            seq: seq_num,
+        };
+
+        let payload = Payload {
+            op: GatewayOpcode::Resume,
+            d: Some(serde_json::to_value(payload_data)?),
+            ..Default::default()
+        };
+
+        Self::static_send_payload(writer_lock, payload).await?;
+
+        Ok(())
+    }
+
     /// Start heartbeating with the API.
     async fn start_heartbeating(
         heartbeat_interval: u128,
         writer_lock: WriterLock,
         heartbeat_handle_lock: Arc<Mutex<Option<JoinHandle<()>>>>,
+        seq_num_lock: Arc<Mutex<Option<u64>>>,
     ) {
         debug!("Starting heartbeat...");
 
@@ -257,23 +362,24 @@ impl Gateway {
             loop {
                 tokio::time::sleep(Duration::from_millis(heartbeat_interval as u64)).await;
 
+                // Get current sequence number
+                let seq_num = {
+                    let seq = seq_num_lock.lock().await;
+                    *seq
+                };
+
                 let payload = Payload {
                     op: GatewayOpcode::Heartbeat,
-                    d: None,
-                    // TODO: Try to retrieve seq_num
-                    // d: match seq_num {
-                    //     Some(seq) => Some(serde_json::to_value(seq).unwrap()),
-                    //     None => None,
-                    // },
+                    d: seq_num.map(|seq| serde_json::to_value(seq).unwrap()),
                     ..Default::default()
                 };
 
-                trace!("Sending heartbeat...");
+                trace!("Sending heartbeat with seq_num: {:?}...", seq_num);
                 if let Err(e) = Self::static_send_payload(&writer_lock, payload).await {
                     error!("Error sending heartbeat: {}", e);
                     break;
                 }
-                trace!("Send heartbeat!");
+                trace!("Sent heartbeat!");
             }
         });
 
@@ -313,6 +419,23 @@ impl Gateway {
 
     pub async fn receiver(&self) -> &Receiver<Payload> {
         &self.rec_tuple.1
+    }
+
+    /// Get the current sequence number (used for RESUME)
+    pub async fn seq_num(&self) -> Option<u64> {
+        *self.seq_num.lock().await
+    }
+
+    /// Get the current session ID (used for RESUME)
+    pub async fn session_id(&self) -> Option<String> {
+        self.session_id.lock().await.clone()
+    }
+
+    /// Set the session ID (called when READY event is received)
+    pub async fn set_session_id(&self, session_id: String) {
+        let mut sid = self.session_id.lock().await;
+        *sid = Some(session_id);
+        info!("Session ID set for RESUME capability");
     }
 }
 
