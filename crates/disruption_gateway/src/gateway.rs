@@ -1,4 +1,4 @@
-use std::{error::Error, sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration};
 
 use async_channel::{Receiver, Sender};
 use disruption_types::{
@@ -17,6 +17,8 @@ use tokio_tungstenite::{
     tungstenite::{client::IntoClientRequest, Message},
     MaybeTlsStream, WebSocketStream,
 };
+
+use crate::error::{GatewayError, Result};
 
 type WriterLock = Arc<
     Mutex<
@@ -41,7 +43,7 @@ pub struct Gateway {
 }
 
 impl Gateway {
-    pub async fn connect(token: impl ToString) -> Result<Self, Box<dyn std::error::Error>> {
+    pub async fn connect(token: impl ToString) -> Result<Self> {
         // Stuff related to receiving messages from the websocket
         let rec_tuple = async_channel::unbounded::<Payload>();
 
@@ -57,7 +59,7 @@ impl Gateway {
         Ok(gateway)
     }
 
-    async fn spawn_receiver_thread(&mut self) -> Result<(), Box<dyn Error>> {
+    async fn spawn_receiver_thread(&mut self) -> Result<()> {
         let token = self.token.clone();
         let writer_lock = self.writer.clone();
         let heartbeat_handle_lock = self.heartbeat_handle.clone();
@@ -65,13 +67,24 @@ impl Gateway {
         let (channel_writer, _) = self.rec_tuple.clone();
         let receiver_handle = tokio::spawn(async move {
             loop {
-                let (socket, _response) = connect_async(
-                    "wss://gateway.discord.gg/?v=10&encoding=json"
-                        .into_client_request()
-                        .expect("could not parse URL"),
-                )
-                .await
-                .expect("could not connect to gateway");
+                let url = match "wss://gateway.discord.gg/?v=10&encoding=json".into_client_request()
+                {
+                    Ok(req) => req,
+                    Err(e) => {
+                        error!("Failed to parse gateway URL: {}", e);
+                        tokio::time::sleep(Duration::from_secs(5)).await;
+                        continue;
+                    }
+                };
+
+                let (socket, _response) = match connect_async(url).await {
+                    Ok(s) => s,
+                    Err(e) => {
+                        error!("Failed to connect to gateway: {}", e);
+                        tokio::time::sleep(Duration::from_secs(5)).await;
+                        continue;
+                    }
+                };
 
                 let (socket_writer, mut socket_reader) = socket.split();
                 {
@@ -79,13 +92,17 @@ impl Gateway {
                     *writer_inner = Some(socket_writer);
                 }
 
-                Self::connect_to_gateway(
+                if let Err(e) = Self::connect_to_gateway(
                     token.clone(),
                     &mut socket_reader,
                     writer_lock.clone(),
                     heartbeat_handle_lock.clone(),
                 )
-                .await;
+                .await
+                {
+                    error!("Failed to connect to gateway: {}", e);
+                    continue;
+                }
 
                 loop {
                     match socket_reader.next().await {
@@ -114,28 +131,30 @@ impl Gateway {
         message: Message,
         channel_writer: &Sender<Payload>,
         writer_lock: &WriterLock,
-    ) -> Result<(), Box<dyn Error>> {
+    ) -> Result<()> {
         match message {
             Message::Text(message) => {
                 Self::handle_text(channel_writer, message.to_string()).await?
             }
             Message::Ping(payload) => Self::handle_ping(writer_lock, payload.to_vec()).await?,
-            message => unimplemented!("{message:#?}"),
+            Message::Pong(_) | Message::Binary(_) | Message::Frame(_) => {
+                trace!("Received {:?} message, ignoring", message);
+            }
+            Message::Close(frame) => {
+                debug!("Received close frame: {:?}", frame);
+            }
         }
 
         Ok(())
     }
 
-    async fn handle_text(
-        channel_writer: &Sender<Payload>,
-        message: String,
-    ) -> Result<(), Box<dyn Error>> {
+    async fn handle_text(channel_writer: &Sender<Payload>, message: String) -> Result<()> {
         let payload: Payload = serde_json::from_str(message.as_str())?;
         channel_writer.send(payload).await?;
         Ok(())
     }
 
-    async fn handle_ping(writer_lock: &WriterLock, payload: Vec<u8>) -> Result<(), Box<dyn Error>> {
+    async fn handle_ping(writer_lock: &WriterLock, payload: Vec<u8>) -> Result<()> {
         Self::static_send_message(writer_lock, Message::Pong(payload.into())).await
     }
 
@@ -144,15 +163,10 @@ impl Gateway {
         socket_reader: &mut SocketReader,
         writer_lock: WriterLock,
         heartbeat_handle_lock: Arc<Mutex<Option<JoinHandle<()>>>>,
-    ) {
-        if let Err(e) = Self::handle_hello(socket_reader, &writer_lock, heartbeat_handle_lock).await
-        {
-            panic!("{e}");
-        }
-
-        if let Err(e) = Self::identify(&token, &writer_lock).await {
-            panic!("{e}");
-        };
+    ) -> Result<()> {
+        Self::handle_hello(socket_reader, &writer_lock, heartbeat_handle_lock).await?;
+        Self::identify(&token, &writer_lock).await?;
+        Ok(())
     }
 
     /// Handle the intial message after connecting to the discord gateway.
@@ -160,8 +174,8 @@ impl Gateway {
         socket_reader: &mut SocketReader,
         writer_lock: &WriterLock,
         heartbeat_handle_lock: Arc<Mutex<Option<JoinHandle<()>>>>,
-    ) -> Result<(), Box<dyn Error>> {
-        let message = Self::static_receive(socket_reader).await;
+    ) -> Result<()> {
+        let message = Self::static_receive(socket_reader).await?;
         match message {
             Message::Text(msg) => {
                 let payload: disruption_types::payloads::Payload =
@@ -178,19 +192,31 @@ impl Gateway {
                             .await;
                         }
                         _ => {
-                            panic!("Gateway::Hello did not have matching payload")
+                            return Err(GatewayError::InvalidHello(
+                                "Hello payload missing data field".to_string(),
+                            ))
                         }
                     },
-                    _ => panic!("Initial message from gateway was not Hello"),
+                    _ => {
+                        return Err(GatewayError::InvalidPayload {
+                            opcode: payload.op as u8,
+                            message: "Expected Hello opcode as first message".to_string(),
+                        })
+                    }
                 }
             }
-            _ => panic!("Unexpected message from gateway"),
+            _ => {
+                return Err(GatewayError::InvalidPayload {
+                    opcode: 0,
+                    message: "Expected text message containing Hello payload".to_string(),
+                })
+            }
         }
         Ok(())
     }
 
     /// Identify to the gateway.
-    async fn identify(token: &str, writer_lock: &WriterLock) -> Result<(), Box<dyn Error>> {
+    async fn identify(token: &str, writer_lock: &WriterLock) -> Result<()> {
         info!("Trying to identify with Gateway");
         let payload_data = IdentifyPayloadData {
             token: token.to_owned(),
@@ -244,49 +270,44 @@ impl Gateway {
 
                 trace!("Sending heartbeat...");
                 if let Err(e) = Self::static_send_payload(&writer_lock, payload).await {
-                    panic!("Error sending heartbeat ({e})");
+                    error!("Error sending heartbeat: {}", e);
+                    break;
                 }
                 trace!("Send heartbeat!");
             }
         });
 
         let mut current_hearbeat = heartbeat_handle_lock.lock().await;
-        if current_hearbeat.is_some() {
-            current_hearbeat.as_ref().unwrap().abort();
+        if let Some(handle) = current_hearbeat.as_ref() {
+            handle.abort();
         }
         *current_hearbeat = Some(heartbeat_handle);
     }
 
-    pub async fn send_message(&self, message: Message) -> Result<(), Box<dyn Error>> {
+    pub async fn send_message(&self, message: Message) -> Result<()> {
         Self::static_send_message(&self.writer, message).await
     }
 
-    pub async fn static_send_message(
-        writer: &WriterLock,
-        message: Message,
-    ) -> Result<(), Box<dyn Error>> {
+    pub async fn static_send_message(writer: &WriterLock, message: Message) -> Result<()> {
         if let Some(writer) = writer.lock().await.as_mut() {
             writer.send(message).await?;
         }
         Ok(())
     }
 
-    pub async fn static_send_payload(
-        writer: &WriterLock,
-        payload: Payload,
-    ) -> Result<(), Box<dyn Error>> {
+    pub async fn static_send_payload(writer: &WriterLock, payload: Payload) -> Result<()> {
         let message = serde_json::to_string(&payload)?;
         Self::static_send_message(writer, Message::Text(message.into())).await
     }
 
-    async fn static_receive(socket_reader: &mut SocketReader) -> Message {
+    async fn static_receive(socket_reader: &mut SocketReader) -> Result<Message> {
         match socket_reader.next().await {
-            Some(Ok(message)) => message,
+            Some(Ok(message)) => Ok(message),
             Some(Err(e)) => {
                 error!("Error reading from socket: {e}");
-                panic!()
+                Err(GatewayError::WebSocketError(e))
             }
-            None => panic!(),
+            None => Err(GatewayError::ConnectionClosed),
         }
     }
 
@@ -302,8 +323,8 @@ impl Drop for Gateway {
         }
 
         let heartbeat_handle = self.heartbeat_handle.blocking_lock();
-        if heartbeat_handle.is_some() {
-            heartbeat_handle.as_ref().unwrap().abort();
+        if let Some(handle) = heartbeat_handle.as_ref() {
+            handle.abort();
         }
     }
 }

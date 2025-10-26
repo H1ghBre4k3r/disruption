@@ -1,12 +1,12 @@
+mod error;
 mod implementations;
 mod internal;
 
 pub mod traits;
 
-use std::error::Error;
-
 use async_trait::async_trait;
 use disruption_types::{channel::MessageApiType, gateway::Event, payloads::ReadyPayloadData};
+pub use error::{Error, RestError, Result};
 pub use implementations::*;
 
 pub use disruption_gateway::*;
@@ -35,14 +35,16 @@ impl<'a> Client<'a> {
         }
     }
 
-    pub async fn connect(&mut self) -> Result<(), Box<dyn Error>> {
+    pub async fn connect(&mut self) -> Result<()> {
         self.gateway = Some(Gateway::connect(&self.token).await?);
         Ok(())
     }
 
-    pub async fn start(&mut self) -> Result<(), Box<dyn Error>> {
+    pub async fn start(&mut self) -> Result<()> {
         let Some(gateway) = &self.gateway else {
-            todo!()
+            return Err(Error::Internal(
+                "Gateway not connected. Call connect() before start()".to_string(),
+            ));
         };
 
         let receiver = gateway.receiver().await.clone();

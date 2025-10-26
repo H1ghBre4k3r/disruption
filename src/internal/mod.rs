@@ -2,6 +2,8 @@ use core::fmt::Debug;
 use reqwest::Response;
 use serde::Serialize;
 
+use crate::error::RestResult;
+
 #[derive(Clone)]
 pub struct RestClient {
     bot_token: String,
@@ -24,7 +26,7 @@ impl RestClient {
         &self,
         uri: &String,
         content: &T,
-    ) -> Result<Response, reqwest::Error> {
+    ) -> RestResult<Response> {
         self.client
             .post(format!("{}/{}", self.base_url, uri))
             .header("Authorization", format!("Bot {}", self.bot_token))
@@ -35,10 +37,11 @@ impl RestClient {
             .json(content)
             .send()
             .await
+            .map_err(Into::into)
     }
 
     /// Issue a GET request to the API.
-    pub async fn get(&self, uri: &String) -> Result<Response, reqwest::Error> {
+    pub async fn get(&self, uri: &String) -> RestResult<Response> {
         self.client
             .get(format!("{}/{}", self.base_url, uri))
             .header("Authorization", format!("Bot {}", self.bot_token))
@@ -48,6 +51,7 @@ impl RestClient {
             )
             .send()
             .await
+            .map_err(Into::into)
     }
 }
 

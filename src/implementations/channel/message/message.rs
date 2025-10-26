@@ -1,8 +1,6 @@
-use std::error::Error;
-
 use disruption_types::channel::{MessageApiType, MessageReferenceApiType};
 
-use crate::{implementations::channel::Channel, internal::RestClient};
+use crate::{implementations::channel::Channel, internal::RestClient, Result};
 
 /// Struct representing a message send in a Discord channel.
 #[derive(Debug, Clone)]
@@ -38,7 +36,7 @@ impl Message {
     }
 
     /// Reply to this message.
-    pub async fn reply(&self, content: &str) -> Result<(), Box<dyn Error>> {
+    pub async fn reply(&self, content: &str) -> Result<()> {
         match self.channel() {
             None => (),
             Some(channel) => {
