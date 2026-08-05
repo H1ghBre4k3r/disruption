@@ -3,15 +3,16 @@
 #![allow(clippy::all)]
 #![allow(unused_imports)]
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
-use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ActionRowComponent {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub components: Option<Vec<Value>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -20,21 +21,28 @@ pub struct ActionRowComponent {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ButtonComponent {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_id: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sku_id: Option<String>,
     pub style: i64,
     #[serde(rename = "type")]
     pub type_: ComponentType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 }
 
@@ -42,15 +50,20 @@ pub struct ButtonComponent {
 pub struct ChannelSelectComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_values: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_values: Option<i64>,
     pub options: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -60,8 +73,10 @@ pub struct ChannelSelectComponent {
 pub struct CheckboxComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -70,15 +85,17 @@ pub struct CheckboxComponent {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CheckboxGroupComponent {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     pub options: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum Component {
     ActionRowComponent(ActionRowComponent),
@@ -101,41 +118,184 @@ pub enum Component {
     RadioGroupComponent(RadioGroupComponent),
     CheckboxGroupComponent(CheckboxGroupComponent),
     CheckboxComponent(CheckboxComponent),
+    Unknown(Value),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
-#[repr(i64)]
+impl<'de> Deserialize<'de> for Component {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = Value::deserialize(deserializer)?;
+        let discriminator = value
+            .get("type")
+            .and_then(Value::as_i64)
+            .ok_or_else(|| serde::de::Error::custom("missing numeric discriminator"))?;
+        match discriminator {
+            1 => serde_json::from_value(value)
+                .map(Self::ActionRowComponent)
+                .map_err(serde::de::Error::custom),
+            2 => serde_json::from_value(value)
+                .map(Self::ButtonComponent)
+                .map_err(serde::de::Error::custom),
+            3 => serde_json::from_value(value)
+                .map(Self::StringSelectComponent)
+                .map_err(serde::de::Error::custom),
+            4 => serde_json::from_value(value)
+                .map(Self::TextInputComponent)
+                .map_err(serde::de::Error::custom),
+            5 => serde_json::from_value(value)
+                .map(Self::UserSelectComponent)
+                .map_err(serde::de::Error::custom),
+            6 => serde_json::from_value(value)
+                .map(Self::RoleSelectComponent)
+                .map_err(serde::de::Error::custom),
+            7 => serde_json::from_value(value)
+                .map(Self::MentionableSelectComponent)
+                .map_err(serde::de::Error::custom),
+            8 => serde_json::from_value(value)
+                .map(Self::ChannelSelectComponent)
+                .map_err(serde::de::Error::custom),
+            9 => serde_json::from_value(value)
+                .map(Self::SectionComponent)
+                .map_err(serde::de::Error::custom),
+            10 => serde_json::from_value(value)
+                .map(Self::TextDisplayComponent)
+                .map_err(serde::de::Error::custom),
+            11 => serde_json::from_value(value)
+                .map(Self::ThumbnailComponent)
+                .map_err(serde::de::Error::custom),
+            12 => serde_json::from_value(value)
+                .map(Self::MediaGalleryComponent)
+                .map_err(serde::de::Error::custom),
+            13 => serde_json::from_value(value)
+                .map(Self::FileComponent)
+                .map_err(serde::de::Error::custom),
+            14 => serde_json::from_value(value)
+                .map(Self::SeparatorComponent)
+                .map_err(serde::de::Error::custom),
+            17 => serde_json::from_value(value)
+                .map(Self::ContainerComponent)
+                .map_err(serde::de::Error::custom),
+            18 => serde_json::from_value(value)
+                .map(Self::LabelComponent)
+                .map_err(serde::de::Error::custom),
+            19 => serde_json::from_value(value)
+                .map(Self::FileUploadComponent)
+                .map_err(serde::de::Error::custom),
+            21 => serde_json::from_value(value)
+                .map(Self::RadioGroupComponent)
+                .map_err(serde::de::Error::custom),
+            22 => serde_json::from_value(value)
+                .map(Self::CheckboxGroupComponent)
+                .map_err(serde::de::Error::custom),
+            23 => serde_json::from_value(value)
+                .map(Self::CheckboxComponent)
+                .map_err(serde::de::Error::custom),
+            _ => Ok(Self::Unknown(value)),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ComponentType {
-    Value1 = 1,
-    Value2 = 2,
-    Value3 = 3,
-    Value4 = 4,
-    Value5 = 5,
-    Value6 = 6,
-    Value7 = 7,
-    Value8 = 8,
-    Value9 = 9,
-    Value10 = 10,
-    Value11 = 11,
-    Value12 = 12,
-    Value13 = 13,
-    Value14 = 14,
-    Value17 = 17,
-    Value18 = 18,
-    Value19 = 19,
-    Value21 = 21,
-    Value22 = 22,
-    Value23 = 23,
+    Value1,
+    Value2,
+    Value3,
+    Value4,
+    Value5,
+    Value6,
+    Value7,
+    Value8,
+    Value9,
+    Value10,
+    Value11,
+    Value12,
+    Value13,
+    Value14,
+    Value17,
+    Value18,
+    Value19,
+    Value21,
+    Value22,
+    Value23,
+    Unknown(i64),
+}
+
+impl Serialize for ComponentType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(match self {
+            Self::Value1 => 1,
+            Self::Value2 => 2,
+            Self::Value3 => 3,
+            Self::Value4 => 4,
+            Self::Value5 => 5,
+            Self::Value6 => 6,
+            Self::Value7 => 7,
+            Self::Value8 => 8,
+            Self::Value9 => 9,
+            Self::Value10 => 10,
+            Self::Value11 => 11,
+            Self::Value12 => 12,
+            Self::Value13 => 13,
+            Self::Value14 => 14,
+            Self::Value17 => 17,
+            Self::Value18 => 18,
+            Self::Value19 => 19,
+            Self::Value21 => 21,
+            Self::Value22 => 22,
+            Self::Value23 => 23,
+            Self::Unknown(value) => *value,
+        })
+    }
+}
+
+impl<'de> Deserialize<'de> for ComponentType {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = i64::deserialize(deserializer)?;
+        Ok(match value {
+            1 => Self::Value1,
+            2 => Self::Value2,
+            3 => Self::Value3,
+            4 => Self::Value4,
+            5 => Self::Value5,
+            6 => Self::Value6,
+            7 => Self::Value7,
+            8 => Self::Value8,
+            9 => Self::Value9,
+            10 => Self::Value10,
+            11 => Self::Value11,
+            12 => Self::Value12,
+            13 => Self::Value13,
+            14 => Self::Value14,
+            17 => Self::Value17,
+            18 => Self::Value18,
+            19 => Self::Value19,
+            21 => Self::Value21,
+            22 => Self::Value22,
+            23 => Self::Value23,
+            _ => Self::Unknown(value),
+        })
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ContainerComponent {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub accent_color: Option<i64>,
     pub components: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spoiler: Option<bool>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -145,8 +305,10 @@ pub struct ContainerComponent {
 pub struct FileComponent {
     pub file: Value,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spoiler: Option<bool>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -156,12 +318,16 @@ pub struct FileComponent {
 pub struct FileUploadComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_values: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_values: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -302,6 +468,7 @@ pub enum GatewayEvent {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GatewayHello {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub _trace: Option<Vec<String>>,
     pub heartbeat_interval: i64,
 }
@@ -309,34 +476,87 @@ pub struct GatewayHello {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GatewayIdentify {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub compress: Option<bool>,
     pub intents: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub large_threshold: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub presence: Option<Value>,
     pub properties: Value,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub shard: Option<Vec<i64>>,
     pub token: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
-#[repr(i64)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GatewayOpcode {
-    Value0 = 0,
-    Value1 = 1,
-    Value2 = 2,
-    Value3 = 3,
-    Value4 = 4,
-    Value6 = 6,
-    Value7 = 7,
-    Value8 = 8,
-    Value9 = 9,
-    Value10 = 10,
-    Value11 = 11,
-    Value31 = 31,
-    Value43 = 43,
+    Value0,
+    Value1,
+    Value2,
+    Value3,
+    Value4,
+    Value6,
+    Value7,
+    Value8,
+    Value9,
+    Value10,
+    Value11,
+    Value31,
+    Value43,
+    Unknown(i64),
+}
+
+impl Serialize for GatewayOpcode {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(match self {
+            Self::Value0 => 0,
+            Self::Value1 => 1,
+            Self::Value2 => 2,
+            Self::Value3 => 3,
+            Self::Value4 => 4,
+            Self::Value6 => 6,
+            Self::Value7 => 7,
+            Self::Value8 => 8,
+            Self::Value9 => 9,
+            Self::Value10 => 10,
+            Self::Value11 => 11,
+            Self::Value31 => 31,
+            Self::Value43 => 43,
+            Self::Unknown(value) => *value,
+        })
+    }
+}
+
+impl<'de> Deserialize<'de> for GatewayOpcode {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = i64::deserialize(deserializer)?;
+        Ok(match value {
+            0 => Self::Value0,
+            1 => Self::Value1,
+            2 => Self::Value2,
+            3 => Self::Value3,
+            4 => Self::Value4,
+            6 => Self::Value6,
+            7 => Self::Value7,
+            8 => Self::Value8,
+            9 => Self::Value9,
+            10 => Self::Value10,
+            11 => Self::Value11,
+            31 => Self::Value31,
+            43 => Self::Value43,
+            _ => Self::Unknown(value),
+        })
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -353,11 +573,13 @@ pub struct GatewayPayload {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GatewayReady {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application: Option<Value>,
     pub guilds: Vec<Value>,
     pub resume_gateway_url: String,
     pub session_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub shard: Option<Vec<i64>>,
     pub user: Value,
     pub v: i64,
@@ -372,14 +594,19 @@ pub struct GatewayRequestChannelInfo {
 pub struct GatewayRequestGuildMembers {
     pub guild_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub nonce: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub presences: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub query: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_ids: Option<Vec<String>>,
 }
 
@@ -416,30 +643,42 @@ pub struct GatewayUpdateVoiceState {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Interaction {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub app_permissions: Option<String>,
     pub application_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub attachment_size_limit: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub authorizing_integration_owners: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub channel: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub channel_id: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub entitlements: Option<Vec<Value>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_locale: Option<String>,
     pub id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub locale: Option<String>,
     pub token: String,
     #[serde(rename = "type")]
@@ -447,22 +686,57 @@ pub struct Interaction {
     pub version: i64,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
-#[repr(i64)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum InteractionType {
-    Value1 = 1,
-    Value2 = 2,
-    Value3 = 3,
-    Value4 = 4,
-    Value5 = 5,
+    Value1,
+    Value2,
+    Value3,
+    Value4,
+    Value5,
+    Unknown(i64),
+}
+
+impl Serialize for InteractionType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_i64(match self {
+            Self::Value1 => 1,
+            Self::Value2 => 2,
+            Self::Value3 => 3,
+            Self::Value4 => 4,
+            Self::Value5 => 5,
+            Self::Unknown(value) => *value,
+        })
+    }
+}
+
+impl<'de> Deserialize<'de> for InteractionType {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let value = i64::deserialize(deserializer)?;
+        Ok(match value {
+            1 => Self::Value1,
+            2 => Self::Value2,
+            3 => Self::Value3,
+            4 => Self::Value4,
+            5 => Self::Value5,
+            _ => Self::Unknown(value),
+        })
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct LabelComponent {
     pub component: Value,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     pub label: String,
     #[serde(rename = "type")]
@@ -472,6 +746,7 @@ pub struct LabelComponent {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MediaGalleryComponent {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     pub items: Vec<Value>,
     #[serde(rename = "type")]
@@ -482,15 +757,20 @@ pub struct MediaGalleryComponent {
 pub struct MentionableSelectComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_values: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_values: Option<i64>,
     pub options: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -500,9 +780,11 @@ pub struct MentionableSelectComponent {
 pub struct RadioGroupComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     pub options: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -512,15 +794,20 @@ pub struct RadioGroupComponent {
 pub struct RoleSelectComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_values: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_values: Option<i64>,
     pub options: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -531,6 +818,7 @@ pub struct SectionComponent {
     pub accessory: Value,
     pub components: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -539,10 +827,13 @@ pub struct SectionComponent {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SeparatorComponent {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub divider: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spacing: Option<i64>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -552,15 +843,20 @@ pub struct SeparatorComponent {
 pub struct StringSelectComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_values: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_values: Option<i64>,
     pub options: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -570,6 +866,7 @@ pub struct StringSelectComponent {
 pub struct TextDisplayComponent {
     pub content: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -579,32 +876,42 @@ pub struct TextDisplayComponent {
 pub struct TextInputComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_length: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     pub style: i64,
     #[serde(rename = "type")]
     pub type_: ComponentType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ThumbnailComponent {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     pub media: Value,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spoiler: Option<bool>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
@@ -614,15 +921,20 @@ pub struct ThumbnailComponent {
 pub struct UserSelectComponent {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_values: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_values: Option<i64>,
     pub options: Vec<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: ComponentType,

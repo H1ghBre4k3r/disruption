@@ -3,9 +3,8 @@
 #![allow(clippy::all)]
 #![allow(unused_imports)]
 
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_json::Value;
-use serde_repr::{Deserialize_repr, Serialize_repr};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AccountResponse {
@@ -78,13 +77,16 @@ pub struct ApplicationCommandAttachmentOptionResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -117,13 +119,16 @@ pub struct ApplicationCommandBooleanOptionResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -148,18 +153,22 @@ pub struct ApplicationCommandChannelOption {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationCommandChannelOptionResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub channel_types: Option<Vec<ChannelTypes>>,
     pub description: String,
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -218,24 +227,31 @@ pub struct ApplicationCommandIntegerOption {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationCommandIntegerOptionResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autocomplete: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub choices: Option<Vec<ApplicationCommandOptionIntegerChoiceResponse>>,
     pub description: String,
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_value: Option<Int53Type>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_value: Option<Int53Type>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -246,14 +262,18 @@ pub struct ApplicationCommandInteractionMetadataResponse {
     pub authorizing_integration_owners: Value,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub original_response_message_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_message_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_user: Option<UserResponse>,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -277,13 +297,16 @@ pub struct ApplicationCommandMentionableOptionResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -314,24 +337,31 @@ pub struct ApplicationCommandNumberOption {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationCommandNumberOptionResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autocomplete: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub choices: Option<Vec<ApplicationCommandOptionNumberChoiceResponse>>,
     pub description: String,
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_value: Option<f64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_value: Option<f64>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -351,6 +381,7 @@ pub struct ApplicationCommandOptionIntegerChoiceResponse {
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     pub value: Int53Type,
 }
@@ -369,6 +400,7 @@ pub struct ApplicationCommandOptionNumberChoiceResponse {
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     pub value: f64,
 }
@@ -387,6 +419,7 @@ pub struct ApplicationCommandOptionStringChoiceResponse {
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     pub value: String,
 }
@@ -410,6 +443,7 @@ pub struct ApplicationCommandPatchRequestPartial {
     #[serde(default)]
     pub integration_types: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
     pub name_localizations: Option<Value>,
@@ -438,24 +472,32 @@ pub struct ApplicationCommandResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub dm_permission: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub handler: Option<ApplicationCommandHandler>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub integration_types: Option<Vec<ApplicationIntegrationType>>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub nsfw: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<Vec<Value>>,
     #[serde(rename = "type")]
     pub type_: ApplicationCommandType,
@@ -482,13 +524,16 @@ pub struct ApplicationCommandRoleOptionResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -519,24 +564,31 @@ pub struct ApplicationCommandStringOption {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationCommandStringOptionResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub autocomplete: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub choices: Option<Vec<ApplicationCommandOptionStringChoiceResponse>>,
     pub description: String,
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_length: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub min_length: Option<i64>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -564,15 +616,19 @@ pub struct ApplicationCommandSubcommandGroupOptionResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<Vec<ApplicationCommandSubcommandOptionResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -600,15 +656,19 @@ pub struct ApplicationCommandSubcommandOptionResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<Vec<Value>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -664,13 +724,16 @@ pub struct ApplicationCommandUserOptionResponse {
     #[serde(default)]
     pub description_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description_localized: Option<String>,
     pub name: String,
     #[serde(default)]
     pub name_localizations: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -723,10 +786,12 @@ pub type ApplicationIdentityProviderAuthType = String;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationIncomingWebhookResponse {
-    pub application_id: Value,
+    #[serde(default)]
+    pub application_id: Option<Value>,
     #[serde(default)]
     pub avatar: Option<String>,
-    pub channel_id: Value,
+    #[serde(default)]
+    pub channel_id: Option<Value>,
     #[serde(default)]
     pub guild_id: Option<Value>,
     pub id: SnowflakeType,
@@ -734,6 +799,7 @@ pub struct ApplicationIncomingWebhookResponse {
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -748,6 +814,7 @@ pub struct ApplicationIntegrationTypeConfiguration {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationIntegrationTypeConfigurationResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub oauth2_install_params: Option<ApplicationOAuth2InstallParamsResponse>,
 }
 
@@ -768,44 +835,59 @@ pub struct ApplicationOAuth2InstallParamsResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_public: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_require_code_grant: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_install_url: Option<String>,
     pub description: String,
     pub flags: i64,
     pub flags_new: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<SnowflakeType>,
     #[serde(default)]
     pub icon: Option<String>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub install_params: Option<ApplicationOAuth2InstallParamsResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub integration_types_config: Option<Value>,
     #[serde(default)]
     pub max_participants: Option<i64>,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub primary_sku_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_policy_url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rpc_origins: Option<Vec<String>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub terms_of_service_url: Option<String>,
     #[serde(rename = "type")]
-    pub type_: Value,
+    #[serde(default)]
+    pub type_: Option<Value>,
     pub verify_key: String,
 }
 
@@ -840,8 +922,10 @@ pub type ApplicationTypes = i64;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ApplicationUserRoleConnectionResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub platform_name: Option<String>,
     #[serde(default)]
     pub platform_username: Option<String>,
@@ -850,28 +934,39 @@ pub struct ApplicationUserRoleConnectionResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AttachmentResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application: Option<ApplicationResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub clip_created_at: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub clip_participants: Option<Vec<UserResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_type: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_secs: Option<f64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub ephemeral: Option<bool>,
     pub filename: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder_version: Option<i64>,
     pub proxy_url: String,
     pub size: i64,
@@ -879,8 +974,10 @@ pub struct AttachmentResponse {
     pub title: Option<String>,
     pub url: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub waveform: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
 }
 
@@ -890,14 +987,19 @@ pub type AuditLogActionTypes = i64;
 pub struct AuditLogEntryResponse {
     pub action_type: AuditLogActionTypes,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub changes: Option<Vec<AuditLogObjectChangeResponse>>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<String>,
-    pub target_id: Value,
-    pub user_id: Value,
+    #[serde(default)]
+    pub target_id: Option<Value>,
+    #[serde(default)]
+    pub user_id: Option<Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -905,8 +1007,10 @@ pub struct AuditLogObjectChangeResponse {
     #[serde(default)]
     pub key: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub new_value: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub old_value: Option<Value>,
 }
 
@@ -955,8 +1059,10 @@ pub struct BaseCreateMessageCreateRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BasicApplicationResponseWithBot {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<String>,
     pub description: String,
     #[serde(default)]
@@ -964,9 +1070,11 @@ pub struct BasicApplicationResponseWithBot {
     pub id: SnowflakeType,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub primary_sku_id: Option<SnowflakeType>,
     #[serde(rename = "type")]
-    pub type_: Value,
+    #[serde(default)]
+    pub type_: Option<Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -994,14 +1102,18 @@ pub struct BasicGuildMemberResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BasicMessageResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<MessageActivityResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application: Option<BasicApplicationResponseWithBot>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<SnowflakeType>,
     pub attachments: Vec<MessageAttachmentResponse>,
     pub author: UserResponse,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub call: Option<MessageCallResponse>,
     pub channel_id: SnowflakeType,
     pub components: Vec<Value>,
@@ -1012,46 +1124,63 @@ pub struct BasicMessageResponse {
     pub flags: i64,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interaction: Option<MessageInteractionResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interaction_metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lobby_member: Option<MessageLobbyMemberResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mention_channels: Option<Vec<MessageMentionChannelResponse>>,
     pub mention_everyone: bool,
     pub mention_roles: Vec<SnowflakeType>,
     pub mentions: Vec<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_reference: Option<MessageReferenceResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_snapshots: Option<Vec<MessageSnapshotResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub nonce: Option<Value>,
     pub pinned: bool,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub poll: Option<PollResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub position: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purchase_notification: Option<PurchaseNotificationResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub resolved: Option<ResolvedObjectsResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub role_subscription_data: Option<MessageRoleSubscriptionDataResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_client_theme: Option<CustomClientThemeResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sticker_items: Option<Vec<MessageStickerItemResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub stickers: Option<Vec<Value>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<ThreadResponse>,
     pub timestamp: String,
     pub tts: bool,
     #[serde(rename = "type")]
     pub type_: MessageType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub webhook_id: Option<SnowflakeType>,
 }
 
@@ -1072,6 +1201,7 @@ pub struct BlockMessageActionMetadata {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct BlockMessageActionMetadataResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_message: Option<String>,
 }
 
@@ -1156,15 +1286,20 @@ pub struct ButtonComponentForMessageRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ButtonComponentResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_id: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ComponentEmojiResponse>,
     pub id: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sku_id: Option<SnowflakeType>,
     pub style: ButtonStyleTypes,
     #[serde(rename = "type")]
@@ -1195,21 +1330,26 @@ pub struct ChannelFollowerResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ChannelFollowerWebhookResponse {
-    pub application_id: Value,
+    #[serde(default)]
+    pub application_id: Option<Value>,
     #[serde(default)]
     pub avatar: Option<String>,
-    pub channel_id: Value,
+    #[serde(default)]
+    pub channel_id: Option<Value>,
     #[serde(default)]
     pub guild_id: Option<Value>,
     pub id: SnowflakeType,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub source_channel: Option<WebhookSourceChannelResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub source_guild: Option<WebhookSourceGuildResponse>,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -1285,16 +1425,20 @@ pub struct ChannelSelectComponentForModalRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ChannelSelectComponentResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub channel_types: Option<Vec<ChannelTypes>>,
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<Vec<ChannelSelectDefaultValueResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     pub id: i64,
     pub max_values: i64,
     pub min_values: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -1379,8 +1523,10 @@ pub struct ComponentEmojiForRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ComponentEmojiResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub animated: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<SnowflakeType>,
     pub name: String,
 }
@@ -1409,10 +1555,12 @@ pub struct ConnectedAccountResponse {
     pub friend_sync: bool,
     pub id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub integrations: Option<Vec<ConnectedAccountIntegrationResponse>>,
     #[serde(default)]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub revoked: Option<bool>,
     pub show_activity: bool,
     pub two_way_link: bool,
@@ -1617,8 +1765,10 @@ pub struct CreateTextThreadWithoutMessageRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CreatedThreadResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub applied_tags: Option<Vec<SnowflakeType>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bitrate: Option<i64>,
     pub flags: i64,
     pub guild_id: SnowflakeType,
@@ -1628,6 +1778,7 @@ pub struct CreatedThreadResponse {
     #[serde(default)]
     pub last_pin_timestamp: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<ThreadMemberResponse>,
     pub member_count: i64,
     pub message_count: i64,
@@ -1636,8 +1787,10 @@ pub struct CreatedThreadResponse {
     #[serde(default)]
     pub parent_id: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub permissions: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rate_limit_per_user: Option<i64>,
     #[serde(default)]
     pub rtc_region: Option<String>,
@@ -1646,8 +1799,10 @@ pub struct CreatedThreadResponse {
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_limit: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub video_quality_mode: Option<VideoQualityModes>,
 }
 
@@ -1705,16 +1860,20 @@ pub struct DefaultKeywordListUpsertRequestPartial {
     #[serde(default)]
     pub enabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_type: Option<AutomodEventType>,
     #[serde(default)]
     pub exempt_channels: Option<Value>,
     #[serde(default)]
     pub exempt_roles: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_metadata: Option<DefaultKeywordListTriggerMetadata>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_type: Option<i64>,
 }
 
@@ -1735,7 +1894,8 @@ pub struct DefaultKeywordRuleResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DefaultReactionEmojiResponse {
-    pub emoji_id: Value,
+    #[serde(default)]
+    pub emoji_id: Option<Value>,
     #[serde(default)]
     pub emoji_name: Option<String>,
 }
@@ -1752,6 +1912,7 @@ pub struct DiscordIntegrationResponse {
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -1776,6 +1937,7 @@ pub struct EmojiResponse {
     pub require_colons: bool,
     pub roles: Vec<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -1785,6 +1947,7 @@ pub type EntitlementOwnerTypes = i64;
 pub struct EntitlementResponse {
     pub application_id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consumed: Option<bool>,
     pub deleted: bool,
     #[serde(default)]
@@ -1846,6 +2009,7 @@ pub type ErrorDetails = Value;
 pub struct ErrorResponse {
     pub code: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub errors: Option<ErrorDetails>,
     pub message: String,
 }
@@ -1854,24 +2018,31 @@ pub struct ErrorResponse {
 pub struct ExternalConnectionIntegrationResponse {
     pub account: AccountResponse,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub enable_emoticons: Option<bool>,
     pub enabled: bool,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expire_behavior: Option<IntegrationExpireBehaviorTypes>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expire_grace_period: Option<IntegrationExpireGracePeriodTypes>,
     pub id: String,
     #[serde(default)]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub revoked: Option<bool>,
     #[serde(default)]
     pub role_id: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub subscriber_count: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub synced_at: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub syncing: Option<bool>,
     #[serde(rename = "type")]
     pub type_: String,
@@ -1904,20 +2075,24 @@ pub struct ExternalScheduledEventPatchRequestPartial {
     #[serde(default)]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub entity_metadata: Option<EntityMetadataExternal>,
     #[serde(default)]
     pub entity_type: Option<Value>,
     #[serde(default)]
     pub image: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_level: Option<GuildScheduledEventPrivacyLevels>,
     #[serde(default)]
     pub recurrence_rule: Option<Value>,
     #[serde(default)]
     pub scheduled_end_time: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scheduled_start_time: Option<String>,
     #[serde(default)]
     pub status: Option<Value>,
@@ -1925,13 +2100,17 @@ pub struct ExternalScheduledEventPatchRequestPartial {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ExternalScheduledEventResponse {
-    pub channel_id: Value,
     #[serde(default)]
+    pub channel_id: Option<Value>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub creator: Option<UserResponse>,
-    pub creator_id: Value,
+    #[serde(default)]
+    pub creator_id: Option<Value>,
     #[serde(default)]
     pub description: Option<String>,
-    pub entity_id: Value,
+    #[serde(default)]
+    pub entity_id: Option<Value>,
     pub entity_metadata: EntityMetadataExternalResponse,
     pub entity_type: i64,
     pub guild_id: SnowflakeType,
@@ -1941,12 +2120,14 @@ pub struct ExternalScheduledEventResponse {
     pub image: Option<String>,
     pub name: String,
     pub privacy_level: GuildScheduledEventPrivacyLevels,
-    pub recurrence_rule: Value,
+    #[serde(default)]
+    pub recurrence_rule: Option<Value>,
     #[serde(default)]
     pub scheduled_end_time: Option<String>,
     pub scheduled_start_time: String,
     pub status: GuildScheduledEventStatuses,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_count: Option<i64>,
     #[serde(default)]
     pub user_rsvp: Option<Value>,
@@ -2019,7 +2200,8 @@ pub type ForumLayout = i64;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ForumTagResponse {
-    pub emoji_id: Value,
+    #[serde(default)]
+    pub emoji_id: Option<Value>,
     #[serde(default)]
     pub emoji_name: Option<String>,
     pub id: SnowflakeType,
@@ -2029,27 +2211,36 @@ pub struct ForumTagResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FriendInviteResponse {
-    pub channel: Value,
+    #[serde(default)]
+    pub channel: Option<Value>,
     pub code: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
     #[serde(default)]
     pub expires_at: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub friends_count: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub inviter: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub is_contact: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_age: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_uses: Option<i64>,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub uses: Option<i64>,
 }
 
@@ -2163,6 +2354,7 @@ pub struct GithubIssue {
     pub id: i64,
     pub number: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub pull_request: Option<Value>,
     pub title: String,
     pub user: GithubUser,
@@ -2252,12 +2444,15 @@ pub struct GroupDMInviteResponse {
     pub channel: InviteChannelResponse,
     pub code: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
     #[serde(default)]
     pub expires_at: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub inviter: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_age: Option<i64>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -2293,12 +2488,16 @@ pub struct GuildChannelLocation {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildChannelResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub available_tags: Option<Vec<ForumTagResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bitrate: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_auto_archive_duration: Option<ThreadAutoArchiveDuration>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_forum_layout: Option<ForumLayout>,
     #[serde(default)]
     pub default_reaction_emoji: Option<Value>,
@@ -2307,6 +2506,7 @@ pub struct GuildChannelResponse {
     #[serde(default)]
     pub default_tag_setting: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_thread_rate_limit_per_user: Option<i64>,
     pub flags: i64,
     pub guild_id: SnowflakeType,
@@ -2317,15 +2517,19 @@ pub struct GuildChannelResponse {
     pub last_pin_timestamp: Option<String>,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub nsfw: Option<bool>,
     #[serde(default)]
     pub parent_id: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub permission_overwrites: Option<Vec<ChannelPermissionOverwriteResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub permissions: Option<String>,
     pub position: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rate_limit_per_user: Option<i64>,
     #[serde(default)]
     pub rtc_region: Option<String>,
@@ -2334,8 +2538,10 @@ pub struct GuildChannelResponse {
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_limit: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub video_quality_mode: Option<VideoQualityModes>,
 }
 
@@ -2350,6 +2556,7 @@ pub struct GuildHomeSettingsResponse {
     pub new_member_actions: Vec<NewMemberActionResponse>,
     pub resource_channels: Vec<ResourceChannelResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub welcome_message: Option<WelcomeMessageResponse>,
 }
 
@@ -2371,21 +2578,26 @@ pub struct GuildIncidentsDataResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildIncomingWebhookResponse {
-    pub application_id: Value,
+    #[serde(default)]
+    pub application_id: Option<Value>,
     #[serde(default)]
     pub avatar: Option<String>,
-    pub channel_id: Value,
+    #[serde(default)]
+    pub channel_id: Option<Value>,
     #[serde(default)]
     pub guild_id: Option<Value>,
     pub id: SnowflakeType,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub token: Option<String>,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -2398,44 +2610,59 @@ pub struct GuildInviteResponse {
     pub channel: InviteChannelResponse,
     pub code: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
     #[serde(default)]
     pub expires_at: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<i64>,
     pub guild: InviteGuildResponse,
     pub guild_id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_scheduled_event: Option<ScheduledEventResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub inviter: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub is_contact: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub is_nickname_changeable: Option<bool>,
     #[serde(default)]
     pub liveliness: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_age: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub max_uses: Option<i64>,
     #[serde(default)]
     pub roles: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_application: Option<InviteApplicationResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_channel_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_message_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_type: Option<InviteTargetTypes>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub target_user: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub temporary: Option<bool>,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub uses: Option<i64>,
 }
 
@@ -2445,7 +2672,8 @@ pub type GuildJoinRequestApplicationStatus = String;
 pub struct GuildJoinRequestResponse {
     #[serde(default)]
     pub actioned_by_user: Option<Value>,
-    pub application_status: Value,
+    #[serde(default)]
+    pub application_status: Option<Value>,
     pub created_at: String,
     #[serde(default)]
     pub form_responses: Option<Value>,
@@ -2463,8 +2691,10 @@ pub struct GuildJoinRequestResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildJoinRequestsListResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_join_requests: Option<Vec<GuildJoinRequestResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub total: Option<i64>,
 }
 
@@ -2540,6 +2770,7 @@ pub struct GuildPatchRequestPartial {
     #[serde(default)]
     pub icon: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
     pub preferred_locale: Option<Value>,
@@ -2598,9 +2829,11 @@ pub struct GuildPruneResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildResponse {
-    pub afk_channel_id: Value,
+    #[serde(default)]
+    pub afk_channel_id: Option<Value>,
     pub afk_timeout: AfkTimeouts,
-    pub application_id: Value,
+    #[serde(default)]
+    pub application_id: Option<Value>,
     #[serde(default)]
     pub banner: Option<String>,
     pub default_message_notifications: UserNotificationSettings,
@@ -2616,7 +2849,8 @@ pub struct GuildResponse {
     #[serde(default)]
     pub icon: Option<String>,
     pub id: SnowflakeType,
-    pub incidents_data: Value,
+    #[serde(default)]
+    pub incidents_data: Option<Value>,
     pub max_members: i64,
     #[serde(default)]
     pub max_presences: Option<i64>,
@@ -2633,20 +2867,25 @@ pub struct GuildResponse {
     pub premium_progress_bar_enabled_user_updated_at: Option<String>,
     pub premium_subscription_count: i64,
     pub premium_tier: PremiumGuildTiers,
-    pub public_updates_channel_id: Value,
+    #[serde(default)]
+    pub public_updates_channel_id: Option<Value>,
     pub region: String,
     pub roles: Vec<GuildRoleResponse>,
-    pub rules_channel_id: Value,
-    pub safety_alerts_channel_id: Value,
+    #[serde(default)]
+    pub rules_channel_id: Option<Value>,
+    #[serde(default)]
+    pub safety_alerts_channel_id: Option<Value>,
     #[serde(default)]
     pub splash: Option<String>,
     pub stickers: Vec<GuildStickerResponse>,
     pub system_channel_flags: i64,
-    pub system_channel_id: Value,
+    #[serde(default)]
+    pub system_channel_id: Option<Value>,
     #[serde(default)]
     pub vanity_url_code: Option<String>,
     pub verification_level: VerificationLevels,
-    pub widget_channel_id: Value,
+    #[serde(default)]
+    pub widget_channel_id: Option<Value>,
     pub widget_enabled: bool,
 }
 
@@ -2674,6 +2913,7 @@ pub struct GuildRoleResponse {
     pub permissions: String,
     pub position: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<GuildRoleTagsResponse>,
     #[serde(default)]
     pub unicode_emoji: Option<String>,
@@ -2682,16 +2922,22 @@ pub struct GuildRoleResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildRoleTagsResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub available_for_purchase: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_connections: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub integration_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub premium_subscriber: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub subscription_listing_id: Option<SnowflakeType>,
 }
 
@@ -2753,7 +2999,8 @@ pub struct GuildStickerResponse {
     pub available: bool,
     #[serde(default)]
     pub description: Option<String>,
-    pub format_type: Value,
+    #[serde(default)]
+    pub format_type: Option<Value>,
     pub guild_id: SnowflakeType,
     pub id: SnowflakeType,
     pub name: String,
@@ -2761,6 +3008,7 @@ pub struct GuildStickerResponse {
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -2780,11 +3028,16 @@ pub struct GuildTemplateChannelResponse {
     #[serde(default)]
     pub available_tags: Option<Value>,
     pub bitrate: i64,
-    pub default_auto_archive_duration: Value,
-    pub default_forum_layout: Value,
-    pub default_reaction_emoji: Value,
-    pub default_sort_order: Value,
-    pub default_tag_setting: Value,
+    #[serde(default)]
+    pub default_auto_archive_duration: Option<Value>,
+    #[serde(default)]
+    pub default_forum_layout: Option<Value>,
+    #[serde(default)]
+    pub default_reaction_emoji: Option<Value>,
+    #[serde(default)]
+    pub default_sort_order: Option<Value>,
+    #[serde(default)]
+    pub default_tag_setting: Option<Value>,
     #[serde(default)]
     pub default_thread_rate_limit_per_user: Option<i64>,
     #[serde(default)]
@@ -2792,7 +3045,8 @@ pub struct GuildTemplateChannelResponse {
     #[serde(default)]
     pub name: Option<String>,
     pub nsfw: bool,
-    pub parent_id: Value,
+    #[serde(default)]
+    pub parent_id: Option<Value>,
     pub permission_overwrites: Vec<ChannelPermissionOverwriteResponse>,
     #[serde(default)]
     pub position: Option<i64>,
@@ -2809,7 +3063,8 @@ pub struct GuildTemplateChannelResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildTemplateChannelTags {
-    pub emoji_id: Value,
+    #[serde(default)]
+    pub emoji_id: Option<Value>,
     #[serde(default)]
     pub emoji_name: Option<String>,
     #[serde(default)]
@@ -2823,7 +3078,8 @@ pub struct GuildTemplateChannelTags {
 pub struct GuildTemplateResponse {
     pub code: String,
     pub created_at: String,
-    pub creator: Value,
+    #[serde(default)]
+    pub creator: Option<Value>,
     pub creator_id: SnowflakeType,
     #[serde(default)]
     pub description: Option<String>,
@@ -2848,7 +3104,8 @@ pub struct GuildTemplateRoleColorsResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildTemplateRoleResponse {
     pub color: i64,
-    pub colors: Value,
+    #[serde(default)]
+    pub colors: Option<Value>,
     pub hoist: bool,
     #[serde(default)]
     pub icon: Option<String>,
@@ -2862,7 +3119,8 @@ pub struct GuildTemplateRoleResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildTemplateSnapshotResponse {
-    pub afk_channel_id: Value,
+    #[serde(default)]
+    pub afk_channel_id: Option<Value>,
     pub afk_timeout: AfkTimeouts,
     pub channels: Vec<GuildTemplateChannelResponse>,
     pub default_message_notifications: UserNotificationSettings,
@@ -2875,7 +3133,8 @@ pub struct GuildTemplateSnapshotResponse {
     pub region: Option<String>,
     pub roles: Vec<GuildTemplateRoleResponse>,
     pub system_channel_flags: i64,
-    pub system_channel_id: Value,
+    #[serde(default)]
+    pub system_channel_id: Option<Value>,
     pub verification_level: VerificationLevels,
 }
 
@@ -2893,7 +3152,8 @@ pub struct GuildWelcomeChannel {
 pub struct GuildWelcomeScreenChannelResponse {
     pub channel_id: SnowflakeType,
     pub description: String,
-    pub emoji_id: Value,
+    #[serde(default)]
+    pub emoji_id: Option<Value>,
     #[serde(default)]
     pub emoji_name: Option<String>,
 }
@@ -2907,9 +3167,11 @@ pub struct GuildWelcomeScreenResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct GuildWithCountsResponse {
-    pub afk_channel_id: Value,
+    #[serde(default)]
+    pub afk_channel_id: Option<Value>,
     pub afk_timeout: AfkTimeouts,
-    pub application_id: Value,
+    #[serde(default)]
+    pub application_id: Option<Value>,
     #[serde(default)]
     pub approximate_member_count: Option<i64>,
     #[serde(default)]
@@ -2929,7 +3191,8 @@ pub struct GuildWithCountsResponse {
     #[serde(default)]
     pub icon: Option<String>,
     pub id: SnowflakeType,
-    pub incidents_data: Value,
+    #[serde(default)]
+    pub incidents_data: Option<Value>,
     pub max_members: i64,
     #[serde(default)]
     pub max_presences: Option<i64>,
@@ -2946,20 +3209,25 @@ pub struct GuildWithCountsResponse {
     pub premium_progress_bar_enabled_user_updated_at: Option<String>,
     pub premium_subscription_count: i64,
     pub premium_tier: PremiumGuildTiers,
-    pub public_updates_channel_id: Value,
+    #[serde(default)]
+    pub public_updates_channel_id: Option<Value>,
     pub region: String,
     pub roles: Vec<GuildRoleResponse>,
-    pub rules_channel_id: Value,
-    pub safety_alerts_channel_id: Value,
+    #[serde(default)]
+    pub rules_channel_id: Option<Value>,
+    #[serde(default)]
+    pub safety_alerts_channel_id: Option<Value>,
     #[serde(default)]
     pub splash: Option<String>,
     pub stickers: Vec<GuildStickerResponse>,
     pub system_channel_flags: i64,
-    pub system_channel_id: Value,
+    #[serde(default)]
+    pub system_channel_id: Option<Value>,
     #[serde(default)]
     pub vanity_url_code: Option<String>,
     pub verification_level: VerificationLevels,
-    pub widget_channel_id: Value,
+    #[serde(default)]
+    pub widget_channel_id: Option<Value>,
     pub widget_enabled: bool,
 }
 
@@ -3057,8 +3325,10 @@ pub type Int53Type = i64;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct IntegrationApplicationResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<String>,
     pub description: String,
     #[serde(default)]
@@ -3066,9 +3336,11 @@ pub struct IntegrationApplicationResponse {
     pub id: SnowflakeType,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub primary_sku_id: Option<SnowflakeType>,
     #[serde(rename = "type")]
-    pub type_: Value,
+    #[serde(default)]
+    pub type_: Option<Value>,
 }
 
 pub type IntegrationExpireBehaviorTypes = i64;
@@ -3099,6 +3371,7 @@ pub struct InteractionApplicationCommandAutocompleteCallbackStringData {
 pub struct InteractionCallbackResponse {
     pub interaction: InteractionResponse,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub resource: Option<Value>,
 }
 
@@ -3111,15 +3384,20 @@ pub struct InteractionResponse {
     #[serde(default)]
     pub activity_instance_id: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub channel_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<SnowflakeType>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response_message_ephemeral: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response_message_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response_message_loading: Option<bool>,
     #[serde(rename = "type")]
     pub type_: InteractionTypes,
@@ -3130,44 +3408,59 @@ pub type InteractionTypes = i64;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct InviteApplicationResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_public: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_require_code_grant: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_install_url: Option<String>,
     pub description: String,
     pub flags: i64,
     pub flags_new: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<SnowflakeType>,
     #[serde(default)]
     pub icon: Option<String>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub install_params: Option<ApplicationOAuth2InstallParamsResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub integration_types_config: Option<Value>,
     #[serde(default)]
     pub max_participants: Option<i64>,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub primary_sku_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_policy_url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rpc_origins: Option<Vec<String>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub terms_of_service_url: Option<String>,
     #[serde(rename = "type")]
-    pub type_: Value,
+    #[serde(default)]
+    pub type_: Option<Value>,
     pub verify_key: String,
 }
 
@@ -3182,11 +3475,13 @@ pub struct InviteChannelRecipientResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct InviteChannelResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
     pub id: SnowflakeType,
     #[serde(default)]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub recipients: Option<Vec<InviteChannelRecipientResponse>>,
     #[serde(rename = "type")]
     pub type_: ChannelTypes,
@@ -3205,13 +3500,15 @@ pub struct InviteGuildResponse {
     pub name: String,
     #[serde(default)]
     pub nsfw: Option<bool>,
-    pub nsfw_level: Value,
+    #[serde(default)]
+    pub nsfw_level: Option<Value>,
     pub premium_subscription_count: i64,
     #[serde(default)]
     pub splash: Option<String>,
     #[serde(default)]
     pub vanity_url_code: Option<String>,
-    pub verification_level: Value,
+    #[serde(default)]
+    pub verification_level: Option<Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -3223,6 +3520,7 @@ pub struct InviteGuildRoleResponse {
     pub id: SnowflakeType,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub permissions: Option<String>,
     pub position: i64,
     #[serde(default)]
@@ -3289,16 +3587,19 @@ pub struct KeywordUpsertRequestPartial {
     #[serde(default)]
     pub enabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_type: Option<AutomodEventType>,
     #[serde(default)]
     pub exempt_channels: Option<Value>,
     #[serde(default)]
     pub exempt_roles: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
     pub trigger_metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_type: Option<i64>,
 }
 
@@ -3354,6 +3655,7 @@ pub struct LobbyMemberRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct LobbyMemberResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_name: Option<String>,
     pub flags: i64,
     pub id: SnowflakeType,
@@ -3364,6 +3666,7 @@ pub struct LobbyMemberResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct LobbyMessageResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<SnowflakeType>,
     pub author: UserResponse,
     pub channel_id: SnowflakeType,
@@ -3372,10 +3675,13 @@ pub struct LobbyMessageResponse {
     pub id: SnowflakeType,
     pub lobby_id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lobby_member: Option<MessageLobbyMemberResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub moderation_metadata: Option<Value>,
     #[serde(rename = "type")]
     pub type_: MessageType,
@@ -3387,6 +3693,7 @@ pub struct LobbyResponse {
     pub flags: UInt32Type,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub linked_channel: Option<GuildChannelResponse>,
     pub members: Vec<LobbyMemberResponse>,
     #[serde(default)]
@@ -3440,16 +3747,19 @@ pub struct MLSpamUpsertRequestPartial {
     #[serde(default)]
     pub enabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_type: Option<AutomodEventType>,
     #[serde(default)]
     pub exempt_channels: Option<Value>,
     #[serde(default)]
     pub exempt_roles: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
     pub trigger_metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_type: Option<i64>,
 }
 
@@ -3540,16 +3850,19 @@ pub struct MentionSpamUpsertRequestPartial {
     #[serde(default)]
     pub enabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_type: Option<AutomodEventType>,
     #[serde(default)]
     pub exempt_channels: Option<Value>,
     #[serde(default)]
     pub exempt_roles: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
     pub trigger_metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_type: Option<i64>,
 }
 
@@ -3599,13 +3912,16 @@ pub struct MentionableSelectComponentForModalRequest {
 pub struct MentionableSelectComponentResponse {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<Vec<Value>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     pub id: i64,
     pub max_values: i64,
     pub min_values: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -3614,6 +3930,7 @@ pub struct MentionableSelectComponentResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageActivityResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub party_id: Option<String>,
     #[serde(rename = "type")]
     pub type_: ActivityActionTypes,
@@ -3653,28 +3970,39 @@ pub struct MessageAttachmentRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageAttachmentResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application: Option<ApplicationResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub clip_created_at: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub clip_participants: Option<Vec<UserResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_type: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_secs: Option<f64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub ephemeral: Option<bool>,
     pub filename: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder_version: Option<i64>,
     pub proxy_url: String,
     pub size: i64,
@@ -3682,8 +4010,10 @@ pub struct MessageAttachmentResponse {
     pub title: Option<String>,
     pub url: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub waveform: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
 }
 
@@ -3700,10 +4030,12 @@ pub struct MessageComponentInteractionMetadataResponse {
     pub id: SnowflakeType,
     pub interacted_message_id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub original_response_message_id: Option<SnowflakeType>,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -3762,11 +4094,14 @@ pub struct MessageEditRequestPartial {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageEmbedAuthorResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub proxy_icon_url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 }
 
@@ -3780,8 +4115,10 @@ pub struct MessageEmbedFieldResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageEmbedFooterResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub proxy_icon_url: Option<String>,
     pub text: String,
 }
@@ -3789,22 +4126,31 @@ pub struct MessageEmbedFooterResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageEmbedImageResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_type: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<UInt32Type>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<UInt32Type>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder_version: Option<UInt32Type>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub proxy_url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<UInt32Type>,
 }
 
@@ -3812,62 +4158,85 @@ pub struct MessageEmbedImageResponse {
 pub struct MessageEmbedProviderResponse {
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageEmbedResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<MessageEmbedAuthorResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub components: Option<Vec<ContainerComponentResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub fields: Option<Vec<MessageEmbedFieldResponse>>,
     #[serde(default)]
     pub flags: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub footer: Option<MessageEmbedFooterResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<MessageEmbedImageResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub provider: Option<MessageEmbedProviderResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub thumbnail: Option<MessageEmbedImageResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub timestamp: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
     #[serde(rename = "type")]
     pub type_: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub video: Option<MessageEmbedVideoResponse>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageEmbedVideoResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub content_type: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub flags: Option<UInt32Type>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<UInt32Type>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder_version: Option<UInt32Type>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub proxy_url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<UInt32Type>,
 }
 
@@ -3876,10 +4245,12 @@ pub struct MessageInteractionResponse {
     pub id: SnowflakeType,
     pub name: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name_localized: Option<String>,
     #[serde(rename = "type")]
     pub type_: InteractionTypes,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -3906,8 +4277,10 @@ pub struct MessageReactionCountDetailsResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageReactionEmojiResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub animated: Option<bool>,
-    pub id: Value,
+    #[serde(default)]
+    pub id: Option<Value>,
     #[serde(default)]
     pub name: Option<String>,
 }
@@ -3940,8 +4313,10 @@ pub struct MessageReferenceRequest {
 pub struct MessageReferenceResponse {
     pub channel_id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_id: Option<SnowflakeType>,
     #[serde(rename = "type")]
     pub type_: MessageReferenceType,
@@ -3952,14 +4327,18 @@ pub type MessageReferenceType = i64;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MessageResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<MessageActivityResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application: Option<BasicApplicationResponseWithBot>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<SnowflakeType>,
     pub attachments: Vec<MessageAttachmentResponse>,
     pub author: UserResponse,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub call: Option<MessageCallResponse>,
     pub channel_id: SnowflakeType,
     pub components: Vec<Value>,
@@ -3970,50 +4349,68 @@ pub struct MessageResponse {
     pub flags: i64,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interaction: Option<MessageInteractionResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interaction_metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lobby_member: Option<MessageLobbyMemberResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mention_channels: Option<Vec<MessageMentionChannelResponse>>,
     pub mention_everyone: bool,
     pub mention_roles: Vec<SnowflakeType>,
     pub mentions: Vec<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_reference: Option<MessageReferenceResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_snapshots: Option<Vec<MessageSnapshotResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub nonce: Option<Value>,
     pub pinned: bool,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub poll: Option<PollResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub position: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purchase_notification: Option<PurchaseNotificationResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reactions: Option<Vec<MessageReactionResponse>>,
     #[serde(default)]
     pub referenced_message: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub resolved: Option<ResolvedObjectsResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub role_subscription_data: Option<MessageRoleSubscriptionDataResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_client_theme: Option<CustomClientThemeResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sticker_items: Option<Vec<MessageStickerItemResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub stickers: Option<Vec<Value>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<ThreadResponse>,
     pub timestamp: String,
     pub tts: bool,
     #[serde(rename = "type")]
     pub type_: MessageType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub webhook_id: Option<SnowflakeType>,
 }
 
@@ -4055,8 +4452,10 @@ pub struct MinimalContentMessageResponse {
     pub mention_roles: Vec<SnowflakeType>,
     pub mentions: Vec<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sticker_items: Option<Vec<MessageStickerItemResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub stickers: Option<Vec<Value>>,
     pub timestamp: String,
     #[serde(rename = "type")]
@@ -4082,11 +4481,13 @@ pub struct ModalSubmitInteractionMetadataResponse {
     pub authorizing_integration_owners: Value,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub original_response_message_id: Option<SnowflakeType>,
     pub triggering_interaction_metadata: Value,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -4094,13 +4495,17 @@ pub struct ModalSubmitInteractionMetadataResponse {
 pub struct MultipleChoiceFormFieldResponse {
     pub choices: Vec<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     pub field_type: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response: Option<i64>,
 }
 
@@ -4129,8 +4534,10 @@ pub struct NewMemberActionResponse {
     pub channel_id: SnowflakeType,
     pub description: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<SettingsEmojiResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
     pub title: String,
 }
@@ -4143,6 +4550,7 @@ pub struct OAuth2GetAuthorizationResponse {
     pub expires: String,
     pub scopes: Vec<OAuth2Scopes>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
 }
 
@@ -4156,14 +4564,18 @@ pub struct OAuth2GetOpenIDConnectUserInfoResponse {
     #[serde(default)]
     pub email: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub email_verified: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub locale: Option<String>,
     #[serde(default)]
     pub nickname: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub picture: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub preferred_username: Option<String>,
     pub sub: String,
 }
@@ -4227,15 +4639,20 @@ pub type OnboardingPromptType = i64;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ParagraphFormFieldResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     pub field_type: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response: Option<String>,
 }
 
@@ -4351,8 +4768,10 @@ pub struct PollMediaCreateRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PollMediaResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<MessageReactionEmojiResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<String>,
 }
 
@@ -4395,20 +4814,27 @@ pub struct PrivateApplicationResponse {
     pub approximate_user_authorization_count: i64,
     pub approximate_user_install_count: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot: Option<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_public: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot_require_code_grant: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_install_url: Option<String>,
     pub description: String,
     pub eligible_oauth2_scopes: Vec<OAuth2Scopes>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_webhooks_status: Option<ApplicationEventWebhooksStatus>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_webhooks_types: Option<Vec<String>>,
     #[serde(default)]
     pub event_webhooks_url: Option<String>,
@@ -4416,13 +4842,16 @@ pub struct PrivateApplicationResponse {
     pub flags: i64,
     pub flags_new: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<SnowflakeType>,
     #[serde(default)]
     pub icon: Option<String>,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub install_params: Option<ApplicationOAuth2InstallParamsResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub integration_types_config: Option<Value>,
     #[serde(default)]
     pub interactions_endpoint_url: Option<String>,
@@ -4431,23 +4860,31 @@ pub struct PrivateApplicationResponse {
     pub name: String,
     pub owner: UserResponse,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub primary_sku_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_policy_url: Option<String>,
     pub redirect_uris: Vec<String>,
     #[serde(default)]
     pub role_connections_verification_url: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rpc_origins: Option<Vec<String>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
-    pub team: Value,
     #[serde(default)]
+    pub team: Option<Value>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub terms_of_service_url: Option<String>,
     #[serde(rename = "type")]
-    pub type_: Value,
+    #[serde(default)]
+    pub type_: Option<Value>,
     pub verify_key: String,
 }
 
@@ -4474,6 +4911,7 @@ pub struct PrivateChannelResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PrivateGroupChannelResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<SnowflakeType>,
     pub flags: i64,
     #[serde(default)]
@@ -4484,6 +4922,7 @@ pub struct PrivateGroupChannelResponse {
     #[serde(default)]
     pub last_pin_timestamp: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub managed: Option<bool>,
     #[serde(default)]
     pub name: Option<String>,
@@ -4513,6 +4952,7 @@ pub struct PrivateGuildMemberResponse {
     pub nick: Option<String>,
     pub pending: bool,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub permissions: Option<String>,
     #[serde(default)]
     pub premium_since: Option<String>,
@@ -4548,6 +4988,7 @@ pub struct PruneGuildRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PurchaseNotificationResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_product_purchase: Option<GuildProductPurchaseResponse>,
     #[serde(rename = "type")]
     pub type_: PurchaseType,
@@ -4674,8 +5115,10 @@ pub struct ResourceChannelResponse {
     pub channel_id: SnowflakeType,
     pub description: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<SettingsEmojiResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
     pub title: String,
 }
@@ -4855,13 +5298,16 @@ pub struct RoleSelectComponentForModalRequest {
 pub struct RoleSelectComponentResponse {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<Vec<RoleSelectDefaultValueResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     pub id: i64,
     pub max_values: i64,
     pub min_values: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -4915,13 +5361,17 @@ pub type SKUIneligibilityReason = i64;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ScheduledEventResponse {
-    pub channel_id: Value,
     #[serde(default)]
+    pub channel_id: Option<Value>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub creator: Option<UserResponse>,
-    pub creator_id: Value,
+    #[serde(default)]
+    pub creator_id: Option<Value>,
     #[serde(default)]
     pub description: Option<String>,
-    pub entity_id: Value,
+    #[serde(default)]
+    pub entity_id: Option<Value>,
     pub entity_type: GuildScheduledEventEntityTypes,
     pub guild_id: SnowflakeType,
     pub guild_scheduled_event_exceptions: Vec<GuildScheduledEventExceptionResponse>,
@@ -4930,12 +5380,14 @@ pub struct ScheduledEventResponse {
     pub image: Option<String>,
     pub name: String,
     pub privacy_level: GuildScheduledEventPrivacyLevels,
-    pub recurrence_rule: Value,
+    #[serde(default)]
+    pub recurrence_rule: Option<Value>,
     #[serde(default)]
     pub scheduled_end_time: Option<String>,
     pub scheduled_start_time: String,
     pub status: GuildScheduledEventStatuses,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_count: Option<i64>,
     #[serde(default)]
     pub user_rsvp: Option<Value>,
@@ -4953,9 +5405,11 @@ pub struct ScheduledEventUserResponse {
     pub guild_scheduled_event_exception_id: Option<Value>,
     pub guild_scheduled_event_id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<GuildMemberResponse>,
     pub response: GuildScheduledEventUserResponses,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
     pub user_id: SnowflakeType,
 }
@@ -4971,14 +5425,18 @@ pub struct SearchIndexNotReadyResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SearchMessageResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<MessageActivityResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application: Option<BasicApplicationResponseWithBot>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub application_id: Option<SnowflakeType>,
     pub attachments: Vec<MessageAttachmentResponse>,
     pub author: UserResponse,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub call: Option<MessageCallResponse>,
     pub channel_id: SnowflakeType,
     pub components: Vec<Value>,
@@ -4990,52 +5448,71 @@ pub struct SearchMessageResponse {
     pub hit: bool,
     pub id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interaction: Option<MessageInteractionResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub interaction_metadata: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lobby_member: Option<MessageLobbyMemberResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mention_channels: Option<Vec<MessageMentionChannelResponse>>,
     pub mention_everyone: bool,
     pub mention_roles: Vec<SnowflakeType>,
     pub mentions: Vec<UserResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_reference: Option<MessageReferenceResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message_snapshots: Option<Vec<MessageSnapshotResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub nonce: Option<Value>,
     pub pinned: bool,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub poll: Option<PollResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub position: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purchase_notification: Option<PurchaseNotificationResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub reactions: Option<Vec<MessageReactionResponse>>,
     #[serde(default)]
     pub referenced_message: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub resolved: Option<ResolvedObjectsResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub restriction_count: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub role_subscription_data: Option<MessageRoleSubscriptionDataResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub shared_client_theme: Option<CustomClientThemeResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sticker_items: Option<Vec<MessageStickerItemResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub stickers: Option<Vec<Value>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub thread: Option<ThreadResponse>,
     pub timestamp: String,
     pub tts: bool,
     #[serde(rename = "type")]
     pub type_: MessageType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub webhook_id: Option<SnowflakeType>,
 }
 
@@ -5084,7 +5561,8 @@ pub struct SeparatorComponentResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SettingsEmojiResponse {
     pub animated: bool,
-    pub id: Value,
+    #[serde(default)]
+    pub id: Option<Value>,
     #[serde(default)]
     pub name: Option<String>,
 }
@@ -5144,6 +5622,7 @@ pub struct SoundboardPatchRequestPartial {
     #[serde(default)]
     pub emoji_name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
     pub volume: Option<f64>,
@@ -5152,14 +5631,17 @@ pub struct SoundboardPatchRequestPartial {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SoundboardSoundResponse {
     pub available: bool,
-    pub emoji_id: Value,
+    #[serde(default)]
+    pub emoji_id: Option<Value>,
     #[serde(default)]
     pub emoji_name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub guild_id: Option<SnowflakeType>,
     pub name: String,
     pub sound_id: SnowflakeType,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user: Option<UserResponse>,
     pub volume: f64,
 }
@@ -5176,7 +5658,8 @@ pub struct StageInstanceResponse {
     pub channel_id: SnowflakeType,
     pub discoverable_disabled: bool,
     pub guild_id: SnowflakeType,
-    pub guild_scheduled_event_id: Value,
+    #[serde(default)]
+    pub guild_scheduled_event_id: Option<Value>,
     pub id: SnowflakeType,
     pub privacy_level: StageInstancesPrivacyLevels,
     pub topic: String,
@@ -5217,14 +5700,17 @@ pub struct StageScheduledEventPatchRequestPartial {
     #[serde(default)]
     pub image: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_level: Option<GuildScheduledEventPrivacyLevels>,
     #[serde(default)]
     pub recurrence_rule: Option<Value>,
     #[serde(default)]
     pub scheduled_end_time: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scheduled_start_time: Option<String>,
     #[serde(default)]
     pub status: Option<Value>,
@@ -5232,14 +5718,19 @@ pub struct StageScheduledEventPatchRequestPartial {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StageScheduledEventResponse {
-    pub channel_id: Value,
     #[serde(default)]
+    pub channel_id: Option<Value>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub creator: Option<UserResponse>,
-    pub creator_id: Value,
+    #[serde(default)]
+    pub creator_id: Option<Value>,
     #[serde(default)]
     pub description: Option<String>,
-    pub entity_id: Value,
-    pub entity_metadata: Value,
+    #[serde(default)]
+    pub entity_id: Option<Value>,
+    #[serde(default)]
+    pub entity_metadata: Option<Value>,
     pub entity_type: i64,
     pub guild_id: SnowflakeType,
     pub guild_scheduled_event_exceptions: Vec<GuildScheduledEventExceptionResponse>,
@@ -5248,12 +5739,14 @@ pub struct StageScheduledEventResponse {
     pub image: Option<String>,
     pub name: String,
     pub privacy_level: GuildScheduledEventPrivacyLevels,
-    pub recurrence_rule: Value,
+    #[serde(default)]
+    pub recurrence_rule: Option<Value>,
     #[serde(default)]
     pub scheduled_end_time: Option<String>,
     pub scheduled_start_time: String,
     pub status: GuildScheduledEventStatuses,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_count: Option<i64>,
     #[serde(default)]
     pub user_rsvp: Option<Value>,
@@ -5263,7 +5756,8 @@ pub struct StageScheduledEventResponse {
 pub struct StandardStickerResponse {
     #[serde(default)]
     pub description: Option<String>,
-    pub format_type: Value,
+    #[serde(default)]
+    pub format_type: Option<Value>,
     pub id: SnowflakeType,
     pub name: String,
     pub pack_id: SnowflakeType,
@@ -5283,8 +5777,10 @@ pub struct StickerPackCollectionResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StickerPackResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub banner_asset_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_sticker_id: Option<SnowflakeType>,
     #[serde(default)]
     pub description: Option<String>,
@@ -5340,12 +5836,14 @@ pub struct StringSelectComponentForModalRequest {
 pub struct StringSelectComponentResponse {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     pub id: i64,
     pub max_values: i64,
     pub min_values: i64,
     pub options: Vec<StringSelectOptionResponse>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -5366,10 +5864,13 @@ pub struct StringSelectOptionForRequest {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StringSelectOptionResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<ComponentEmojiResponse>,
     pub label: String,
     pub value: String,
@@ -5435,13 +5936,17 @@ pub struct TeamResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TermsFormFieldResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     pub field_type: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response: Option<bool>,
     pub values: Vec<String>,
 }
@@ -5505,28 +6010,36 @@ pub struct TextInputComponentResponse {
     #[serde(default)]
     pub min_length: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     pub style: TextInputStyleTypes,
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TextInputFormFieldResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     pub field_type: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub response: Option<String>,
 }
 
@@ -5540,6 +6053,7 @@ pub struct ThreadMemberResponse {
     pub id: SnowflakeType,
     pub join_timestamp: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<GuildMemberResponse>,
     pub user_id: SnowflakeType,
 }
@@ -5551,8 +6065,10 @@ pub struct ThreadMetadataResponse {
     pub archived: bool,
     pub auto_archive_duration: ThreadAutoArchiveDuration,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub create_timestamp: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub invitable: Option<bool>,
     pub locked: bool,
 }
@@ -5560,8 +6076,10 @@ pub struct ThreadMetadataResponse {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ThreadResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub applied_tags: Option<Vec<SnowflakeType>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bitrate: Option<i64>,
     pub flags: i64,
     pub guild_id: SnowflakeType,
@@ -5571,6 +6089,7 @@ pub struct ThreadResponse {
     #[serde(default)]
     pub last_pin_timestamp: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<ThreadMemberResponse>,
     pub member_count: i64,
     pub message_count: i64,
@@ -5579,8 +6098,10 @@ pub struct ThreadResponse {
     #[serde(default)]
     pub parent_id: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub permissions: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rate_limit_per_user: Option<i64>,
     #[serde(default)]
     pub rtc_region: Option<String>,
@@ -5589,14 +6110,17 @@ pub struct ThreadResponse {
     #[serde(rename = "type")]
     pub type_: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_limit: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub video_quality_mode: Option<VideoQualityModes>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ThreadSearchResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub first_messages: Option<Vec<MessageResponse>>,
     pub has_more: bool,
     pub members: Vec<ThreadMemberResponse>,
@@ -5613,6 +6137,7 @@ pub type ThreadSortingMode = String;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ThreadsResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub first_messages: Option<Vec<MessageResponse>>,
     pub has_more: bool,
     pub members: Vec<ThreadMemberResponse>,
@@ -5664,6 +6189,7 @@ pub struct UnfurledMediaRequestWithAttachmentReferenceRequired {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UnfurledMediaResponse {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub attachment_id: Option<SnowflakeType>,
     #[serde(default)]
     pub content_type: Option<String>,
@@ -5729,6 +6255,7 @@ pub struct UpdateGuildChannelRequestPartial {
     #[serde(default)]
     pub flags: Option<i64>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
     pub nsfw: Option<bool>,
@@ -5886,12 +6413,14 @@ pub struct UpdateVoiceStateRequestPartial {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UserAvatarDecorationResponse {
     pub asset: String,
-    pub sku_id: Value,
+    #[serde(default)]
+    pub sku_id: Option<Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UserCollectiblesResponse {
-    pub nameplate: Value,
+    #[serde(default)]
+    pub nameplate: Option<Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -5933,7 +6462,8 @@ pub struct UserNameplateResponse {
     pub asset: String,
     pub label: String,
     pub palette: NameplatePalette,
-    pub sku_id: Value,
+    #[serde(default)]
+    pub sku_id: Option<Value>,
 }
 
 pub type UserNotificationSettings = i64;
@@ -5949,6 +6479,7 @@ pub struct UserPIIResponse {
     #[serde(default)]
     pub banner: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot: Option<bool>,
     #[serde(default)]
     pub collectibles: Option<Value>,
@@ -5962,14 +6493,17 @@ pub struct UserPIIResponse {
     pub locale: AvailableLocalesEnum,
     pub mfa_enabled: bool,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub premium_type: Option<PremiumTypes>,
     #[serde(default)]
     pub primary_guild: Option<Value>,
     pub public_flags: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub system: Option<bool>,
     pub username: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub verified: Option<bool>,
 }
 
@@ -5979,7 +6513,8 @@ pub struct UserPrimaryGuildResponse {
     pub badge: Option<String>,
     #[serde(default)]
     pub identity_enabled: Option<bool>,
-    pub identity_guild_id: Value,
+    #[serde(default)]
+    pub identity_guild_id: Option<Value>,
     #[serde(default)]
     pub tag: Option<String>,
 }
@@ -6039,16 +6574,20 @@ pub struct UserProfileUpsertRequestPartial {
     #[serde(default)]
     pub enabled: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub event_type: Option<AutomodEventType>,
     #[serde(default)]
     pub exempt_channels: Option<Value>,
     #[serde(default)]
     pub exempt_roles: Option<Value>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_metadata: Option<UserProfileMetadata>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub trigger_type: Option<i64>,
 }
 
@@ -6063,6 +6602,7 @@ pub struct UserResponse {
     #[serde(default)]
     pub banner: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub bot: Option<bool>,
     #[serde(default)]
     pub collectibles: Option<Value>,
@@ -6071,9 +6611,11 @@ pub struct UserResponse {
     #[serde(default)]
     pub global_name: Option<String>,
     pub id: SnowflakeType,
-    pub primary_guild: Value,
+    #[serde(default)]
+    pub primary_guild: Option<Value>,
     pub public_flags: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub system: Option<bool>,
     pub username: String,
 }
@@ -6124,13 +6666,16 @@ pub struct UserSelectComponentForModalRequest {
 pub struct UserSelectComponentResponse {
     pub custom_id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default_values: Option<Vec<UserSelectDefaultValueResponse>>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     pub id: i64,
     pub max_values: i64,
     pub min_values: i64,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub placeholder: Option<String>,
     #[serde(rename = "type")]
     pub type_: i64,
@@ -6211,14 +6756,17 @@ pub struct VoiceScheduledEventPatchRequestPartial {
     #[serde(default)]
     pub image: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_level: Option<GuildScheduledEventPrivacyLevels>,
     #[serde(default)]
     pub recurrence_rule: Option<Value>,
     #[serde(default)]
     pub scheduled_end_time: Option<String>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub scheduled_start_time: Option<String>,
     #[serde(default)]
     pub status: Option<Value>,
@@ -6226,14 +6774,19 @@ pub struct VoiceScheduledEventPatchRequestPartial {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct VoiceScheduledEventResponse {
-    pub channel_id: Value,
     #[serde(default)]
+    pub channel_id: Option<Value>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub creator: Option<UserResponse>,
-    pub creator_id: Value,
+    #[serde(default)]
+    pub creator_id: Option<Value>,
     #[serde(default)]
     pub description: Option<String>,
-    pub entity_id: Value,
-    pub entity_metadata: Value,
+    #[serde(default)]
+    pub entity_id: Option<Value>,
+    #[serde(default)]
+    pub entity_metadata: Option<Value>,
     pub entity_type: i64,
     pub guild_id: SnowflakeType,
     pub guild_scheduled_event_exceptions: Vec<GuildScheduledEventExceptionResponse>,
@@ -6242,12 +6795,14 @@ pub struct VoiceScheduledEventResponse {
     pub image: Option<String>,
     pub name: String,
     pub privacy_level: GuildScheduledEventPrivacyLevels,
-    pub recurrence_rule: Value,
+    #[serde(default)]
+    pub recurrence_rule: Option<Value>,
     #[serde(default)]
     pub scheduled_end_time: Option<String>,
     pub scheduled_start_time: String,
     pub status: GuildScheduledEventStatuses,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub user_count: Option<i64>,
     #[serde(default)]
     pub user_rsvp: Option<Value>,
@@ -6255,10 +6810,13 @@ pub struct VoiceScheduledEventResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct VoiceStateResponse {
-    pub channel_id: Value,
-    pub deaf: bool,
-    pub guild_id: Value,
     #[serde(default)]
+    pub channel_id: Option<Value>,
+    pub deaf: bool,
+    #[serde(default)]
+    pub guild_id: Option<Value>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub member: Option<GuildMemberResponse>,
     pub mute: bool,
     #[serde(default)]
@@ -6364,23 +6922,30 @@ pub type WidgetImageStyles = String;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct WidgetMember {
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<WidgetActivity>,
     pub avatar: Value,
     pub avatar_url: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub channel_id: Option<SnowflakeType>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub deaf: Option<bool>,
     pub discriminator: WidgetUserDiscriminator,
     pub id: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub mute: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub self_deaf: Option<bool>,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub self_mute: Option<bool>,
     pub status: String,
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub suppress: Option<bool>,
     pub username: String,
 }
@@ -6398,7 +6963,8 @@ pub struct WidgetResponse {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct WidgetSettingsResponse {
-    pub channel_id: Value,
+    #[serde(default)]
+    pub channel_id: Option<Value>,
     pub enabled: bool,
 }
 

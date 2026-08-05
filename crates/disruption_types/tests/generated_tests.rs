@@ -1,7 +1,8 @@
 use disruption_types::generated::gateway::{
-    GatewayEvent, GatewayOpcode, GatewayPayload, Interaction, SectionComponent,
+    ButtonComponent, Component, GatewayEvent, GatewayOpcode, GatewayPayload, Interaction,
+    SectionComponent,
 };
-use disruption_types::generated::rest::UserResponse;
+use disruption_types::generated::rest::{ApplicationCommandPatchRequestPartial, UserResponse};
 
 #[test]
 fn generated_gateway_payload_accepts_current_opcode_and_event_values() {
@@ -11,6 +12,16 @@ fn generated_gateway_payload_accepts_current_opcode_and_event_values() {
 
     assert_eq!(payload.op, GatewayOpcode::Value31);
     assert_eq!(payload.t, Some(GatewayEvent::ChannelInfo));
+}
+
+#[test]
+fn generated_numeric_enums_preserve_unknown_values() {
+    let opcode: GatewayOpcode = serde_json::from_str("999").expect("unknown opcode is accepted");
+
+    assert_eq!(
+        serde_json::to_value(opcode).expect("opcode serializes"),
+        999
+    );
 }
 
 #[test]
@@ -34,6 +45,21 @@ fn generated_components_include_new_layout_shapes() {
 
     assert_eq!(section.components.len(), 1);
     assert_eq!(section.accessory["type"], 2);
+}
+
+#[test]
+fn generated_component_dispatches_by_type() {
+    let component: Component =
+        serde_json::from_str(r#"{"type":2,"style":1}"#).expect("valid button component");
+
+    match component {
+        Component::ButtonComponent(button) => assert_eq!(button.style, 1),
+        Component::ActionRowComponent(_) => panic!("button was parsed as an action row"),
+        _ => panic!("button was parsed as the wrong component variant"),
+    }
+
+    let _: ButtonComponent = serde_json::from_str(r#"{"type":2,"style":1}"#)
+        .expect("button component remains directly deserializable");
 }
 
 #[test]
@@ -73,4 +99,33 @@ fn generated_rest_models_deserialize_official_shape() {
 
     assert_eq!(user.username, "discord");
     assert_eq!(user.id, "123");
+}
+
+#[test]
+fn generated_patch_requests_omit_absent_fields() {
+    let patch = ApplicationCommandPatchRequestPartial {
+        contexts: None,
+        default_member_permissions: None,
+        description: None,
+        description_localizations: None,
+        dm_permission: None,
+        handler: None,
+        integration_types: None,
+        name: None,
+        name_localizations: None,
+        options: None,
+    };
+
+    let serialized = serde_json::to_value(patch)
+        .expect("patch serializes")
+        .as_object()
+        .cloned()
+        .expect("patch is an object");
+
+    assert!(!serialized.contains_key("name"));
+    assert_eq!(
+        serialized.get("description"),
+        Some(&serde_json::Value::Null)
+    );
+    assert_eq!(serialized.get("handler"), Some(&serde_json::Value::Null));
 }

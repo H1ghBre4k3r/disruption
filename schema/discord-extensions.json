@@ -375,6 +375,31 @@
         }
       },
       "Component": {
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "1": "#/components/schemas/ActionRowComponent",
+            "2": "#/components/schemas/ButtonComponent",
+            "3": "#/components/schemas/StringSelectComponent",
+            "4": "#/components/schemas/TextInputComponent",
+            "5": "#/components/schemas/UserSelectComponent",
+            "6": "#/components/schemas/RoleSelectComponent",
+            "7": "#/components/schemas/MentionableSelectComponent",
+            "8": "#/components/schemas/ChannelSelectComponent",
+            "9": "#/components/schemas/SectionComponent",
+            "10": "#/components/schemas/TextDisplayComponent",
+            "11": "#/components/schemas/ThumbnailComponent",
+            "12": "#/components/schemas/MediaGalleryComponent",
+            "13": "#/components/schemas/FileComponent",
+            "14": "#/components/schemas/SeparatorComponent",
+            "17": "#/components/schemas/ContainerComponent",
+            "18": "#/components/schemas/LabelComponent",
+            "19": "#/components/schemas/FileUploadComponent",
+            "21": "#/components/schemas/RadioGroupComponent",
+            "22": "#/components/schemas/CheckboxGroupComponent",
+            "23": "#/components/schemas/CheckboxComponent"
+          }
+        },
         "oneOf": [
           { "$ref": "#/components/schemas/ActionRowComponent" },
           { "$ref": "#/components/schemas/ButtonComponent" },

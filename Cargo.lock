@@ -283,7 +283,6 @@ dependencies = [
 name = "discord-codegen"
 version = "0.1.0"
 dependencies = [
- "serde",
  "serde_json",
 ]
 
