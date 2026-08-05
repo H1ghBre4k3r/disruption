@@ -48,6 +48,8 @@ fn generate_value(document: &Value) -> Result<String, CodegenError> {
         emit_schema(&mut output, source_name, schema, schemas, &names);
     }
 
+    output.truncate(output.trim_end_matches('\n').len());
+    output.push('\n');
     Ok(output)
 }
 
@@ -125,6 +127,7 @@ fn emit_enum(output: &mut String, rust_name: &str, values: &[Value]) {
             writeln!(output, "    #[serde(rename = {value:?})]").unwrap();
             writeln!(output, "    {variant},").unwrap();
         }
+        output.push_str("    #[serde(other)]\n    Unknown,\n");
         output.push_str("}\n\n");
         return;
     }
@@ -209,6 +212,10 @@ fn emit_struct(
         "#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]"
     )
     .unwrap();
+    if properties.is_empty() {
+        writeln!(output, "pub struct {rust_name} {{}}\n").unwrap();
+        return;
+    }
     writeln!(output, "pub struct {rust_name} {{").unwrap();
 
     let mut used = BTreeSet::new();
@@ -535,5 +542,26 @@ mod tests {
         assert!(output.contains("pub name: Option<String>"));
         assert!(output.contains("pub enum Priority"));
         assert!(output.contains("#[repr(i64)]"));
+    }
+
+    #[test]
+    fn checked_in_rest_output_matches_the_pinned_spec() {
+        let generated = generate(include_str!(
+            "../../../schema/discord-api-spec/openapi.json"
+        ))
+        .expect("pinned Discord OpenAPI is valid");
+        let checked_in = include_str!("../../../crates/disruption_types/src/generated/rest.rs");
+
+        assert_eq!(generated, checked_in);
+        assert!(generated.matches("pub struct ").count() > 400);
+    }
+
+    #[test]
+    fn checked_in_extension_output_matches_its_schema() {
+        let generated = generate(include_str!("../../../schema/discord-extensions.json"))
+            .expect("Discord extension schema is valid");
+        let checked_in = include_str!("../../../crates/disruption_types/src/generated/gateway.rs");
+
+        assert_eq!(generated, checked_in);
     }
 }

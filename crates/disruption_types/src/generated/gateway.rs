@@ -222,6 +222,8 @@ pub enum GatewayEvent {
     MessagePollVoteAdd,
     #[serde(rename = "MESSAGE_POLL_VOTE_REMOVE")]
     MessagePollVoteRemove,
+    #[serde(other)]
+    Unknown,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -484,4 +486,3 @@ pub struct WebhookEvent {
     pub type_: i64,
     pub version: String,
 }
-
