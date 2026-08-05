@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/discord/discord-api-spec",
+  "spec": "specs/openapi.json",
+  "commit": "74fda0fad044407ea280043a03ffc9bc64c4e49e",
+  "api_version": "10"
+}
