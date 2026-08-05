@@ -250,6 +250,130 @@
           { "$ref": "#/components/schemas/StringSelectComponent" }
         ]
       },
+      "SectionComponent": {
+        "type": "object",
+        "required": ["type", "components", "accessory"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "components": { "type": "array", "items": { "type": "object" } },
+          "accessory": { "type": "object" }
+        }
+      },
+      "TextDisplayComponent": {
+        "type": "object",
+        "required": ["type", "content"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "content": { "type": "string" }
+        }
+      },
+      "ThumbnailComponent": {
+        "type": "object",
+        "required": ["type", "media"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "media": { "type": "object" },
+          "description": { "type": "string" },
+          "spoiler": { "type": "boolean" }
+        }
+      },
+      "MediaGalleryComponent": {
+        "type": "object",
+        "required": ["type", "items"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "items": { "type": "array", "items": { "type": "object" } }
+        }
+      },
+      "FileComponent": {
+        "type": "object",
+        "required": ["type", "file"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "file": { "type": "object" },
+          "spoiler": { "type": "boolean" }
+        }
+      },
+      "SeparatorComponent": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "divider": { "type": "boolean" },
+          "spacing": { "type": "integer" }
+        }
+      },
+      "ContainerComponent": {
+        "type": "object",
+        "required": ["type", "components"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "components": { "type": "array", "items": { "type": "object" } },
+          "accent_color": { "type": "integer" },
+          "spoiler": { "type": "boolean" }
+        }
+      },
+      "LabelComponent": {
+        "type": "object",
+        "required": ["type", "label", "component"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "component": { "type": "object" }
+        }
+      },
+      "FileUploadComponent": {
+        "type": "object",
+        "required": ["type", "custom_id"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "custom_id": { "type": "string" },
+          "min_values": { "type": "integer" },
+          "max_values": { "type": "integer" },
+          "required": { "type": "boolean" }
+        }
+      },
+      "RadioGroupComponent": {
+        "type": "object",
+        "required": ["type", "custom_id", "options"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "custom_id": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "object" } },
+          "required": { "type": "boolean" }
+        }
+      },
+      "CheckboxGroupComponent": {
+        "type": "object",
+        "required": ["type", "options"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "options": { "type": "array", "items": { "type": "object" } },
+          "required": { "type": "boolean" }
+        }
+      },
+      "CheckboxComponent": {
+        "type": "object",
+        "required": ["type", "custom_id"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "custom_id": { "type": "string" },
+          "default": { "type": "boolean" }
+        }
+      },
       "Component": {
         "oneOf": [
           { "$ref": "#/components/schemas/ActionRowComponent" },
@@ -259,7 +383,19 @@
           { "$ref": "#/components/schemas/UserSelectComponent" },
           { "$ref": "#/components/schemas/RoleSelectComponent" },
           { "$ref": "#/components/schemas/MentionableSelectComponent" },
-          { "$ref": "#/components/schemas/ChannelSelectComponent" }
+          { "$ref": "#/components/schemas/ChannelSelectComponent" },
+          { "$ref": "#/components/schemas/SectionComponent" },
+          { "$ref": "#/components/schemas/TextDisplayComponent" },
+          { "$ref": "#/components/schemas/ThumbnailComponent" },
+          { "$ref": "#/components/schemas/MediaGalleryComponent" },
+          { "$ref": "#/components/schemas/FileComponent" },
+          { "$ref": "#/components/schemas/SeparatorComponent" },
+          { "$ref": "#/components/schemas/ContainerComponent" },
+          { "$ref": "#/components/schemas/LabelComponent" },
+          { "$ref": "#/components/schemas/FileUploadComponent" },
+          { "$ref": "#/components/schemas/RadioGroupComponent" },
+          { "$ref": "#/components/schemas/CheckboxGroupComponent" },
+          { "$ref": "#/components/schemas/CheckboxComponent" }
         ]
       },
       "InteractionType": {

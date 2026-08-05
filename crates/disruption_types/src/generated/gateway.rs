@@ -57,6 +57,28 @@ pub struct ChannelSelectComponent {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CheckboxComponent {
+    pub custom_id: String,
+    #[serde(default)]
+    pub default: Option<bool>,
+    #[serde(default)]
+    pub id: Option<i64>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CheckboxGroupComponent {
+    #[serde(default)]
+    pub id: Option<i64>,
+    pub options: Vec<Value>,
+    #[serde(default)]
+    pub required: Option<bool>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Component {
     ActionRowComponent(ActionRowComponent),
@@ -67,6 +89,18 @@ pub enum Component {
     RoleSelectComponent(RoleSelectComponent),
     MentionableSelectComponent(MentionableSelectComponent),
     ChannelSelectComponent(ChannelSelectComponent),
+    SectionComponent(SectionComponent),
+    TextDisplayComponent(TextDisplayComponent),
+    ThumbnailComponent(ThumbnailComponent),
+    MediaGalleryComponent(MediaGalleryComponent),
+    FileComponent(FileComponent),
+    SeparatorComponent(SeparatorComponent),
+    ContainerComponent(ContainerComponent),
+    LabelComponent(LabelComponent),
+    FileUploadComponent(FileUploadComponent),
+    RadioGroupComponent(RadioGroupComponent),
+    CheckboxGroupComponent(CheckboxGroupComponent),
+    CheckboxComponent(CheckboxComponent),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize_repr, Deserialize_repr)]
@@ -92,6 +126,45 @@ pub enum ComponentType {
     Value21 = 21,
     Value22 = 22,
     Value23 = 23,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ContainerComponent {
+    #[serde(default)]
+    pub accent_color: Option<i64>,
+    pub components: Vec<Value>,
+    #[serde(default)]
+    pub id: Option<i64>,
+    #[serde(default)]
+    pub spoiler: Option<bool>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FileComponent {
+    pub file: Value,
+    #[serde(default)]
+    pub id: Option<i64>,
+    #[serde(default)]
+    pub spoiler: Option<bool>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct FileUploadComponent {
+    pub custom_id: String,
+    #[serde(default)]
+    pub id: Option<i64>,
+    #[serde(default)]
+    pub max_values: Option<i64>,
+    #[serde(default)]
+    pub min_values: Option<i64>,
+    #[serde(default)]
+    pub required: Option<bool>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -385,6 +458,27 @@ pub enum InteractionType {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct LabelComponent {
+    pub component: Value,
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub id: Option<i64>,
+    pub label: String,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct MediaGalleryComponent {
+    #[serde(default)]
+    pub id: Option<i64>,
+    pub items: Vec<Value>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MentionableSelectComponent {
     pub custom_id: String,
     #[serde(default)]
@@ -398,6 +492,18 @@ pub struct MentionableSelectComponent {
     pub options: Vec<Value>,
     #[serde(default)]
     pub placeholder: Option<String>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RadioGroupComponent {
+    pub custom_id: String,
+    #[serde(default)]
+    pub id: Option<i64>,
+    pub options: Vec<Value>,
+    #[serde(default)]
+    pub required: Option<bool>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
 }
@@ -421,6 +527,28 @@ pub struct RoleSelectComponent {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SectionComponent {
+    pub accessory: Value,
+    pub components: Vec<Value>,
+    #[serde(default)]
+    pub id: Option<i64>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SeparatorComponent {
+    #[serde(default)]
+    pub divider: Option<bool>,
+    #[serde(default)]
+    pub id: Option<i64>,
+    #[serde(default)]
+    pub spacing: Option<i64>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct StringSelectComponent {
     pub custom_id: String,
     #[serde(default)]
@@ -434,6 +562,15 @@ pub struct StringSelectComponent {
     pub options: Vec<Value>,
     #[serde(default)]
     pub placeholder: Option<String>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct TextDisplayComponent {
+    pub content: String,
+    #[serde(default)]
+    pub id: Option<i64>,
     #[serde(rename = "type")]
     pub type_: ComponentType,
 }
@@ -458,6 +595,19 @@ pub struct TextInputComponent {
     pub type_: ComponentType,
     #[serde(default)]
     pub value: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ThumbnailComponent {
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
+    pub id: Option<i64>,
+    pub media: Value,
+    #[serde(default)]
+    pub spoiler: Option<bool>,
+    #[serde(rename = "type")]
+    pub type_: ComponentType,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

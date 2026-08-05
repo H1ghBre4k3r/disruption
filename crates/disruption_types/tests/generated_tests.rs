@@ -1,5 +1,5 @@
 use disruption_types::generated::gateway::{
-    GatewayEvent, GatewayOpcode, GatewayPayload, Interaction,
+    GatewayEvent, GatewayOpcode, GatewayPayload, Interaction, SectionComponent,
 };
 use disruption_types::generated::rest::UserResponse;
 
@@ -19,6 +19,21 @@ fn generated_string_enums_have_an_unknown_fallback() {
         serde_json::from_str(r#""FUTURE_DISCORD_EVENT""#).expect("unknown events are accepted");
 
     assert_eq!(event, GatewayEvent::Unknown);
+}
+
+#[test]
+fn generated_components_include_new_layout_shapes() {
+    let section: SectionComponent = serde_json::from_str(
+        r#"{
+          "type": 9,
+          "components": [{"type": 10, "content": "hello"}],
+          "accessory": {"type": 2, "style": 1}
+        }"#,
+    )
+    .expect("valid section component");
+
+    assert_eq!(section.components.len(), 1);
+    assert_eq!(section.accessory["type"], 2);
 }
 
 #[test]
