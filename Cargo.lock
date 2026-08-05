@@ -280,6 +280,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "discord-codegen"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "displaydoc"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
