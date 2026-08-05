@@ -362,17 +362,22 @@ fn snake_case(value: &str) -> String {
 
 fn pascal_case(value: &str) -> String {
     let mut result = String::new();
-    let mut uppercase = true;
-    for character in value.chars() {
-        if character.is_ascii_alphanumeric() {
-            if uppercase {
-                result.push(character.to_ascii_uppercase());
-                uppercase = false;
-            } else {
-                result.push(character);
-            }
+    for token in value.split(|character: char| !character.is_ascii_alphanumeric()) {
+        if token.is_empty() {
+            continue;
+        }
+        let mut characters = token.chars();
+        let Some(first) = characters.next() else {
+            continue;
+        };
+        result.push(first.to_ascii_uppercase());
+        if token
+            .chars()
+            .all(|character| character.is_ascii_uppercase())
+        {
+            result.extend(characters.map(|character| character.to_ascii_lowercase()));
         } else {
-            uppercase = true;
+            result.extend(characters);
         }
     }
     if result.is_empty() {

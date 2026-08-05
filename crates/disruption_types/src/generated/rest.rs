@@ -1823,20 +1823,16 @@ pub struct EntityMetadataExternalResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct EntityMetadataStageInstance {
-}
+pub struct EntityMetadataStageInstance {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct EntityMetadataStageInstanceResponse {
-}
+pub struct EntityMetadataStageInstanceResponse {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct EntityMetadataVoice {
-}
+pub struct EntityMetadataVoice {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct EntityMetadataVoiceResponse {
-}
+pub struct EntityMetadataVoiceResponse {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Error {
@@ -3415,12 +3411,10 @@ pub struct MLSpamRuleResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct MLSpamTriggerMetadata {
-}
+pub struct MLSpamTriggerMetadata {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct MLSpamTriggerMetadataResponse {
-}
+pub struct MLSpamTriggerMetadataResponse {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MLSpamUpsertRequest {
@@ -4570,12 +4564,10 @@ pub struct QuarantineUserAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct QuarantineUserActionMetadata {
-}
+pub struct QuarantineUserActionMetadata {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct QuarantineUserActionMetadataResponse {
-}
+pub struct QuarantineUserActionMetadataResponse {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct QuarantineUserActionResponse {
@@ -5652,14 +5644,12 @@ pub struct ThumbnailComponentResponse {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct TypingIndicatorResponse {
-}
+pub struct TypingIndicatorResponse {}
 
 pub type UInt32Type = i64;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct UnbanUserFromGuildRequest {
-}
+pub struct UnbanUserFromGuildRequest {}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UnfurledMediaRequest {
@@ -6413,4 +6403,3 @@ pub struct WidgetSettingsResponse {
 }
 
 pub type WidgetUserDiscriminator = String;
-

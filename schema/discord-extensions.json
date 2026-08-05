@@ -1,0 +1,304 @@
+{
+  "components": {
+    "schemas": {
+      "GatewayOpcode": {
+        "type": "integer",
+        "enum": [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 31, 43]
+      },
+      "GatewayEvent": {
+        "type": "string",
+        "enum": [
+          "READY",
+          "RESUMED",
+          "CHANNEL_CREATE",
+          "CHANNEL_UPDATE",
+          "CHANNEL_DELETE",
+          "CHANNEL_PINS_UPDATE",
+          "CHANNEL_INFO",
+          "GUILD_CREATE",
+          "GUILD_UPDATE",
+          "GUILD_DELETE",
+          "GUILD_BAN_ADD",
+          "GUILD_BAN_REMOVE",
+          "GUILD_EMOJIS_UPDATE",
+          "GUILD_STICKERS_UPDATE",
+          "GUILD_INTEGRATIONS_UPDATE",
+          "GUILD_MEMBER_ADD",
+          "GUILD_MEMBER_REMOVE",
+          "GUILD_MEMBER_UPDATE",
+          "GUILD_MEMBERS_CHUNK",
+          "GUILD_ROLE_CREATE",
+          "GUILD_ROLE_UPDATE",
+          "GUILD_ROLE_DELETE",
+          "GUILD_SCHEDULED_EVENT_CREATE",
+          "GUILD_SCHEDULED_EVENT_UPDATE",
+          "GUILD_SCHEDULED_EVENT_DELETE",
+          "GUILD_SCHEDULED_EVENT_USER_ADD",
+          "GUILD_SCHEDULED_EVENT_USER_REMOVE",
+          "GUILD_SOUNDBOARD_SOUNDS_UPDATE",
+          "SOUNDBOARD_SOUNDS",
+          "VOICE_CHANNEL_START_TIME_UPDATE",
+          "VOICE_CHANNEL_STATUS_UPDATE",
+          "MESSAGE_CREATE",
+          "MESSAGE_UPDATE",
+          "MESSAGE_DELETE",
+          "MESSAGE_DELETE_BULK",
+          "MESSAGE_REACTION_ADD",
+          "MESSAGE_REACTION_REMOVE",
+          "MESSAGE_REACTION_REMOVE_ALL",
+          "MESSAGE_REACTION_REMOVE_EMOJI",
+          "THREAD_CREATE",
+          "THREAD_UPDATE",
+          "THREAD_DELETE",
+          "THREAD_LIST_SYNC",
+          "THREAD_MEMBER_UPDATE",
+          "THREAD_MEMBERS_UPDATE",
+          "INVITE_CREATE",
+          "INVITE_DELETE",
+          "PRESENCE_UPDATE",
+          "TYPING_START",
+          "USER_UPDATE",
+          "VOICE_STATE_UPDATE",
+          "VOICE_SERVER_UPDATE",
+          "WEBHOOKS_UPDATE",
+          "INTERACTION_CREATE",
+          "AUTO_MODERATION_RULE_CREATE",
+          "AUTO_MODERATION_RULE_UPDATE",
+          "AUTO_MODERATION_RULE_DELETE",
+          "AUTO_MODERATION_ACTION_EXECUTION",
+          "ENTITLEMENT_CREATE",
+          "ENTITLEMENT_UPDATE",
+          "ENTITLEMENT_DELETE",
+          "MESSAGE_POLL_VOTE_ADD",
+          "MESSAGE_POLL_VOTE_REMOVE"
+        ]
+      },
+      "GatewayPayload": {
+        "type": "object",
+        "required": ["op"],
+        "properties": {
+          "op": { "$ref": "#/components/schemas/GatewayOpcode" },
+          "d": { "type": "object", "nullable": true },
+          "s": { "type": "integer", "nullable": true },
+          "t": { "$ref": "#/components/schemas/GatewayEvent", "nullable": true }
+        }
+      },
+      "GatewayHello": {
+        "type": "object",
+        "required": ["heartbeat_interval"],
+        "properties": {
+          "heartbeat_interval": { "type": "integer" },
+          "_trace": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "GatewayReady": {
+        "type": "object",
+        "required": ["v", "user", "guilds", "session_id", "resume_gateway_url"],
+        "properties": {
+          "v": { "type": "integer" },
+          "user": { "type": "object" },
+          "guilds": { "type": "array", "items": { "type": "object" } },
+          "session_id": { "type": "string" },
+          "resume_gateway_url": { "type": "string" },
+          "shard": { "type": "array", "items": { "type": "integer" } },
+          "application": { "type": "object" }
+        }
+      },
+      "GatewayIdentify": {
+        "type": "object",
+        "required": ["token", "intents", "properties"],
+        "properties": {
+          "token": { "type": "string" },
+          "intents": { "type": "integer" },
+          "properties": { "type": "object" },
+          "compress": { "type": "boolean" },
+          "large_threshold": { "type": "integer" },
+          "shard": { "type": "array", "items": { "type": "integer" } },
+          "presence": { "type": "object" }
+        }
+      },
+      "GatewayResume": {
+        "type": "object",
+        "required": ["token", "session_id", "seq"],
+        "properties": {
+          "token": { "type": "string" },
+          "session_id": { "type": "string" },
+          "seq": { "type": "integer" }
+        }
+      },
+      "GatewayRequestGuildMembers": {
+        "type": "object",
+        "required": ["guild_id"],
+        "properties": {
+          "guild_id": { "type": "string" },
+          "query": { "type": "string" },
+          "limit": { "type": "integer" },
+          "presences": { "type": "boolean" },
+          "user_ids": { "type": "array", "items": { "type": "string" } },
+          "nonce": { "type": "string" }
+        }
+      },
+      "GatewayRequestSoundboardSounds": {
+        "type": "object",
+        "required": ["guild_ids"],
+        "properties": {
+          "guild_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "GatewayRequestChannelInfo": {
+        "type": "object",
+        "required": ["channel_id"],
+        "properties": {
+          "channel_id": { "type": "string" }
+        }
+      },
+      "GatewayUpdateVoiceState": {
+        "type": "object",
+        "required": ["guild_id", "channel_id", "self_mute", "self_deaf"],
+        "properties": {
+          "guild_id": { "type": "string" },
+          "channel_id": { "type": "string", "nullable": true },
+          "self_mute": { "type": "boolean" },
+          "self_deaf": { "type": "boolean" }
+        }
+      },
+      "GatewayUpdatePresence": {
+        "type": "object",
+        "required": ["since", "activities", "status", "afk"],
+        "properties": {
+          "since": { "type": "integer", "nullable": true },
+          "activities": { "type": "array", "items": { "type": "object" } },
+          "status": { "type": "string" },
+          "afk": { "type": "boolean" }
+        }
+      },
+      "ComponentType": {
+        "type": "integer",
+        "enum": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 21, 22, 23]
+      },
+      "ActionRowComponent": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "components": { "type": "array", "items": { "type": "object" } }
+        }
+      },
+      "ButtonComponent": {
+        "type": "object",
+        "required": ["type", "style"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "style": { "type": "integer" },
+          "label": { "type": "string" },
+          "emoji": { "type": "object" },
+          "custom_id": { "type": "string" },
+          "url": { "type": "string" },
+          "sku_id": { "type": "string" },
+          "disabled": { "type": "boolean" }
+        }
+      },
+      "StringSelectComponent": {
+        "type": "object",
+        "required": ["type", "custom_id", "options"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "custom_id": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "object" } },
+          "placeholder": { "type": "string" },
+          "min_values": { "type": "integer" },
+          "max_values": { "type": "integer" },
+          "disabled": { "type": "boolean" }
+        }
+      },
+      "TextInputComponent": {
+        "type": "object",
+        "required": ["type", "custom_id", "style"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer" },
+          "custom_id": { "type": "string" },
+          "style": { "type": "integer" },
+          "label": { "type": "string" },
+          "min_length": { "type": "integer" },
+          "max_length": { "type": "integer" },
+          "required": { "type": "boolean" },
+          "value": { "type": "string" },
+          "placeholder": { "type": "string" }
+        }
+      },
+      "UserSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/StringSelectComponent" }
+        ]
+      },
+      "RoleSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/StringSelectComponent" }
+        ]
+      },
+      "MentionableSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/StringSelectComponent" }
+        ]
+      },
+      "ChannelSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/StringSelectComponent" }
+        ]
+      },
+      "Component": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/ActionRowComponent" },
+          { "$ref": "#/components/schemas/ButtonComponent" },
+          { "$ref": "#/components/schemas/StringSelectComponent" },
+          { "$ref": "#/components/schemas/TextInputComponent" },
+          { "$ref": "#/components/schemas/UserSelectComponent" },
+          { "$ref": "#/components/schemas/RoleSelectComponent" },
+          { "$ref": "#/components/schemas/MentionableSelectComponent" },
+          { "$ref": "#/components/schemas/ChannelSelectComponent" }
+        ]
+      },
+      "InteractionType": {
+        "type": "integer",
+        "enum": [1, 2, 3, 4, 5]
+      },
+      "Interaction": {
+        "type": "object",
+        "required": ["id", "application_id", "type", "token", "version"],
+        "properties": {
+          "id": { "type": "string" },
+          "application_id": { "type": "string" },
+          "type": { "$ref": "#/components/schemas/InteractionType" },
+          "data": { "type": "object" },
+          "guild": { "type": "object" },
+          "guild_id": { "type": "string" },
+          "channel": { "type": "object" },
+          "channel_id": { "type": "string" },
+          "token": { "type": "string" },
+          "version": { "type": "integer" },
+          "app_permissions": { "type": "string" },
+          "locale": { "type": "string" },
+          "guild_locale": { "type": "string" },
+          "entitlements": { "type": "array", "items": { "type": "object" } },
+          "authorizing_integration_owners": { "type": "object" },
+          "context": { "type": "integer" },
+          "attachment_size_limit": { "type": "integer" }
+        }
+      },
+      "WebhookEvent": {
+        "type": "object",
+        "required": ["version", "application_id", "type", "event"],
+        "properties": {
+          "version": { "type": "string" },
+          "application_id": { "type": "string" },
+          "type": { "type": "integer" },
+          "event": { "type": "object" }
+        }
+      }
+    }
+  }
+}
