@@ -6,6 +6,9 @@ use serde_json::{Map, Value};
 #[derive(Debug)]
 pub enum CodegenError {
     Json(serde_json::Error),
+    ExternalRustType(String),
+    InlineObject(String),
+    InvalidEnumNames(String),
     MissingSchemas,
 }
 
@@ -13,6 +16,17 @@ impl std::fmt::Display for CodegenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Json(error) => write!(f, "invalid OpenAPI JSON: {error}"),
+            Self::ExternalRustType(rust_type) => write!(
+                f,
+                "x-rust-type {rust_type:?} must name a local primitive"
+            ),
+            Self::InlineObject(path) => write!(
+                f,
+                "strict Gateway schema contains inline object at {path}; use a named schema or x-dynamic"
+            ),
+            Self::InvalidEnumNames(message) => {
+                write!(f, "invalid enum variant metadata: {message}")
+            }
             Self::MissingSchemas => write!(f, "OpenAPI document has no components.schemas object"),
         }
     }
@@ -38,6 +52,14 @@ fn generate_value(document: &Value) -> Result<String, CodegenError> {
         .and_then(|components| components.get("schemas"))
         .and_then(Value::as_object)
         .ok_or(CodegenError::MissingSchemas)?;
+
+    validate_schema_extensions(
+        schemas,
+        document
+            .get("x-codegen-strict-objects")
+            .and_then(Value::as_bool)
+            .unwrap_or(false),
+    )?;
 
     let names = rust_names(schemas);
     let mut output = String::from(
@@ -81,7 +103,7 @@ fn emit_schema(
     let rust_name = &names[source_name];
 
     if let Some(values) = schema.get("enum").and_then(Value::as_array) {
-        emit_enum(output, rust_name, values);
+        emit_enum(output, rust_name, schema, values);
         return;
     }
 
@@ -107,7 +129,7 @@ fn emit_schema(
     writeln!(output, "pub type {rust_name} = {type_name};\n").unwrap();
 }
 
-fn emit_enum(output: &mut String, rust_name: &str, values: &[Value]) {
+fn emit_enum(output: &mut String, rust_name: &str, schema: &Value, values: &[Value]) {
     if values.is_empty() {
         writeln!(output, "pub type {rust_name} = Value;\n").unwrap();
         return;
@@ -137,12 +159,16 @@ fn emit_enum(output: &mut String, rust_name: &str, values: &[Value]) {
         writeln!(output, "pub enum {rust_name} {{").unwrap();
 
         let mut used = BTreeSet::new();
-        for value in values.iter().filter_map(Value::as_i64) {
-            let variant = unique_name(&format!("Value{value}"), &mut used);
+        for (_, variant_name) in values
+            .iter()
+            .filter_map(Value::as_i64)
+            .zip(enum_variant_names(schema, values))
+        {
+            let variant = unique_name(&variant_name, &mut used);
             writeln!(output, "    {variant},").unwrap();
         }
         output.push_str("    Unknown(i64),\n}\n\n");
-        emit_numeric_enum_impls(output, rust_name, values);
+        emit_numeric_enum_impls(output, rust_name, schema, values);
         return;
     }
 
@@ -198,15 +224,19 @@ fn emit_union(
     true
 }
 
-fn emit_numeric_enum_impls(output: &mut String, rust_name: &str, values: &[Value]) {
+fn emit_numeric_enum_impls(output: &mut String, rust_name: &str, schema: &Value, values: &[Value]) {
     writeln!(
         output,
         "impl Serialize for {rust_name} {{\n    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>\n    where\n        S: Serializer,\n    {{\n        serializer.serialize_i64(match self {{"
     )
     .unwrap();
     let mut used = BTreeSet::new();
-    for value in values.iter().filter_map(Value::as_i64) {
-        let variant = unique_name(&format!("Value{value}"), &mut used);
+    for (value, variant_name) in values
+        .iter()
+        .filter_map(Value::as_i64)
+        .zip(enum_variant_names(schema, values))
+    {
+        let variant = unique_name(&variant_name, &mut used);
         writeln!(output, "            Self::{variant} => {value},").unwrap();
     }
     output.push_str("            Self::Unknown(value) => *value,\n        })\n    }\n}\n\n");
@@ -217,11 +247,38 @@ fn emit_numeric_enum_impls(output: &mut String, rust_name: &str, values: &[Value
     )
     .unwrap();
     let mut used = BTreeSet::new();
-    for value in values.iter().filter_map(Value::as_i64) {
-        let variant = unique_name(&format!("Value{value}"), &mut used);
+    for (value, variant_name) in values
+        .iter()
+        .filter_map(Value::as_i64)
+        .zip(enum_variant_names(schema, values))
+    {
+        let variant = unique_name(&variant_name, &mut used);
         writeln!(output, "            {value} => Self::{variant},").unwrap();
     }
     output.push_str("            _ => Self::Unknown(value),\n        })\n    }\n}\n\n");
+}
+
+fn enum_variant_names(schema: &Value, values: &[Value]) -> Vec<String> {
+    let Some(names) = schema
+        .get("x-enum-names")
+        .and_then(Value::as_array)
+        .filter(|names| names.len() == values.len())
+    else {
+        return values
+            .iter()
+            .filter_map(Value::as_i64)
+            .map(|value| format!("Value{value}"))
+            .collect();
+    };
+
+    names
+        .iter()
+        .map(|name| {
+            name.as_str()
+                .map(pascal_case)
+                .unwrap_or_else(|| "Value".to_owned())
+        })
+        .collect()
 }
 
 fn emit_discriminated_union(
@@ -391,6 +448,10 @@ fn collect_object_shape(
 }
 
 fn type_for_schema(schema: &Value, names: &BTreeMap<String, String>) -> String {
+    if let Some(rust_type) = schema.get("x-rust-type").and_then(Value::as_str) {
+        return rust_type.to_owned();
+    }
+
     if let Some(reference) = schema.get("$ref").and_then(Value::as_str) {
         let source_name = reference.rsplit('/').next().unwrap_or(reference);
         return names
@@ -421,6 +482,162 @@ fn type_for_schema(schema: &Value, names: &BTreeMap<String, String>) -> String {
         Some("object") => "Value".to_owned(),
         _ => "Value".to_owned(),
     }
+}
+
+fn validate_schema_extensions(
+    schemas: &Map<String, Value>,
+    strict_objects: bool,
+) -> Result<(), CodegenError> {
+    for (name, schema) in schemas {
+        validate_schema_node(schema, name, true, strict_objects)?;
+    }
+    Ok(())
+}
+
+fn validate_schema_node(
+    schema: &Value,
+    path: &str,
+    is_root: bool,
+    strict_objects: bool,
+) -> Result<(), CodegenError> {
+    if let Some(rust_type) = schema.get("x-rust-type").and_then(Value::as_str) {
+        if !is_local_primitive(rust_type) {
+            return Err(CodegenError::ExternalRustType(rust_type.to_owned()));
+        }
+    }
+
+    if schema
+        .get("enum")
+        .and_then(Value::as_array)
+        .is_some_and(|values| values.iter().all(|value| value.as_i64().is_some()))
+    {
+        validate_enum_names(schema, path)?;
+    }
+
+    if strict_objects
+        && !is_root
+        && schema.get("$ref").is_none()
+        && schema.get("x-dynamic").and_then(Value::as_bool) != Some(true)
+        && is_object_schema(schema)
+    {
+        return Err(CodegenError::InlineObject(path.to_owned()));
+    }
+
+    if schema.get("$ref").is_some() || schema.get("x-dynamic") == Some(&Value::Bool(true)) {
+        return Ok(());
+    }
+
+    if let Some(properties) = schema.get("properties").and_then(Value::as_object) {
+        for (name, property) in properties {
+            validate_schema_node(property, &format!("{path}.{name}"), false, strict_objects)?;
+        }
+    }
+    if let Some(items) = schema.get("items") {
+        validate_schema_node(items, &format!("{path}[]"), false, strict_objects)?;
+    }
+    for key in ["allOf", "oneOf", "anyOf"] {
+        if let Some(variants) = schema.get(key).and_then(Value::as_array) {
+            for (index, variant) in variants.iter().enumerate() {
+                validate_schema_node(
+                    variant,
+                    &format!("{path}.{key}[{index}]"),
+                    false,
+                    strict_objects,
+                )?;
+            }
+        }
+    }
+    Ok(())
+}
+
+fn validate_enum_names(schema: &Value, path: &str) -> Result<(), CodegenError> {
+    let Some(names) = schema.get("x-enum-names") else {
+        return Ok(());
+    };
+    let Some(names) = names.as_array() else {
+        return Err(CodegenError::InvalidEnumNames(format!(
+            "{path}.x-enum-names must be an array"
+        )));
+    };
+    let values = schema
+        .get("enum")
+        .and_then(Value::as_array)
+        .expect("numeric enum was checked by validate_schema_node");
+    if names.len() != values.len() {
+        return Err(CodegenError::InvalidEnumNames(format!(
+            "{path}.x-enum-names has {} entries for {} enum values",
+            names.len(),
+            values.len()
+        )));
+    }
+
+    let mut used = BTreeSet::new();
+    for (index, name) in names.iter().enumerate() {
+        let Some(name) = name.as_str() else {
+            return Err(CodegenError::InvalidEnumNames(format!(
+                "{path}.x-enum-names[{index}] must be a string"
+            )));
+        };
+        let variant = pascal_case(name);
+        if name.is_empty() {
+            return Err(CodegenError::InvalidEnumNames(format!(
+                "{path}.x-enum-names[{index}] must not be empty"
+            )));
+        }
+        if matches!(variant.as_str(), "Unknown" | "Self") {
+            return Err(CodegenError::InvalidEnumNames(format!(
+                "{path}.x-enum-names[{index}] generates reserved enum variant {variant}"
+            )));
+        }
+        if !is_valid_enum_variant(&variant) {
+            return Err(CodegenError::InvalidEnumNames(format!(
+                "{path}.x-enum-names[{index}] generates invalid enum variant {variant:?}"
+            )));
+        }
+        if !used.insert(variant.clone()) {
+            return Err(CodegenError::InvalidEnumNames(format!(
+                "{path}.x-enum-names[{index}] duplicates enum variant {variant}"
+            )));
+        }
+    }
+
+    Ok(())
+}
+
+fn is_valid_enum_variant(value: &str) -> bool {
+    value
+        .chars()
+        .next()
+        .is_some_and(|character| character.is_ascii_uppercase())
+        && value
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || character == '_')
+}
+
+fn is_object_schema(schema: &Value) -> bool {
+    schema.get("type").and_then(Value::as_str) == Some("object")
+        || schema.get("properties").is_some()
+        || schema.get("allOf").is_some()
+}
+
+fn is_local_primitive(value: &str) -> bool {
+    matches!(
+        value,
+        "bool"
+            | "String"
+            | "f32"
+            | "f64"
+            | "i8"
+            | "i16"
+            | "i32"
+            | "i64"
+            | "i128"
+            | "u8"
+            | "u16"
+            | "u32"
+            | "u64"
+            | "u128"
+    )
 }
 
 fn primitive_type(kind: &str) -> &'static str {
@@ -726,6 +943,161 @@ mod tests {
     }
 
     #[test]
+    fn generates_local_references_and_unsigned_overrides() {
+        let document = r##"
+        {
+          "x-codegen-strict-objects": true,
+          "components": {
+            "schemas": {
+              "ConnectionProperties": {
+                "type": "object",
+                "required": ["os"],
+                "properties": {
+                  "os": { "type": "string" }
+                }
+              },
+              "Identify": {
+                "type": "object",
+                "required": ["properties", "intents"],
+                "properties": {
+                  "properties": {
+                    "$ref": "#/components/schemas/ConnectionProperties"
+                  },
+                  "intents": { "type": "integer", "x-rust-type": "u64" },
+                  "shard": {
+                    "type": "array",
+                    "items": { "type": "integer", "x-rust-type": "u64" }
+                  }
+                }
+              }
+            }
+          }
+        }
+        "##;
+
+        let output = generate(document).expect("valid self-contained schema");
+
+        assert!(output.contains("pub properties: ConnectionProperties"));
+        assert!(output.contains("pub intents: u64"));
+        assert!(output.contains("pub shard: Option<Vec<u64>>"));
+        assert!(!output.contains("use crate::"));
+    }
+
+    #[test]
+    fn generates_named_numeric_enum_variants() {
+        let document = r##"
+        {
+          "components": {
+            "schemas": {
+              "Opcode": {
+                "type": "integer",
+                "enum": [0, 1],
+                "x-enum-names": ["Dispatch", "Heartbeat"]
+              }
+            }
+          }
+        }
+        "##;
+
+        let output = generate(document).expect("valid numeric enum schema");
+
+        assert!(output.contains("    Dispatch,"));
+        assert!(output.contains("    Heartbeat,"));
+        assert!(!output.contains("    Value0,"));
+    }
+
+    #[test]
+    fn rejects_reserved_numeric_enum_variant_names() {
+        let document = r##"
+        {
+          "components": {
+            "schemas": {
+              "Opcode": {
+                "type": "integer",
+                "enum": [1, 2],
+                "x-enum-names": ["Unknown", "Self"]
+              }
+            }
+          }
+        }
+        "##;
+
+        let error = generate(document).expect_err("reserved variant names must be rejected");
+
+        assert!(error.to_string().contains("enum variant"));
+    }
+
+    #[test]
+    fn rejects_duplicate_normalized_numeric_enum_variant_names() {
+        let document = r##"
+        {
+          "components": {
+            "schemas": {
+              "Opcode": {
+                "type": "integer",
+                "enum": [1, 2],
+                "x-enum-names": ["foo-bar", "foo_bar"]
+              }
+            }
+          }
+        }
+        "##;
+
+        let error = generate(document).expect_err("duplicate normalized names must be rejected");
+
+        assert!(error.to_string().contains("enum variant"));
+    }
+
+    #[test]
+    fn rejects_external_rust_type_overrides() {
+        let document = r##"
+        {
+          "components": {
+            "schemas": {
+              "Gateway": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "x-rust-type": "crate::entities::UserApiType"
+                  }
+                }
+              }
+            }
+          }
+        }
+        "##;
+
+        let error = generate(document).expect_err("external types must be rejected");
+
+        assert!(error.to_string().contains("local primitive"));
+    }
+
+    #[test]
+    fn strict_gateway_schemas_require_named_or_dynamic_objects() {
+        let document = r##"
+        {
+          "x-codegen-strict-objects": true,
+          "components": {
+            "schemas": {
+              "Gateway": {
+                "type": "object",
+                "properties": {
+                  "concrete": { "type": "object" },
+                  "dynamic": { "type": "object", "x-dynamic": true }
+                }
+              }
+            }
+          }
+        }
+        "##;
+
+        let error = generate(document).expect_err("inline objects must be explicit");
+
+        assert!(error.to_string().contains("named schema or x-dynamic"));
+    }
+
+    #[test]
     fn checked_in_rest_output_matches_the_pinned_spec() {
         let generated = generate(include_str!(
             "../../../schema/discord-api-spec/openapi.json"
@@ -744,5 +1116,9 @@ mod tests {
         let checked_in = include_str!("../../../crates/disruption_types/src/generated/gateway.rs");
 
         assert_eq!(generated, checked_in);
+        assert!(!generated.contains("use crate::"));
+        assert!(generated.contains("pub properties: GatewayConnectionProperties"));
+        assert!(generated.contains("pub presence: Option<GatewayPresence>"));
+        assert!(generated.contains("pub d: Option<Value>"));
     }
 }

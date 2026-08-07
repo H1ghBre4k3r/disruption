@@ -1,17 +1,31 @@
 use disruption_types::generated::gateway::{
-    ButtonComponent, Component, GatewayEvent, GatewayOpcode, GatewayPayload, Interaction,
-    SectionComponent,
+    ButtonComponent, ButtonStyle, Component, GatewayEvent, GatewayIdentify, GatewayOpcode,
+    GatewayPayload, GatewaySectionAccessory, Interaction, SectionComponent,
 };
 use disruption_types::generated::rest::{ApplicationCommandPatchRequestPartial, UserResponse};
 
 #[test]
 fn generated_gateway_payload_accepts_current_opcode_and_event_values() {
     let payload: GatewayPayload =
-        serde_json::from_str(r#"{"op":31,"d":{"guild_id":"1"},"s":null,"t":"CHANNEL_INFO"}"#)
+        serde_json::from_str(r#"{"op":43,"d":{"guild_id":"1"},"s":null,"t":"CHANNEL_INFO"}"#)
             .expect("valid gateway payload");
 
-    assert_eq!(payload.op, GatewayOpcode::Value31);
+    assert_eq!(payload.op, GatewayOpcode::RequestChannelInfo);
     assert_eq!(payload.t, Some(GatewayEvent::ChannelInfo));
+}
+
+#[test]
+fn generated_gateway_opcode_values_match_discord() {
+    assert_eq!(
+        serde_json::to_value(GatewayOpcode::RequestSoundboardSounds)
+            .expect("soundboard opcode serializes"),
+        31
+    );
+    assert_eq!(
+        serde_json::to_value(GatewayOpcode::RequestChannelInfo)
+            .expect("channel info opcode serializes"),
+        43
+    );
 }
 
 #[test]
@@ -44,7 +58,41 @@ fn generated_components_include_new_layout_shapes() {
     .expect("valid section component");
 
     assert_eq!(section.components.len(), 1);
-    assert_eq!(section.accessory["type"], 2);
+    match section.accessory {
+        GatewaySectionAccessory::ButtonComponent(button) => {
+            assert_eq!(button.style, ButtonStyle::Primary)
+        }
+        _ => panic!("section accessory was parsed as the wrong component"),
+    }
+}
+
+#[test]
+fn generated_identify_uses_self_contained_gateway_models() {
+    let identify: GatewayIdentify = serde_json::from_str(
+        r#"{
+          "token": "token",
+          "properties": {
+            "os": "linux",
+            "browser": "disco",
+            "device": "disco"
+          },
+          "presence": {
+            "since": null,
+            "activities": [{"name": "Cards", "type": 0}],
+            "status": "online",
+            "afk": false
+          },
+          "intents": 5
+        }"#,
+    )
+    .expect("valid identify payload");
+
+    assert_eq!(identify.properties.os, "linux");
+    assert_eq!(identify.intents, 5);
+    assert_eq!(
+        identify.presence.expect("presence is present").activities[0].name,
+        "Cards"
+    );
 }
 
 #[test]
@@ -53,13 +101,34 @@ fn generated_component_dispatches_by_type() {
         serde_json::from_str(r#"{"type":2,"style":1}"#).expect("valid button component");
 
     match component {
-        Component::ButtonComponent(button) => assert_eq!(button.style, 1),
+        Component::ButtonComponent(button) => assert_eq!(button.style, ButtonStyle::Primary),
         Component::ActionRowComponent(_) => panic!("button was parsed as an action row"),
         _ => panic!("button was parsed as the wrong component variant"),
     }
 
     let _: ButtonComponent = serde_json::from_str(r#"{"type":2,"style":1}"#)
         .expect("button component remains directly deserializable");
+}
+
+#[test]
+fn generated_auto_populated_selects_do_not_require_options() {
+    let user: Component = serde_json::from_str(r#"{"type":5,"custom_id":"user_select"}"#)
+        .expect("user select without options is valid");
+    let role: Component = serde_json::from_str(r#"{"type":6,"custom_id":"role_select"}"#)
+        .expect("role select without options is valid");
+    let mentionable: Component =
+        serde_json::from_str(r#"{"type":7,"custom_id":"mentionable_select"}"#)
+            .expect("mentionable select without options is valid");
+    let channel: Component = serde_json::from_str(r#"{"type":8,"custom_id":"channel_select"}"#)
+        .expect("channel select without options is valid");
+
+    assert!(matches!(user, Component::UserSelectComponent(_)));
+    assert!(matches!(role, Component::RoleSelectComponent(_)));
+    assert!(matches!(
+        mentionable,
+        Component::MentionableSelectComponent(_)
+    ));
+    assert!(matches!(channel, Component::ChannelSelectComponent(_)));
 }
 
 #[test]
