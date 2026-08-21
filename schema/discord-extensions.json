@@ -1,0 +1,869 @@
+{
+  "x-codegen-strict-objects": true,
+  "components": {
+    "schemas": {
+      "GatewayOpcode": {
+        "type": "integer",
+        "enum": [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 31, 43],
+        "x-enum-names": [
+          "Dispatch",
+          "Heartbeat",
+          "Identify",
+          "PresenceUpdate",
+          "VoiceStateUpdate",
+          "Resume",
+          "Reconnect",
+          "RequestGuildMembers",
+          "InvalidSession",
+          "Hello",
+          "HeartbeatAck",
+          "RequestSoundboardSounds",
+          "RequestChannelInfo"
+        ]
+      },
+      "GatewayEvent": {
+        "type": "string",
+        "enum": [
+          "READY",
+          "RESUMED",
+          "CHANNEL_CREATE",
+          "CHANNEL_UPDATE",
+          "CHANNEL_DELETE",
+          "CHANNEL_PINS_UPDATE",
+          "CHANNEL_INFO",
+          "GUILD_CREATE",
+          "GUILD_UPDATE",
+          "GUILD_DELETE",
+          "GUILD_BAN_ADD",
+          "GUILD_BAN_REMOVE",
+          "GUILD_EMOJIS_UPDATE",
+          "GUILD_STICKERS_UPDATE",
+          "GUILD_INTEGRATIONS_UPDATE",
+          "GUILD_MEMBER_ADD",
+          "GUILD_MEMBER_REMOVE",
+          "GUILD_MEMBER_UPDATE",
+          "GUILD_MEMBERS_CHUNK",
+          "GUILD_ROLE_CREATE",
+          "GUILD_ROLE_UPDATE",
+          "GUILD_ROLE_DELETE",
+          "GUILD_SCHEDULED_EVENT_CREATE",
+          "GUILD_SCHEDULED_EVENT_UPDATE",
+          "GUILD_SCHEDULED_EVENT_DELETE",
+          "GUILD_SCHEDULED_EVENT_USER_ADD",
+          "GUILD_SCHEDULED_EVENT_USER_REMOVE",
+          "GUILD_SOUNDBOARD_SOUNDS_UPDATE",
+          "SOUNDBOARD_SOUNDS",
+          "VOICE_CHANNEL_START_TIME_UPDATE",
+          "VOICE_CHANNEL_STATUS_UPDATE",
+          "MESSAGE_CREATE",
+          "MESSAGE_UPDATE",
+          "MESSAGE_DELETE",
+          "MESSAGE_DELETE_BULK",
+          "MESSAGE_REACTION_ADD",
+          "MESSAGE_REACTION_REMOVE",
+          "MESSAGE_REACTION_REMOVE_ALL",
+          "MESSAGE_REACTION_REMOVE_EMOJI",
+          "THREAD_CREATE",
+          "THREAD_UPDATE",
+          "THREAD_DELETE",
+          "THREAD_LIST_SYNC",
+          "THREAD_MEMBER_UPDATE",
+          "THREAD_MEMBERS_UPDATE",
+          "INVITE_CREATE",
+          "INVITE_DELETE",
+          "PRESENCE_UPDATE",
+          "TYPING_START",
+          "USER_UPDATE",
+          "VOICE_STATE_UPDATE",
+          "VOICE_SERVER_UPDATE",
+          "WEBHOOKS_UPDATE",
+          "INTERACTION_CREATE",
+          "AUTO_MODERATION_RULE_CREATE",
+          "AUTO_MODERATION_RULE_UPDATE",
+          "AUTO_MODERATION_RULE_DELETE",
+          "AUTO_MODERATION_ACTION_EXECUTION",
+          "ENTITLEMENT_CREATE",
+          "ENTITLEMENT_UPDATE",
+          "ENTITLEMENT_DELETE",
+          "MESSAGE_POLL_VOTE_ADD",
+          "MESSAGE_POLL_VOTE_REMOVE"
+        ]
+      },
+      "GatewayPayload": {
+        "type": "object",
+        "required": ["op"],
+        "properties": {
+          "op": { "$ref": "#/components/schemas/GatewayOpcode" },
+          "d": { "type": "object", "nullable": true, "x-dynamic": true },
+          "s": { "type": "integer", "nullable": true, "x-rust-type": "u64" },
+          "t": { "$ref": "#/components/schemas/GatewayEvent", "nullable": true }
+        }
+      },
+      "GatewayHello": {
+        "type": "object",
+        "required": ["heartbeat_interval"],
+        "properties": {
+          "heartbeat_interval": { "type": "integer", "x-rust-type": "u64" },
+          "_trace": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "GatewayReady": {
+        "type": "object",
+        "required": ["v", "user", "guilds", "session_id", "resume_gateway_url"],
+        "properties": {
+          "v": { "type": "integer", "x-rust-type": "u8" },
+          "user": { "$ref": "#/components/schemas/GatewayUser" },
+          "guilds": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewayUnavailableGuild" }
+          },
+          "session_id": { "type": "string" },
+          "resume_gateway_url": { "type": "string" },
+          "shard": {
+            "type": "array",
+            "items": { "type": "integer", "x-rust-type": "u64" }
+          },
+          "application": { "$ref": "#/components/schemas/GatewayApplication" }
+        }
+      },
+      "GatewayIdentify": {
+        "type": "object",
+        "required": ["token", "intents", "properties"],
+        "properties": {
+          "token": { "type": "string" },
+          "intents": { "type": "integer", "x-rust-type": "u64" },
+          "properties": { "$ref": "#/components/schemas/GatewayConnectionProperties" },
+          "compress": { "type": "boolean" },
+          "large_threshold": { "type": "integer", "x-rust-type": "u8" },
+          "shard": {
+            "type": "array",
+            "items": { "type": "integer", "x-rust-type": "u64" }
+          },
+          "presence": { "$ref": "#/components/schemas/GatewayPresence" }
+        }
+      },
+      "GatewayResume": {
+        "type": "object",
+        "required": ["token", "session_id", "seq"],
+        "properties": {
+          "token": { "type": "string" },
+          "session_id": { "type": "string" },
+          "seq": { "type": "integer", "x-rust-type": "u64" }
+        }
+      },
+      "GatewayRequestGuildMembers": {
+        "type": "object",
+        "required": ["guild_id"],
+        "properties": {
+          "guild_id": { "type": "string" },
+          "query": { "type": "string" },
+          "limit": { "type": "integer", "x-rust-type": "u64" },
+          "presences": { "type": "boolean" },
+          "user_ids": { "type": "array", "items": { "type": "string" } },
+          "nonce": { "type": "string" }
+        }
+      },
+      "GatewayRequestSoundboardSounds": {
+        "type": "object",
+        "required": ["guild_ids"],
+        "properties": {
+          "guild_ids": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "GatewayRequestChannelInfo": {
+        "type": "object",
+        "required": ["channel_id"],
+        "properties": {
+          "channel_id": { "type": "string" }
+        }
+      },
+      "GatewayUpdateVoiceState": {
+        "type": "object",
+        "required": ["guild_id", "channel_id", "self_mute", "self_deaf"],
+        "properties": {
+          "guild_id": { "type": "string" },
+          "channel_id": { "type": "string", "nullable": true },
+          "self_mute": { "type": "boolean" },
+          "self_deaf": { "type": "boolean" }
+        }
+      },
+      "GatewayUpdatePresence": {
+        "type": "object",
+        "required": ["since", "activities", "status", "afk"],
+        "properties": {
+          "since": { "type": "integer", "nullable": true, "x-rust-type": "u64" },
+          "activities": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewayActivity" }
+          },
+          "status": { "type": "string" },
+          "afk": { "type": "boolean" }
+        }
+      },
+      "ComponentType": {
+        "type": "integer",
+        "enum": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 21, 22, 23],
+        "x-enum-names": [
+          "ActionRow",
+          "Button",
+          "StringSelect",
+          "TextInput",
+          "UserSelect",
+          "RoleSelect",
+          "MentionableSelect",
+          "ChannelSelect",
+          "Section",
+          "TextDisplay",
+          "Thumbnail",
+          "MediaGallery",
+          "File",
+          "Separator",
+          "Container",
+          "Label",
+          "FileUpload",
+          "RadioGroup",
+          "CheckboxGroup",
+          "Checkbox"
+        ]
+      },
+      "ButtonStyle": {
+        "type": "integer",
+        "enum": [1, 2, 3, 4, 5, 6],
+        "x-enum-names": ["Primary", "Secondary", "Success", "Danger", "Link", "Premium"]
+      },
+      "TextInputStyle": {
+        "type": "integer",
+        "enum": [1, 2],
+        "x-enum-names": ["Short", "Paragraph"]
+      },
+      "ActionRowComponent": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "components": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Component" }
+          }
+        }
+      },
+      "ButtonComponent": {
+        "type": "object",
+        "required": ["type", "style"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "style": { "$ref": "#/components/schemas/ButtonStyle" },
+          "label": { "type": "string" },
+          "emoji": { "$ref": "#/components/schemas/GatewayPartialEmoji" },
+          "custom_id": { "type": "string" },
+          "url": { "type": "string" },
+          "sku_id": { "type": "string" },
+          "disabled": { "type": "boolean" }
+        }
+      },
+      "SelectComponentBase": {
+        "type": "object",
+        "required": ["type", "custom_id"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "custom_id": { "type": "string" },
+          "placeholder": { "type": "string" },
+          "min_values": { "type": "integer", "x-rust-type": "u8" },
+          "max_values": { "type": "integer", "x-rust-type": "u8" },
+          "required": { "type": "boolean" },
+          "disabled": { "type": "boolean" }
+        }
+      },
+      "StringSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/SelectComponentBase" }
+        ],
+        "required": ["options"],
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewaySelectOption" }
+          }
+        }
+      },
+      "GatewaySelectDefaultValue": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" }
+        }
+      },
+      "TextInputComponent": {
+        "type": "object",
+        "required": ["type", "custom_id", "style"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "custom_id": { "type": "string" },
+          "style": { "$ref": "#/components/schemas/TextInputStyle" },
+          "label": { "type": "string" },
+          "min_length": { "type": "integer" },
+          "max_length": { "type": "integer" },
+          "required": { "type": "boolean" },
+          "value": { "type": "string" },
+          "placeholder": { "type": "string" }
+        }
+      },
+      "UserSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/SelectComponentBase" }
+        ],
+        "properties": {
+          "default_values": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewaySelectDefaultValue" }
+          }
+        }
+      },
+      "RoleSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/SelectComponentBase" }
+        ],
+        "properties": {
+          "default_values": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewaySelectDefaultValue" }
+          }
+        }
+      },
+      "MentionableSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/SelectComponentBase" }
+        ],
+        "properties": {
+          "default_values": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewaySelectDefaultValue" }
+          }
+        }
+      },
+      "ChannelSelectComponent": {
+        "allOf": [
+          { "$ref": "#/components/schemas/SelectComponentBase" }
+        ],
+        "properties": {
+          "default_values": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewaySelectDefaultValue" }
+          }
+        }
+      },
+      "SectionComponent": {
+        "type": "object",
+        "required": ["type", "components", "accessory"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "components": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Component" }
+          },
+          "accessory": { "$ref": "#/components/schemas/GatewaySectionAccessory" }
+        }
+      },
+      "TextDisplayComponent": {
+        "type": "object",
+        "required": ["type", "content"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "content": { "type": "string" }
+        }
+      },
+      "ThumbnailComponent": {
+        "type": "object",
+        "required": ["type", "media"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "media": { "$ref": "#/components/schemas/GatewayUnfurledMediaItem" },
+          "description": { "type": "string" },
+          "spoiler": { "type": "boolean" }
+        }
+      },
+      "MediaGalleryComponent": {
+        "type": "object",
+        "required": ["type", "items"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewayMediaGalleryItem" }
+          }
+        }
+      },
+      "FileComponent": {
+        "type": "object",
+        "required": ["type", "file"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "file": { "$ref": "#/components/schemas/GatewayUnfurledMediaItem" },
+          "spoiler": { "type": "boolean" }
+        }
+      },
+      "SeparatorComponent": {
+        "type": "object",
+        "required": ["type"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "divider": { "type": "boolean" },
+          "spacing": { "type": "integer", "x-rust-type": "u8" }
+        }
+      },
+      "ContainerComponent": {
+        "type": "object",
+        "required": ["type", "components"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "components": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Component" }
+          },
+          "accent_color": { "type": "integer", "x-rust-type": "u32" },
+          "spoiler": { "type": "boolean" }
+        }
+      },
+      "LabelComponent": {
+        "type": "object",
+        "required": ["type", "label", "component"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "component": { "$ref": "#/components/schemas/GatewayLabelChild" }
+        }
+      },
+      "FileUploadComponent": {
+        "type": "object",
+        "required": ["type", "custom_id"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "custom_id": { "type": "string" },
+          "min_values": { "type": "integer" },
+          "max_values": { "type": "integer" },
+          "required": { "type": "boolean" }
+        }
+      },
+      "RadioGroupComponent": {
+        "type": "object",
+        "required": ["type", "custom_id", "options"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "custom_id": { "type": "string" },
+          "options": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewayRadioGroupOption" }
+          },
+          "required": { "type": "boolean" }
+        }
+      },
+      "CheckboxGroupComponent": {
+        "type": "object",
+        "required": ["type", "options"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "options": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewayCheckboxGroupOption" }
+          },
+          "min_values": { "type": "integer", "x-rust-type": "u8" },
+          "max_values": { "type": "integer", "x-rust-type": "u8" },
+          "required": { "type": "boolean" }
+        }
+      },
+      "CheckboxComponent": {
+        "type": "object",
+        "required": ["type", "custom_id"],
+        "properties": {
+          "type": { "$ref": "#/components/schemas/ComponentType" },
+          "id": { "type": "integer", "x-rust-type": "u32" },
+          "custom_id": { "type": "string" },
+          "default": { "type": "boolean" }
+        }
+      },
+      "Component": {
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "1": "#/components/schemas/ActionRowComponent",
+            "2": "#/components/schemas/ButtonComponent",
+            "3": "#/components/schemas/StringSelectComponent",
+            "4": "#/components/schemas/TextInputComponent",
+            "5": "#/components/schemas/UserSelectComponent",
+            "6": "#/components/schemas/RoleSelectComponent",
+            "7": "#/components/schemas/MentionableSelectComponent",
+            "8": "#/components/schemas/ChannelSelectComponent",
+            "9": "#/components/schemas/SectionComponent",
+            "10": "#/components/schemas/TextDisplayComponent",
+            "11": "#/components/schemas/ThumbnailComponent",
+            "12": "#/components/schemas/MediaGalleryComponent",
+            "13": "#/components/schemas/FileComponent",
+            "14": "#/components/schemas/SeparatorComponent",
+            "17": "#/components/schemas/ContainerComponent",
+            "18": "#/components/schemas/LabelComponent",
+            "19": "#/components/schemas/FileUploadComponent",
+            "21": "#/components/schemas/RadioGroupComponent",
+            "22": "#/components/schemas/CheckboxGroupComponent",
+            "23": "#/components/schemas/CheckboxComponent"
+          }
+        },
+        "oneOf": [
+          { "$ref": "#/components/schemas/ActionRowComponent" },
+          { "$ref": "#/components/schemas/ButtonComponent" },
+          { "$ref": "#/components/schemas/StringSelectComponent" },
+          { "$ref": "#/components/schemas/TextInputComponent" },
+          { "$ref": "#/components/schemas/UserSelectComponent" },
+          { "$ref": "#/components/schemas/RoleSelectComponent" },
+          { "$ref": "#/components/schemas/MentionableSelectComponent" },
+          { "$ref": "#/components/schemas/ChannelSelectComponent" },
+          { "$ref": "#/components/schemas/SectionComponent" },
+          { "$ref": "#/components/schemas/TextDisplayComponent" },
+          { "$ref": "#/components/schemas/ThumbnailComponent" },
+          { "$ref": "#/components/schemas/MediaGalleryComponent" },
+          { "$ref": "#/components/schemas/FileComponent" },
+          { "$ref": "#/components/schemas/SeparatorComponent" },
+          { "$ref": "#/components/schemas/ContainerComponent" },
+          { "$ref": "#/components/schemas/LabelComponent" },
+          { "$ref": "#/components/schemas/FileUploadComponent" },
+          { "$ref": "#/components/schemas/RadioGroupComponent" },
+          { "$ref": "#/components/schemas/CheckboxGroupComponent" },
+          { "$ref": "#/components/schemas/CheckboxComponent" }
+        ]
+      },
+      "GatewayConnectionProperties": {
+        "type": "object",
+        "required": ["os", "browser", "device"],
+        "properties": {
+          "os": { "type": "string" },
+          "browser": { "type": "string" },
+          "device": { "type": "string" }
+        }
+      },
+      "GatewayUnavailableGuild": {
+        "type": "object",
+        "required": ["id", "unavailable"],
+        "properties": {
+          "id": { "type": "string" },
+          "unavailable": { "type": "boolean" }
+        }
+      },
+      "GatewayApplication": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "flags": { "type": "integer", "x-rust-type": "u64" }
+        }
+      },
+      "GatewayUser": {
+        "type": "object",
+        "required": ["id", "username", "discriminator"],
+        "properties": {
+          "id": { "type": "string" },
+          "username": { "type": "string" },
+          "discriminator": { "type": "string" },
+          "global_name": { "type": "string", "nullable": true },
+          "avatar": { "type": "string", "nullable": true },
+          "bot": { "type": "boolean" },
+          "system": { "type": "boolean" },
+          "mfa_enabled": { "type": "boolean" },
+          "banner": { "type": "string", "nullable": true },
+          "accent_color": {
+            "type": "integer",
+            "nullable": true,
+            "x-rust-type": "u32"
+          },
+          "locale": { "type": "string" },
+          "verified": { "type": "boolean" },
+          "email": { "type": "string", "nullable": true },
+          "flags": { "type": "integer", "x-rust-type": "u64" },
+          "premium_type": { "type": "integer", "x-rust-type": "u8" },
+          "public_flags": { "type": "integer", "x-rust-type": "u64" },
+          "avatar_decoration_data": { "type": "object", "x-dynamic": true }
+        }
+      },
+      "GatewayPartialEmoji": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "nullable": true },
+          "name": { "type": "string", "nullable": true },
+          "animated": { "type": "boolean", "nullable": true }
+        }
+      },
+      "GatewaySelectOption": {
+        "type": "object",
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "type": "string" },
+          "value": { "type": "string" },
+          "description": { "type": "string" },
+          "emoji": { "$ref": "#/components/schemas/GatewayPartialEmoji" },
+          "default": { "type": "boolean" }
+        }
+      },
+      "GatewayUnfurledMediaItem": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": { "type": "string" },
+          "proxy_url": { "type": "string" },
+          "height": { "type": "integer", "x-rust-type": "u32" },
+          "width": { "type": "integer", "x-rust-type": "u32" },
+          "placeholder": { "type": "string" },
+          "placeholder_version": { "type": "integer", "x-rust-type": "u8" },
+          "content_type": { "type": "string" },
+          "flags": { "type": "integer", "x-rust-type": "u64" },
+          "attachment_id": { "type": "string" }
+        }
+      },
+      "GatewayMediaGalleryItem": {
+        "type": "object",
+        "required": ["media"],
+        "properties": {
+          "media": { "$ref": "#/components/schemas/GatewayUnfurledMediaItem" },
+          "description": { "type": "string", "nullable": true },
+          "spoiler": { "type": "boolean" }
+        }
+      },
+      "GatewaySectionAccessory": {
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "2": "#/components/schemas/ButtonComponent",
+            "11": "#/components/schemas/ThumbnailComponent"
+          }
+        },
+        "oneOf": [
+          { "$ref": "#/components/schemas/ButtonComponent" },
+          { "$ref": "#/components/schemas/ThumbnailComponent" }
+        ]
+      },
+      "GatewayLabelChild": {
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "3": "#/components/schemas/StringSelectComponent",
+            "4": "#/components/schemas/TextInputComponent",
+            "5": "#/components/schemas/UserSelectComponent",
+            "6": "#/components/schemas/RoleSelectComponent",
+            "7": "#/components/schemas/MentionableSelectComponent",
+            "8": "#/components/schemas/ChannelSelectComponent",
+            "19": "#/components/schemas/FileUploadComponent",
+            "21": "#/components/schemas/RadioGroupComponent",
+            "22": "#/components/schemas/CheckboxGroupComponent",
+            "23": "#/components/schemas/CheckboxComponent"
+          }
+        },
+        "oneOf": [
+          { "$ref": "#/components/schemas/StringSelectComponent" },
+          { "$ref": "#/components/schemas/TextInputComponent" },
+          { "$ref": "#/components/schemas/UserSelectComponent" },
+          { "$ref": "#/components/schemas/RoleSelectComponent" },
+          { "$ref": "#/components/schemas/MentionableSelectComponent" },
+          { "$ref": "#/components/schemas/ChannelSelectComponent" },
+          { "$ref": "#/components/schemas/FileUploadComponent" },
+          { "$ref": "#/components/schemas/RadioGroupComponent" },
+          { "$ref": "#/components/schemas/CheckboxGroupComponent" },
+          { "$ref": "#/components/schemas/CheckboxComponent" }
+        ]
+      },
+      "GatewayRadioGroupOption": {
+        "type": "object",
+        "required": ["value", "label"],
+        "properties": {
+          "value": { "type": "string" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "default": { "type": "boolean" }
+        }
+      },
+      "GatewayCheckboxGroupOption": {
+        "type": "object",
+        "required": ["value", "label"],
+        "properties": {
+          "value": { "type": "string" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "default": { "type": "boolean" }
+        }
+      },
+      "GatewayActivityTimestamps": {
+        "type": "object",
+        "properties": {
+          "start": { "type": "integer", "x-rust-type": "u64" },
+          "end": { "type": "integer", "x-rust-type": "u64" }
+        }
+      },
+      "GatewayActivityParty": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "size": {
+            "type": "array",
+            "items": { "type": "integer", "x-rust-type": "u64" }
+          }
+        }
+      },
+      "GatewayActivityAssets": {
+        "type": "object",
+        "properties": {
+          "large_image": { "type": "string" },
+          "large_text": { "type": "string" },
+          "small_image": { "type": "string" },
+          "small_text": { "type": "string" }
+        }
+      },
+      "GatewayActivitySecrets": {
+        "type": "object",
+        "properties": {
+          "join": { "type": "string" },
+          "match": { "type": "string" },
+          "spectate": { "type": "string" }
+        }
+      },
+      "GatewayActivity": {
+        "type": "object",
+        "required": ["name", "type"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": { "type": "integer", "x-rust-type": "u8" },
+          "url": { "type": "string", "nullable": true },
+          "created_at": { "type": "integer", "x-rust-type": "u64" },
+          "timestamps": { "$ref": "#/components/schemas/GatewayActivityTimestamps" },
+          "application_id": { "type": "string" },
+          "status_display_type": { "type": "integer", "x-rust-type": "u8" },
+          "details": { "type": "string", "nullable": true },
+          "details_url": { "type": "string", "nullable": true },
+          "state": { "type": "string", "nullable": true },
+          "state_url": { "type": "string", "nullable": true },
+          "emoji": { "$ref": "#/components/schemas/GatewayPartialEmoji" },
+          "party": { "$ref": "#/components/schemas/GatewayActivityParty" },
+          "assets": { "$ref": "#/components/schemas/GatewayActivityAssets" },
+          "secrets": { "$ref": "#/components/schemas/GatewayActivitySecrets" },
+          "instance": { "type": "boolean" },
+          "flags": { "type": "integer", "x-rust-type": "u64" },
+          "buttons": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "GatewayPresence": {
+        "type": "object",
+        "required": ["since", "activities", "status", "afk"],
+        "properties": {
+          "since": { "type": "integer", "nullable": true, "x-rust-type": "u64" },
+          "activities": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewayActivity" }
+          },
+          "status": { "type": "string" },
+          "afk": { "type": "boolean" }
+        }
+      },
+      "GatewayPartialGuild": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "icon": { "type": "string", "nullable": true },
+          "owner": { "type": "boolean" },
+          "permissions": { "type": "string" },
+          "features": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "GatewayPartialChannel": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "integer", "x-rust-type": "u8" },
+          "guild_id": { "type": "string", "nullable": true },
+          "name": { "type": "string", "nullable": true },
+          "parent_id": { "type": "string", "nullable": true },
+          "permissions": { "type": "string", "nullable": true }
+        }
+      },
+      "GatewayEntitlement": {
+        "type": "object",
+        "required": ["id", "sku_id", "application_id", "type", "deleted"],
+        "properties": {
+          "id": { "type": "string" },
+          "sku_id": { "type": "string" },
+          "application_id": { "type": "string" },
+          "user_id": { "type": "string", "nullable": true },
+          "type": { "type": "integer", "x-rust-type": "u8" },
+          "deleted": { "type": "boolean" },
+          "starts_at": { "type": "string", "nullable": true },
+          "ends_at": { "type": "string", "nullable": true },
+          "consumed": { "type": "boolean" }
+        }
+      },
+      "InteractionType": {
+        "type": "integer",
+        "enum": [1, 2, 3, 4, 5],
+        "x-enum-names": [
+          "Ping",
+          "ApplicationCommand",
+          "MessageComponent",
+          "ApplicationCommandAutocomplete",
+          "ModalSubmit"
+        ]
+      },
+      "Interaction": {
+        "type": "object",
+        "required": ["id", "application_id", "type", "token", "version"],
+        "properties": {
+          "id": { "type": "string" },
+          "application_id": { "type": "string" },
+          "type": { "$ref": "#/components/schemas/InteractionType" },
+          "data": { "type": "object", "x-dynamic": true },
+          "guild": { "$ref": "#/components/schemas/GatewayPartialGuild" },
+          "guild_id": { "type": "string" },
+          "channel": { "$ref": "#/components/schemas/GatewayPartialChannel" },
+          "channel_id": { "type": "string" },
+          "token": { "type": "string" },
+          "version": { "type": "integer", "x-rust-type": "u8" },
+          "app_permissions": { "type": "string" },
+          "locale": { "type": "string" },
+          "guild_locale": { "type": "string" },
+          "entitlements": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/GatewayEntitlement" }
+          },
+          "authorizing_integration_owners": {
+            "type": "object",
+            "x-dynamic": true
+          },
+          "context": { "type": "integer", "x-rust-type": "u8" },
+          "attachment_size_limit": { "type": "integer", "x-rust-type": "u64" }
+        }
+      },
+      "WebhookEvent": {
+        "type": "object",
+        "required": ["version", "application_id", "type", "event"],
+        "properties": {
+          "version": { "type": "string" },
+          "application_id": { "type": "string" },
+          "type": { "type": "integer", "x-rust-type": "u8" },
+          "event": { "type": "object", "x-dynamic": true }
+        }
+      }
+    }
+  }
+}

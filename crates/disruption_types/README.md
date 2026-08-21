@@ -10,13 +10,32 @@ Part of the [Disruption](https://github.com/H1ghBre4k3r/disruption) Discord API 
 
 `disruption_types` is the foundation of the Disruption ecosystem, providing type-safe representations of Discord's API structures. All types are serializable/deserializable with serde, making it easy to work with Discord's JSON API.
 
+## Generated wire models
+
+The generated::rest module is produced from the pinned Discord OpenAPI
+document in schema/discord-api-spec/openapi.json. Gateway, interaction,
+component, and webhook-event models are produced from
+schema/discord-extensions.json.
+
+Regenerate both modules with:
+
+    cargo run -p discord-codegen -- generate \
+      --input schema/discord-api-spec/openapi.json \
+      --output crates/disruption_types/src/generated/rest.rs
+    cargo run -p discord-codegen -- generate \
+      --input schema/discord-extensions.json \
+      --output crates/disruption_types/src/generated/gateway.rs
+
+Generated output is checked into the repository so consuming builds do not
+need network access.
+
 ## Features
 
-- **180+ Type Definitions**: Comprehensive coverage of Discord API structures
+- **Generated Wire Coverage**: REST models plus Gateway and interaction extensions
 - **Strongly Typed**: Compile-time safety for all Discord entities
 - **Serde Integration**: Full serialization/deserialization support
 - **Well Organized**: Logical module structure matching Discord's API
-- **Zero Dependencies**: Only requires serde and serde_json
+- **Small Dependency Set**: Requires serde, serde_json, and serde_repr
 - **Lightweight**: Minimal overhead, pure data structures
 
 ## Type Coverage

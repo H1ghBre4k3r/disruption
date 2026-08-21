@@ -12,7 +12,7 @@ readme = "README.md"
 name = "disruption"
 
 [workspace]
-members = ["crates/*"]
+members = ["crates/*", "tools/discord-codegen"]
 
 [dependencies]
 disruption_types = { version = "0.2.0", path = "./crates/disruption_types" }
